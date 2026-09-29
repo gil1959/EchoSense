@@ -1,0 +1,416 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Dokumen Wireframe Low-Fidelity #03 - Halaman Pengaturan Preferensi</title>
+<!-- Tailwind CSS CDN with forms and container queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['"JetBrains Mono"', 'Menlo', 'Consolas', '"Courier New"', 'monospace'],
+            sans: ['"Inter"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+          },
+          colors: {
+            wire: {
+              bg: '#f3f4f6',
+              paper: '#ffffff',
+              dark: '#1e242b',
+              gray: '#9ca3af',
+              lightGray: '#d1d5db',
+              border: '#2b2f38',
+              line: '#374151'
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="technical-wireframe-tokens">
+    /* Global Monospace & Pixel Alignment for Wireframe Fidelity */
+    body {
+      font-feature-settings: "liga" 0;
+      -webkit-font-smoothing: antialiased;
+    }
+    .slider-track {
+      background: #cbd5e1;
+      height: 10px;
+      position: relative;
+    }
+    .slider-fill {
+      background: #1f2937;
+      height: 100%;
+    }
+  </style>
+</head>
+<body class="bg-[#eef1f5] text-[#111827] font-mono p-4 md:p-8 min-h-screen">
+<div class="max-w-[1520px] mx-auto space-y-6">
+<!-- BEGIN: DocumentHeader -->
+<header class="border-b-2 border-gray-400 pb-5 space-y-3">
+<!-- Tag / Badge -->
+<div>
+<span class="inline-block bg-[#1f2937] text-white text-[11px] font-semibold px-2 py-1 tracking-wider uppercase">
+          Dokumen Wireframe Low-Fidelity #03
+        </span>
+</div>
+<!-- Main Document Title -->
+<h1 class="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">
+        HALAMAN 2: Pengaturan Preferensi Audio &amp; Peringatan
+      </h1>
+<!-- Subtitle Specification -->
+<p class="text-xs md:text-sm text-gray-600">
+        Personalisasi tempo, pitch, intensitas, instrumen, bahasa narasi, mode pemutaran, dan ambang peringatan
+      </p>
+<!-- Checkbox Legend -->
+<div class="flex items-center gap-6 pt-1 text-xs">
+<label class="flex items-center gap-2 cursor-default select-none">
+<span class="w-3.5 h-3.5 border border-gray-700 inline-block bg-white"></span>
+<span class="">Grayscale Only</span>
+</label>
+<label class="flex items-center gap-2 cursor-default select-none">
+<span class="w-3.5 h-3.5 border border-gray-700 bg-white flex items-center justify-center font-bold text-[10px]">✕</span>
+<span class="">[X] Placeholder Visual</span>
+</label>
+</div>
+</header>
+<!-- END: DocumentHeader -->
+<!-- BEGIN: ViewportsContainer -->
+<main class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-2">
+<!-- ======================================================== -->
+<!-- BEGIN: LeftViewport (DESKTOP VERSION)                     -->
+<!-- ======================================================== -->
+<section class="lg:col-span-8 flex flex-col space-y-2">
+<!-- Top Meta Bar -->
+<div class="flex justify-between items-center text-[11px] text-gray-600">
+<div class="flex items-center gap-2">
+<span class="bg-[#9ca3af] text-white px-1.5 py-0.5 font-bold uppercase text-[10px]">Desktop Version</span>
+<span class="">Breakpoint: 1440px (Tampilan Penskalaan)</span>
+</div>
+<span class="">Aspect: 16:10 standard</span>
+</div>
+<!-- Desktop Mockup Outer Frame -->
+<div class="bg-white border-2 border-[#1f2937] shadow-sm flex flex-col">
+<!-- Browser Address Bar Strip -->
+<div class="bg-[#e5e7eb] border-b border-gray-400 px-4 py-2 flex items-center gap-3">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-gray-400 inline-block"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-gray-400 inline-block"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-gray-400 inline-block"></span>
+</div>
+<div class="bg-white border border-gray-400 px-3 py-0.5 text-xs text-gray-700 flex-1 max-w-sm rounded-none">
+              https://echosense.id/pengaturan
+            </div>
+</div>
+<!-- Desktop Application Navbar (No Beranda, No Akun button per specs) -->
+<nav class="border-b-2 border-gray-300 px-6 py-4 flex items-center justify-between">
+<!-- Brand Component -->
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 border border-dashed border-gray-800 flex items-center justify-center font-bold text-xs">
+                [L]
+              </div>
+<div class="leading-tight">
+<div class="font-black text-sm tracking-wider">ECHOSENSE</div>
+<div class="text-[9px] text-gray-500 uppercase tracking-tight">Sonifikasi Lingkungan Aksesibel</div>
+</div>
+</div>
+<!-- Navbar Links -->
+<div class="flex items-center gap-8 text-xs font-semibold">
+<a class="text-gray-500 hover:text-black" href="#">Dashboard</a>
+<a class="text-black border-b-2 border-black pb-0.5" href="#">Pengaturan</a>
+<a class="text-gray-500 hover:text-black" href="#">Riwayat</a>
+<a class="text-gray-500 hover:text-black" href="#">Peringatan</a>
+</div>
+</nav>
+<!-- Desktop Content Area -->
+<div class="p-8 space-y-6">
+<!-- Page Header -->
+<div>
+<h2 class="text-lg font-bold tracking-tight uppercase">PENGATURAN PREFERENSI</h2>
+<div class="w-48 h-1.5 bg-gray-300 mt-2"></div>
+</div>
+<!-- Main Split Grid Configuration Boxes -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Left Panel: Sonifikasi & Narasi -->
+<div class="border-2 border-gray-800 p-5 space-y-5 bg-white">
+<h3 class="text-xs font-bold uppercase tracking-wider text-black">SONIFIKASI &amp; NARASI</h3>
+<!-- Sliders Group -->
+<div class="space-y-3.5 text-xs">
+<!-- Tempo -->
+<div class="flex items-center justify-between gap-4">
+<span class="w-24 font-medium">Tempo</span>
+<div class="flex-1 slider-track">
+<div class="slider-fill w-[60%]"></div>
+</div>
+</div>
+<!-- Pitch -->
+<div class="flex items-center justify-between gap-4">
+<span class="w-24 font-medium">Pitch</span>
+<div class="flex-1 slider-track">
+<div class="slider-fill w-[45%]"></div>
+</div>
+</div>
+<!-- Intensitas -->
+<div class="flex items-center justify-between gap-4">
+<span class="w-24 font-medium">Intensitas</span>
+<div class="flex-1 slider-track">
+<div class="slider-fill w-[70%]"></div>
+</div>
+</div>
+</div>
+<!-- Dropdown: Instrumen -->
+<div class="space-y-1 text-xs pt-1">
+<label class="block font-bold text-[11px] uppercase tracking-wide">INSTRUMEN</label>
+<div class="border border-gray-800 px-3 py-2 flex items-center justify-between cursor-default">
+<span class="">Piano</span>
+<span class="text-[10px]">v</span>
+</div>
+</div>
+<!-- Dropdown: Bahasa Narasi -->
+<div class="space-y-1 text-xs">
+<label class="block font-bold text-[11px] uppercase tracking-wide">BAHASA NARASI</label>
+<div class="border border-gray-800 px-3 py-2 flex items-center justify-between cursor-default">
+<span class="">Bahasa Indonesia</span>
+<span class="text-[10px]">v</span>
+</div>
+</div>
+<!-- Radio Options: Mode Pemutaran -->
+<div class="space-y-2 text-xs pt-1">
+<div class="font-bold text-[11px] uppercase tracking-wide">MODE PEMUTARAN</div>
+<div class="space-y-1.5 pl-1">
+<div class="flex items-center gap-2">
+<span class="font-bold">(x)</span>
+<span class="">Bersamaan (sonifikasi + suara)</span>
+</div>
+<div class="flex items-center gap-2 text-gray-700">
+<span class="">(&nbsp;&nbsp;)</span>
+<span class="">Berurutan</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Panel: Peringatan Lingkungan -->
+<div class="border-2 border-gray-800 p-5 space-y-4 bg-white flex flex-col justify-between">
+<div>
+<h3 class="text-xs font-bold uppercase tracking-wider text-black pb-3">PERINGATAN LINGKUNGAN</h3>
+<!-- Ambang Kondisi Checkboxes -->
+<div class="space-y-2.5 text-xs">
+<div class="flex items-center gap-2.5">
+<span class="font-bold">[x]</span>
+<span class="">Polusi udara tinggi (AQI &gt; 150)</span>
+</div>
+<div class="flex items-center gap-2.5">
+<span class="font-bold">[x]</span>
+<span class="">Cuaca berbahaya</span>
+</div>
+<div class="flex items-center gap-2.5 text-gray-700">
+<span class="">[&nbsp;&nbsp;]</span>
+<span class="">Lalu lintas berat</span>
+</div>
+</div>
+<!-- Separator Line -->
+<hr class="border-gray-300 my-4">
+<!-- Jenis Notifikasi -->
+<div class="space-y-2 text-xs">
+<div class="font-bold text-[11px] uppercase tracking-wide">JENIS NOTIFIKASI</div>
+<div class="space-y-1.5 pl-1">
+<div class="flex items-center gap-2.5">
+<span class="font-bold">[x]</span>
+<span class="">Audio</span>
+</div>
+<div class="flex items-center gap-2.5">
+<span class="font-bold">[x]</span>
+<span class="">Haptic</span>
+</div>
+</div>
+</div>
+<!-- Separator Line -->
+<hr class="border-gray-300 my-4">
+<!-- Lokasi Dipantau -->
+<div class="space-y-2 text-xs">
+<div class="font-bold text-[11px] uppercase tracking-wide">LOKASI DIPANTAU</div>
+<div class="flex items-center gap-4 pl-1">
+<div class="flex items-center gap-1.5">
+<span class="font-bold">[x]</span>
+<span class="">Jakarta</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="font-bold">[x]</span>
+<span class="">Bandung</span>
+</div>
+<div class="flex items-center gap-1.5 text-gray-700">
+<span class="">[&nbsp;&nbsp;]</span>
+<span class="">Surabaya</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Action Button Row -->
+<div class="flex flex-wrap items-center gap-3 pt-2">
+<button class="bg-[#1f2937] text-white border-2 border-[#1f2937] px-6 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-black transition-colors">
+                SIMPAN PENGATURAN
+              </button>
+<button class="bg-white text-gray-900 border-2 border-gray-800 px-6 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-gray-100 transition-colors">
+                PRATINJAU SUARA
+              </button>
+<button class="bg-white text-gray-900 border-2 border-gray-800 px-6 py-2.5 text-xs font-bold uppercase tracking-wider hover:bg-gray-100 transition-colors">
+                SETEL ULANG
+              </button>
+</div>
+</div>
+</div>
+</section>
+<!-- END: LeftViewport -->
+<!-- ======================================================== -->
+<!-- BEGIN: RightViewport (MOBILE 375px VERSION)               -->
+<!-- ======================================================== -->
+<section class="lg:col-span-4 flex flex-col space-y-2">
+<!-- Top Meta Bar -->
+<div class="flex justify-between items-center text-[11px] text-gray-600">
+<div class="flex items-center gap-2">
+<span class="bg-[#9ca3af] text-white px-1.5 py-0.5 font-bold uppercase text-[10px]">Mobile Version</span>
+<span class="">375px Stack</span>
+</div>
+<span class="">Single-col</span>
+</div>
+<!-- Phone Handset Container Mockup -->
+<div class="w-full max-w-[390px] mx-auto bg-white border-[3px] border-[#1f2937] rounded-[32px] overflow-hidden shadow-sm p-3">
+<!-- Inner Phone Screen Area -->
+<div class="border border-gray-300 rounded-[22px] p-3 space-y-4 bg-white flex flex-col">
+<!-- Mobile Speaker Slit / Camera Notch -->
+<div class="flex justify-center mb-1">
+<div class="w-20 h-3.5 bg-[#1f2937] rounded-full"></div>
+</div>
+<!-- Mobile Navigation Bar (No Beranda, No Akun) -->
+<div class="border-b border-gray-300 pb-2.5 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 border border-dashed border-gray-800 flex items-center justify-center font-bold text-[10px]">
+                  [L]
+                </div>
+<span class="font-black text-xs tracking-wider">ECHOSENSE</span>
+</div>
+<!-- Mobile Hamburger Menu -->
+<div class="border border-gray-800 w-7 h-7 flex flex-col justify-center items-center gap-1 cursor-pointer">
+<span class="w-4 h-[1.5px] bg-black"></span>
+<span class="w-4 h-[1.5px] bg-black"></span>
+<span class="w-4 h-[1.5px] bg-black"></span>
+</div>
+</div>
+<!-- Mobile Section Title -->
+<div>
+<h2 class="text-xs font-bold tracking-tight uppercase">PENGATURAN PREFERENSI</h2>
+</div>
+<!-- Card 1: Sonifikasi & Narasi -->
+<div class="border-2 border-gray-800 p-3 space-y-3.5">
+<h3 class="text-[11px] font-bold uppercase tracking-wider text-black border-b border-gray-200 pb-1">
+                SONIFIKASI &amp; NARASI
+              </h3>
+<!-- Sliders with Percentage Indicators -->
+<div class="space-y-2.5 text-[10px]">
+<!-- Tempo -->
+<div class="flex items-center gap-2">
+<span class="w-16">Tempo</span>
+<div class="flex-1 slider-track h-2">
+<div class="slider-fill w-[60%]"></div>
+</div>
+<span class="w-8 text-right text-gray-500">60%</span>
+</div>
+<!-- Pitch -->
+<div class="flex items-center gap-2">
+<span class="w-16">Pitch</span>
+<div class="flex-1 slider-track h-2">
+<div class="slider-fill w-[45%]"></div>
+</div>
+<span class="w-8 text-right text-gray-500">45%</span>
+</div>
+<!-- Intensitas -->
+<div class="flex items-center gap-2">
+<span class="w-16">Intensitas</span>
+<div class="flex-1 slider-track h-2">
+<div class="slider-fill w-[70%]"></div>
+</div>
+<span class="w-8 text-right text-gray-500">70%</span>
+</div>
+</div>
+<!-- Instrumen Select -->
+<div class="space-y-1">
+<label class="block text-[9px] font-bold uppercase tracking-wide">INSTRUMEN</label>
+<div class="border border-gray-800 px-2 py-1.5 text-[10px] flex justify-between items-center">
+<span class="">Piano</span>
+<span class="">v</span>
+</div>
+</div>
+<!-- Bahasa Narasi Select -->
+<div class="space-y-1">
+<label class="block text-[9px] font-bold uppercase tracking-wide">BAHASA NARASI</label>
+<div class="border border-gray-800 px-2 py-1.5 text-[10px] flex justify-between items-center">
+<span class="">Bahasa Indonesia</span>
+<span class="">v</span>
+</div>
+</div>
+<!-- Mode Pemutaran Options -->
+<div class="space-y-1 pt-1">
+<div class="text-[9px] font-bold uppercase tracking-wide">MODE PEMUTARAN</div>
+<div class="space-y-1 text-[10px] pl-1">
+<div class="flex items-center gap-2">
+<span class="">(x)</span>
+<span class="">Bersamaan</span>
+</div>
+<div class="flex items-center gap-2 text-gray-600">
+<span class="">(&nbsp;&nbsp;)</span>
+<span class="">Berurutan</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2: Peringatan -->
+<div class="border-2 border-gray-800 p-3 space-y-3">
+<h3 class="text-[11px] font-bold uppercase tracking-wider text-black border-b border-gray-200 pb-1">
+                PERINGATAN
+              </h3>
+<div class="space-y-1.5 text-[10px]">
+<div class="flex items-center gap-2">
+<span class="font-bold">[x]</span>
+<span class="">Polusi udara tinggi</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-bold">[x]</span>
+<span class="">Cuaca berbahaya</span>
+</div>
+<div class="flex items-center gap-2 text-gray-600">
+<span class="">[&nbsp;&nbsp;]</span>
+<span class="">Lalu lintas berat</span>
+</div>
+</div>
+<div class="flex items-center gap-3 pt-1 border-t border-gray-200 text-[10px]">
+<div class="flex items-center gap-1.5">
+<span class="font-bold">[x]</span>
+<span class="">Audio</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="font-bold">[x]</span>
+<span class="">Haptic</span>
+</div>
+</div>
+</div>
+<!-- Mobile Bottom Action Buttons -->
+<div class="space-y-2 pt-1">
+<button class="w-full bg-[#1f2937] text-white py-2.5 text-xs font-bold uppercase tracking-wider text-center">
+                SIMPAN PENGATURAN
+              </button>
+<button class="w-full bg-white text-gray-900 border-2 border-gray-800 py-2 text-xs font-bold uppercase tracking-wider text-center">
+                PRATINJAU SUARA
+              </button>
+</div>
+</div>
+</div>
+</section>
+<!-- END: RightViewport -->
+</main>
+<!-- END: ViewportsContainer -->
+</div>
+
+
+</body></html>

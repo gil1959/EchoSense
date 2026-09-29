@@ -1,0 +1,426 @@
+<!DOCTYPE html><html lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Dokumen Wireframe Low-Fidelity #02 - EchoSense</title>
+<!-- Load Tailwind CSS v3 with forms & container queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;display=swap" rel="stylesheet">
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['"JetBrains Mono"', 'monospace', 'Courier New'],
+          },
+          colors: {
+            canvas: '#E5E7EB',
+            wireframe: {
+              card: '#FFFFFF',
+              dark: '#181A1F',
+              border: '#27272A',
+              muted: '#9CA3AF',
+              bar: '#D1D5DB'
+            }
+          }
+        }
+      }
+    }
+  </script>
+<!-- BEGIN: Custom Styling for Technical Blueprint -->
+<style data-purpose="technical-blueprint-styling">
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background-color: #E2E8F0;
+      color: #111827;
+      -webkit-font-smoothing: antialiased;
+    }
+    .dashed-wire-box {
+      border: 1.5px dashed #4B5563;
+    }
+    .skeleton-line {
+      height: 6px;
+      background-color: #CBD5E1;
+      border-radius: 1px;
+    }
+    .slider-track {
+      height: 6px;
+      background-color: #E2E8F0;
+      position: relative;
+    }
+    .slider-fill {
+      height: 100%;
+      background-color: #1E293B;
+    }
+  </style>
+<!-- END: Custom Styling for Technical Blueprint -->
+</head>
+<body class="p-4 md:p-8 min-h-screen text-xs select-none">
+<!-- BEGIN: Master Document Container -->
+<div class="max-w-[1720px] mx-auto bg-[#F8FAFC] border-2 border-zinc-800 p-6 shadow-2xl rounded-sm" data-purpose="document-canvas">
+<!-- BEGIN: Document Header & Metadata -->
+<header class="mb-6" data-purpose="document-header">
+<!-- Badge ID -->
+<div class="inline-block bg-zinc-900 text-white text-[10px] font-bold px-2 py-0.5 tracking-wider uppercase mb-2">
+        DOKUMEN WIREFRAME LOW-FIDELITY #02
+      </div>
+<!-- Main Title -->
+<h1 class="text-xl md:text-2xl font-extrabold uppercase tracking-tight text-zinc-900">
+        HALAMAN 1: Dashboard Utama / Kontrol Audio
+      </h1>
+<!-- Subtitle Description -->
+<p class="text-[11px] text-zinc-600 font-semibold mt-1">
+        EchoSense - Sonifikasi Lingkungan Real-time • Format Komparasi Bersebelahan (Desktop 1440px vs Mobile 375px)
+      </p>
+<!-- Meta Bar & Legend -->
+<div class="mt-3 flex flex-wrap items-center justify-between gap-3 text-[10px] text-zinc-700 font-medium">
+<div class="flex items-center space-x-2">
+<span class="">Sidebar Lokasi</span>
+<span class="">•</span>
+<span class="">Audio Control (Play/Pause 44px+)</span>
+<span class="">•</span>
+<span class="">Data Panel Expandable</span>
+<span class="">•</span>
+<span class="">Keyboard Shortcuts</span>
+</div>
+<!-- Interactive Style Spec Checkboxes -->
+<div class="flex items-center space-x-4 border border-zinc-400 bg-white px-3 py-1">
+<label class="flex items-center space-x-1.5 cursor-default">
+<span class="w-3 h-3 border border-zinc-700 inline-block bg-white"></span>
+<span class="">Grayscale Only</span>
+</label>
+<span class="text-zinc-400">|</span>
+<label class="flex items-center space-x-1.5 cursor-default">
+<span class="w-3 h-3 border border-zinc-900 inline-flex items-center justify-center font-bold text-[9px] bg-zinc-100">✕</span>
+<span class="">Placeholder Visual</span>
+</label>
+</div>
+</div>
+<!-- Canvas Horizontal Divider -->
+<div class="h-0.5 bg-zinc-800 w-full mt-4"></div>
+</header>
+<!-- END: Document Header & Metadata -->
+<!-- BEGIN: Side-By-Side Comparison Grid -->
+<main class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start" data-purpose="wireframe-comparison-container">
+<!-- ================================================================= -->
+<!-- BEGIN: Desktop Viewport (1440px Scaled) -->
+<!-- ================================================================= -->
+<section class="lg:col-span-8 flex flex-col" data-purpose="desktop-viewport-container">
+<!-- Desktop Metadata Header Bar -->
+<div class="flex justify-between items-center text-[10px] font-bold tracking-wider uppercase mb-1.5 text-zinc-600">
+<div class="flex items-center space-x-3">
+<span class="bg-zinc-300 text-zinc-900 px-2 py-0.5 border border-zinc-400">DESKTOP VERSION</span>
+<span class="">Breakpoint: 1440px (Tampilan Penskalaan)</span>
+</div>
+<span class="">Aspect: 16:10 standard</span>
+</div>
+<!-- Desktop Mockup Frame -->
+<div class="bg-white border-2 border-zinc-900 shadow-md flex flex-col">
+<!-- Mockup Window Bar & URL -->
+<div class="bg-zinc-200 border-b border-zinc-900 px-3 py-2 flex items-center space-x-3">
+<div class="flex space-x-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-zinc-400 border border-zinc-500"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-zinc-400 border border-zinc-500"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-zinc-400 border border-zinc-500"></span>
+</div>
+<!-- Scaled Browser Address Bar -->
+<div class="flex-1 max-w-sm mx-auto bg-white border border-zinc-400 text-center py-0.5 px-3 text-[10px] text-zinc-600 truncate font-mono">
+              https://echosense.id/dashboard
+            </div>
+</div>
+<!-- Desktop Navigation Bar -->
+<nav class="border-b border-zinc-800 px-6 py-3 flex items-center justify-between bg-white" data-purpose="desktop-navbar">
+<!-- Brand Component -->
+<div class="flex items-center space-x-2.5">
+<div class="w-7 h-7 border border-zinc-800 flex items-center justify-center font-bold text-xs uppercase bg-zinc-50">
+                [L]
+              </div>
+<div class="leading-none">
+<div class="font-black text-sm tracking-wider uppercase text-zinc-900">ECHOSENSE</div>
+<div class="text-[8px] text-zinc-500 font-semibold tracking-tight uppercase">SONIFIKASI LINGKUNGAN AKSESIBEL</div>
+</div>
+</div>
+<!-- Main Navigation Links (No Akun, No Beranda) -->
+<ul class="flex items-center space-x-6 text-[11px] font-semibold text-zinc-700">
+<li class="border-b-2 border-zinc-950 pb-0.5 text-zinc-950 font-bold">Dashboard</li>
+<li class="hover:text-zinc-950 cursor-pointer">Pengaturan</li>
+<li class="hover:text-zinc-950 cursor-pointer">Riwayat</li>
+<li class="hover:text-zinc-950 cursor-pointer">Peringatan</li>
+</ul>
+</nav>
+<!-- Desktop Main Workspace Grid -->
+<div class="p-6 grid grid-cols-12 gap-6 bg-white min-h-[580px]" data-purpose="desktop-content-grid">
+<!-- LEFT SIDEBAR: Lokasi Tersimpan (col-3) -->
+<aside class="col-span-3 border-r border-zinc-200 pr-5 flex flex-col justify-between" data-purpose="desktop-sidebar">
+<div class="space-y-2.5">
+<div class="text-[9px] uppercase tracking-wider font-extrabold text-zinc-500 mb-2">
+                  LOKASI TERSIMPAN
+                </div>
+<!-- Active Location Item -->
+<button class="w-full text-left px-3 py-2.5 bg-zinc-900 text-white font-bold text-[11px] border border-zinc-900 flex items-center justify-between">
+<span class="">Jakarta (saat ini)</span>
+<span class="text-[9px] text-zinc-300">●</span>
+</button>
+<!-- Outline Inactive Items -->
+<button class="w-full text-left px-3 py-2.5 bg-white text-zinc-800 font-medium text-[11px] border border-zinc-800 hover:bg-zinc-50">
+                  Bandung
+                </button>
+<button class="w-full text-left px-3 py-2.5 bg-white text-zinc-800 font-medium text-[11px] border border-zinc-800 hover:bg-zinc-50">
+                  Surabaya
+                </button>
+</div>
+<!-- Add Location CTA -->
+<button class="w-full text-center py-2.5 border border-dashed border-zinc-800 font-bold text-[10px] text-zinc-800 hover:bg-zinc-100 transition-colors">
+                [ + TAMBAH LOKASI ]
+              </button>
+</aside>
+<!-- RIGHT CONTENT AREA (col-9) -->
+<div class="col-span-9 flex flex-col space-y-4" data-purpose="desktop-main-panels">
+<!-- 1. KONTROL AUDIO PANEL -->
+<section class="border border-zinc-900 p-4 bg-white" data-purpose="desktop-audio-controller">
+<div class="flex items-center justify-between text-[9px] font-bold uppercase text-zinc-500 tracking-wider mb-2">
+<span class="">KONTROL AUDIO</span>
+<span class="text-zinc-600 font-normal">Diperbarui: 14:35 WIB</span>
+</div>
+<div class="text-xs font-bold text-zinc-900 mb-3">
+                  Saat ini: Jakarta, ID
+                </div>
+<!-- Play / Pause Master Button -->
+<button class="w-full py-3 bg-zinc-900 text-white font-extrabold text-xs tracking-wider flex items-center justify-center space-x-3 border border-zinc-900 shadow-inner hover:bg-black">
+<span class="">PLAY / PAUSE</span>
+<span class="bg-zinc-800 px-1.5 py-0.5 text-[9px] font-normal text-zinc-300 border border-zinc-700">[Spasi]</span>
+</button>
+<!-- Audio Sliders Controls -->
+<div class="mt-4 space-y-2 text-[10px]">
+<!-- Volume Slider -->
+<div class="flex items-center justify-between">
+<span class="w-14 text-zinc-600 font-medium">Volume</span>
+<div class="flex-1 mx-3 slider-track border border-zinc-300">
+<div class="slider-fill w-[80%]"></div>
+</div>
+<span class="w-8 text-right font-mono text-zinc-600">80%</span>
+</div>
+<!-- Progres Slider -->
+<div class="flex items-center justify-between">
+<span class="w-14 text-zinc-600 font-medium">Progres</span>
+<div class="flex-1 mx-3 slider-track border border-zinc-300">
+<div class="slider-fill w-[35%]"></div>
+</div>
+<span class="w-8 text-right font-mono text-zinc-600">35%</span>
+</div>
+</div>
+<!-- Sub-action Controls -->
+<div class="mt-4 flex space-x-3 pt-1">
+<button class="px-4 py-1.5 border border-zinc-900 text-[10px] font-bold hover:bg-zinc-100">
+                    ULANG
+                  </button>
+<button class="px-4 py-1.5 border border-zinc-900 text-[10px] font-bold hover:bg-zinc-100">
+                    LOKASI BERIKUTNYA →
+                  </button>
+</div>
+</section>
+<!-- 2. RINGKASAN SUARA AI (30-60 DETIK) -->
+<section class="border border-zinc-900 p-4 bg-white" data-purpose="desktop-voice-summary">
+<div class="text-[9px] font-extrabold uppercase tracking-wider text-zinc-900 mb-3">
+                  RINGKASAN SUARA AI (30-60 DETIK)
+                </div>
+<!-- Skeleton Text Wireframe Lines -->
+<div class="space-y-2.5">
+<div class="skeleton-line w-full"></div>
+<div class="skeleton-line w-[96%]"></div>
+<div class="skeleton-line w-[45%]"></div>
+</div>
+</section>
+<!-- 3. DATA PANELS ROW (3 CARDS) -->
+<div class="grid grid-cols-3 gap-3" data-purpose="desktop-metrics-row">
+<!-- Card 1: Kualitas Udara -->
+<div class="border border-zinc-900 p-3 bg-white flex flex-col justify-between h-28">
+<div>
+<div class="text-[8px] uppercase tracking-wider font-extrabold text-zinc-500">KUALITAS UDARA</div>
+<div class="text-xs font-black text-zinc-900 mt-1">AQI 80 (Sedang)</div>
+<div class="text-[9px] text-zinc-600 mt-0.5">PM2.5: 35 | PM10: 55</div>
+</div>
+<div class="text-[8px] text-zinc-400 font-mono">[ expandable: ketuk untuk detail ]</div>
+</div>
+<!-- Card 2: Cuaca -->
+<div class="border border-zinc-900 p-3 bg-white flex flex-col justify-between h-28">
+<div>
+<div class="text-[8px] uppercase tracking-wider font-extrabold text-zinc-500">CUACA</div>
+<div class="text-xs font-black text-zinc-900 mt-1">Cerah Berawan, 28°C</div>
+<div class="text-[9px] text-zinc-600 mt-0.5">Kelembapan: 65% | Angin: 12 km/j</div>
+</div>
+<div class="text-[8px] text-zinc-400 font-mono">[ expandable: ketuk untuk detail ]</div>
+</div>
+<!-- Card 3: Lalu Lintas -->
+<div class="border border-zinc-900 p-3 bg-white flex flex-col justify-between h-28">
+<div>
+<div class="text-[8px] uppercase tracking-wider font-extrabold text-zinc-500">LALU LINTAS</div>
+<div class="text-xs font-black text-zinc-900 mt-1">Lancar</div>
+<div class="text-[9px] text-zinc-600 mt-0.5">Kecepatan rata-rata: 45 km/j</div>
+</div>
+<div class="text-[8px] text-zinc-400 font-mono">[ expandable: ketuk untuk detail ]</div>
+</div>
+</div>
+<!-- Keyboard Shortcuts Helper Bar -->
+<footer class="border border-zinc-400 bg-zinc-50 p-2 text-[9px] text-zinc-600 flex items-center space-x-3 font-mono">
+<span class="border border-zinc-300 bg-white px-1.5 py-0.5 font-bold">[Spasi] Play/Pause</span>
+<span class="border border-zinc-300 bg-white px-1.5 py-0.5 font-bold">[H] Bantuan</span>
+<span class="border border-zinc-300 bg-white px-1.5 py-0.5 font-bold">[S] Pengaturan</span>
+</footer>
+</div>
+</div>
+</div>
+</section>
+<!-- END: Desktop Viewport -->
+<!-- ================================================================= -->
+<!-- BEGIN: Mobile Viewport (375px Stack) -->
+<!-- ================================================================= -->
+<section class="lg:col-span-4 flex flex-col" data-purpose="mobile-viewport-container">
+<!-- Mobile Metadata Header Bar -->
+<div class="flex justify-between items-center text-[10px] font-bold tracking-wider uppercase mb-1.5 text-zinc-600">
+<div class="flex items-center space-x-2">
+<span class="bg-zinc-300 text-zinc-900 px-2 py-0.5 border border-zinc-400">MOBILE VERSION</span>
+<span class="">375px Stack</span>
+</div>
+<span class="">Single-col</span>
+</div>
+<!-- Realistic Mobile Phone Chassis -->
+<div class="bg-white border-2 border-zinc-900 rounded-[2rem] p-3 shadow-md w-full max-w-[375px] mx-auto flex flex-col">
+<!-- Speaker Slit / Top Notch -->
+<div class="w-full flex justify-center items-center pb-2 pt-1">
+<div class="w-16 h-1 bg-zinc-800 rounded-full"></div>
+</div>
+<!-- Screen Inner Frame -->
+<div class="border border-zinc-800 rounded-xl overflow-hidden flex flex-col bg-white">
+<!-- Mobile Header / Top Bar -->
+<div class="border-b border-zinc-800 p-3 flex items-center justify-between bg-white" data-purpose="mobile-navbar">
+<div class="flex items-center space-x-2">
+<div class="w-6 h-6 border border-zinc-800 flex items-center justify-center font-bold text-[10px]">
+                  [L]
+                </div>
+<span class="font-extrabold text-xs tracking-wider uppercase text-zinc-900">ECHOSENSE</span>
+</div>
+<!-- Mobile Hamburger Menu Icon (No Akun) -->
+<button class="w-7 h-7 border border-zinc-800 flex flex-col justify-center items-center space-y-1">
+<span class="w-4 h-0.5 bg-zinc-900"></span>
+<span class="w-4 h-0.5 bg-zinc-900"></span>
+<span class="w-4 h-0.5 bg-zinc-900"></span>
+</button>
+</div>
+<!-- Mobile Main Scrollable Workspace -->
+<div class="p-3.5 space-y-3.5 bg-white text-[10px]" data-purpose="mobile-content-stream">
+<!-- Location Select Dropdown -->
+<div>
+<label class="block text-[8px] uppercase tracking-wider font-extrabold text-zinc-500 mb-1">PILIH LOKASI</label>
+<div class="border border-zinc-800 p-2.5 flex items-center justify-between font-bold text-xs bg-zinc-50">
+<span class="">Jakarta (saat ini)</span>
+<span class="font-mono text-zinc-600">▼</span>
+</div>
+</div>
+<!-- Mobile Audio Control Box -->
+<div class="border border-zinc-800 p-3 space-y-2.5">
+<div class="flex justify-between items-center text-[8px] font-bold text-zinc-500 uppercase">
+<span class="">KONTROL AUDIO</span>
+</div>
+<div class="text-[10px] text-zinc-700 font-semibold border-b border-zinc-200 pb-1.5 flex justify-between">
+<span class="">Jakarta, ID</span>
+<span class="text-zinc-500">14:55 WIB</span>
+</div>
+<!-- Big Mobile Action Button (Minimum 44px height) -->
+<button class="w-full min-h-[44px] bg-zinc-900 text-white font-black text-xs uppercase flex items-center justify-center tracking-wide">
+                  PLAY / PAUSE
+                </button>
+<!-- Mobile Sliders -->
+<div class="space-y-2 pt-1 text-[9px]">
+<div class="flex items-center justify-between">
+<span class="w-12 text-zinc-600">Volume</span>
+<div class="flex-1 mx-2 slider-track border border-zinc-300">
+<div class="slider-fill w-[80%]"></div>
+</div>
+<span class="w-6 text-right font-mono">80%</span>
+</div>
+<div class="flex items-center justify-between">
+<span class="w-12 text-zinc-600">Progres</span>
+<div class="flex-1 mx-2 slider-track border border-zinc-300">
+<div class="slider-fill w-[35%]"></div>
+</div>
+<span class="w-6 text-right font-mono">35%</span>
+</div>
+</div>
+<!-- Mobile Action Sub-buttons -->
+<div class="grid grid-cols-1 gap-1.5 pt-1">
+<button class="w-full py-2 border border-zinc-800 font-bold text-[10px] text-center hover:bg-zinc-50">
+                    ULANG
+                  </button>
+<button class="w-full py-2 border border-zinc-800 font-bold text-[10px] text-center hover:bg-zinc-50">
+                    LOKASI BERIKUTNYA →
+                  </button>
+</div>
+</div>
+<!-- Mobile Summary Box -->
+<div class="border border-zinc-800 p-3 space-y-2">
+<div class="text-[8px] font-extrabold uppercase tracking-wider text-zinc-900">
+                  RINGKASAN SUARA AI
+                </div>
+<div class="space-y-1.5">
+<div class="skeleton-line w-full"></div>
+<div class="skeleton-line w-[90%]"></div>
+<div class="skeleton-line w-[40%]"></div>
+</div>
+</div>
+<!-- Stacked Data Cards for Mobile -->
+<div class="space-y-2">
+<!-- Mobile Card 1: Udara -->
+<div class="border border-zinc-800 p-2.5">
+<div class="text-[7px] uppercase tracking-wider font-extrabold text-zinc-500">KUALITAS UDARA</div>
+<div class="text-xs font-extrabold text-zinc-900 mt-0.5">AQI 80 (Sedang)</div>
+<div class="text-[8px] text-zinc-600 mt-0.5">PM2.5: 35 | PM10: 55</div>
+<div class="text-[7px] text-zinc-400 mt-1 font-mono">[ expandable: ketuk untuk detail ]</div>
+</div>
+<!-- Mobile Card 2: Cuaca -->
+<div class="border border-zinc-800 p-2.5">
+<div class="text-[7px] uppercase tracking-wider font-extrabold text-zinc-500">CUACA</div>
+<div class="text-xs font-extrabold text-zinc-900 mt-0.5">Cerah Berawan, 28°C</div>
+<div class="text-[8px] text-zinc-600 mt-0.5">Lembap 65% | Angin 12 km/j</div>
+<div class="text-[7px] text-zinc-400 mt-1 font-mono">[ expandable: ketuk untuk detail ]</div>
+</div>
+<!-- Mobile Card 3: Lalu Lintas -->
+<div class="border border-zinc-800 p-2.5">
+<div class="text-[7px] uppercase tracking-wider font-extrabold text-zinc-500">LALU LINTAS</div>
+<div class="text-xs font-extrabold text-zinc-900 mt-0.5">Lancar</div>
+<div class="text-[8px] text-zinc-600 mt-0.5">Rata-rata 45 km/j</div>
+<div class="text-[7px] text-zinc-400 mt-1 font-mono">[ expandable: ketuk untuk detail ]</div>
+</div>
+</div>
+</div>
+<!-- Mobile Bottom Navigation Bar -->
+<footer class="border-t border-zinc-800 grid grid-cols-4 bg-zinc-50 text-center py-2" data-purpose="mobile-bottom-nav">
+<div class="flex flex-col items-center justify-center space-y-1">
+<div class="w-4 h-4 border border-zinc-700 flex items-center justify-center text-[7px] font-bold">✕</div>
+<span class="text-[7px] font-semibold text-zinc-800 uppercase">Pengaturan</span>
+</div>
+<div class="flex flex-col items-center justify-center space-y-1">
+<div class="w-4 h-4 border border-zinc-700 flex items-center justify-center text-[7px] font-bold">✕</div>
+<span class="text-[7px] font-semibold text-zinc-800 uppercase">Riwayat</span>
+</div>
+<div class="flex flex-col items-center justify-center space-y-1">
+<div class="w-4 h-4 border border-zinc-700 flex items-center justify-center text-[7px] font-bold">✕</div>
+<span class="text-[7px] font-semibold text-zinc-800 uppercase">Peringatan</span>
+</div>
+<div class="flex flex-col items-center justify-center space-y-1">
+<div class="w-4 h-4 border border-zinc-700 flex items-center justify-center text-[7px] font-bold">✕</div>
+<span class="text-[7px] font-semibold text-zinc-800 uppercase">Bantuan</span>
+</div>
+</footer>
+</div>
+</div>
+</section>
+<!-- END: Mobile Viewport -->
+</main>
+<!-- END: Side-By-Side Comparison Grid -->
+</div>
+<!-- END: Master Document Container -->
+
+
+</body></html>

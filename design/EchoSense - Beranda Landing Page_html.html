@@ -1,0 +1,431 @@
+<!DOCTYPE html><html class="scroll-smooth" lang="id"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>EchoSense — Sonifikasi Lingkungan Real-time Aksesibel</title>
+<meta content="Platform sonifikasi data udara, cuaca, dan lalu lintas real-time dengan voice briefing AI 30–60 detik untuk tunanetra dan pengguna umum." name="description">
+<!-- Atkinson Hyperlegible Next Font -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS v3 CDN with forms and container-queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration Script -->
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              primary: '#033067',
+              primaryDeep: '#02244e',
+              secondary: '#0675A3',
+              sunrise: '#FEB161',
+              sunriseEnd: '#FD7659',
+              tealAccent: '#14C5D9',
+              bgLight: '#F4F9FB',
+              cardBorder: '#D6E6ED',
+              cardHover: '#EBF4F8',
+              textPrimary: '#0A1F33',
+              textSecondary: '#42586A',
+              textDark: '#F4F9FB',
+              textDarkSecondary: '#BFD9E8'
+            }
+          },
+          fontFamily: {
+            sans: ['"Atkinson Hyperlegible Next"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace']
+          },
+          keyframes: {
+            waveBar: {
+              '0%, 100%': { transform: 'scaleY(0.25)' },
+              '50%': { transform: 'scaleY(1)' }
+            }
+          },
+          animation: {
+            'bar-1': 'waveBar 1.2s ease-in-out infinite 0.1s',
+            'bar-2': 'waveBar 1.5s ease-in-out infinite 0.3s',
+            'bar-3': 'waveBar 0.9s ease-in-out infinite 0.5s',
+            'bar-4': 'waveBar 1.6s ease-in-out infinite 0.2s',
+            'bar-5': 'waveBar 1.1s ease-in-out infinite 0.4s',
+            'bar-6': 'waveBar 1.4s ease-in-out infinite 0.6s',
+            'bar-7': 'waveBar 1.0s ease-in-out infinite 0.25s'
+          },
+          borderRadius: {
+            'card': '20px'
+          }
+        }
+      }
+    };
+  </script>
+<style data-purpose="layout-and-effects">
+    body {
+      background-color: #F4F9FB;
+      color: #0A1F33;
+      font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    }
+    .hero-gradient {
+      background: linear-gradient(180deg, #033067 0%, #02437B 100%);
+    }
+    .focus-ring:focus-visible {
+      outline: 3px solid #FEB161;
+      outline-offset: 3px;
+    }
+    .focus-ring-dark:focus-visible {
+      outline: 3px solid #0675A3;
+      outline-offset: 3px;
+    }
+    .sunrise-gradient {
+      background: linear-gradient(180deg, #FEB161 0%, #FD7659 100%);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans selection:bg-brand-sunrise selection:text-brand-primary">
+<!-- BEGIN: AccessibilitySkipLink -->
+<a class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 z-50 px-5 py-3 bg-brand-sunrise text-brand-primary font-bold rounded-lg shadow-xl focus-ring" href="#main-content">
+    Lewati ke konten utama
+  </a>
+<!-- END: AccessibilitySkipLink -->
+<!-- BEGIN: MainHeader -->
+<header class="sticky top-0 z-40 w-full bg-[#033067] border-b border-[#064e8b] text-[#F4F9FB]">
+<div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+<!-- Brand Logo & Descriptor -->
+<a aria-label="EchoSense Beranda" class="group flex items-center gap-3.5 focus-ring rounded-lg p-1" href="#">
+<img alt="Logo EchoSense" class="w-10 h-10 object-contain rounded-lg bg-white p-1 shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8aTC0MhH5csrlmPF8CVK-SKs7n80QpQCxrGW0IJv57NsnVhBSAOi-CDjk1c-ORkmEr5lqDz9i76Uh6Nos4bATA9DJuBK56uyOQNUVrSAE-0GK5CCYmh5CMJTk6v0B8MnMVFevxi-1t9EnaidmBERnzPEVBMAc7e1htedwH9O-_OvQ4A7v_pLaSTpPR-pgxiWjGAUIu0jb5UQCJipgFcV4ZWgj9yi0lzYvIHYodHaHb-fEAT2uqvbFImVTpgX9JrelZA">
+<div class="flex flex-col">
+<span class="text-xl font-bold tracking-tight text-[#F4F9FB]">
+            EchoSense
+          </span>
+<span class="text-xs text-[#BFD9E8] font-normal">
+            Sonifikasi Lingkungan Aksesibel
+          </span>
+</div>
+</a>
+<!-- Desktop Navigation Menu -->
+<nav aria-label="Menu navigasi utama" class="hidden md:flex items-center gap-8">
+<a aria-current="page" class="text-base font-semibold text-[#F4F9FB] border-b-[3px] border-brand-sunrise pb-1 focus-ring" href="#beranda">
+          Beranda
+        </a>
+<a class="text-base font-medium text-[#BFD9E8] hover:text-[#F4F9FB] transition-colors focus-ring" href="#dashboard">
+          Dashboard
+        </a>
+<a class="text-base font-medium text-[#BFD9E8] hover:text-[#F4F9FB] transition-colors focus-ring" href="#fitur">
+          Fitur
+        </a>
+<a class="text-base font-medium text-[#BFD9E8] hover:text-[#F4F9FB] transition-colors focus-ring" href="#bantuan">
+          Bantuan
+        </a>
+</nav>
+<!-- Auth & Quick Access Action -->
+<div class="flex items-center gap-3">
+<button class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 text-xs font-mono rounded-lg bg-[#02244e] border border-[#064e8b] text-[#BFD9E8] hover:border-brand-sunrise hover:text-[#F4F9FB] transition-colors focus-ring" onclick="alert('Pintasan Keyboard EchoSense:\n• Spasi: Putar atau jeda sonifikasi suara\n• Alt + K: Tampilkan bantuan panduan ini\n• Tab: Navigasi tombol dan fitur aksesibel');" title="Panduan navigasi keyboard" type="button">
+<svg aria-hidden="true" class="w-4 h-4 text-brand-sunrise" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<rect height="16" rx="2" width="20" x="2" y="4"></rect>
+<path d="M6 8h.001M10 8h.001M14 8h.001M18 8h.001M6 12h.001M18 12h.001M8 16h8"></path>
+</svg>
+<span class="">Alt + K</span>
+</button>
+<a class="px-6 py-2.5 bg-brand-sunrise hover:bg-[#ffa549] text-brand-primary font-semibold text-sm rounded-[10px] shadow-sm transition-all focus-ring" href="#masuk">
+          Masuk
+        </a>
+</div>
+</div>
+</header>
+<!-- END: MainHeader -->
+<!-- BEGIN: MainContent -->
+<main class="flex-grow" id="main-content">
+<!-- BEGIN: HeroSection -->
+<section aria-labelledby="hero-heading" class="relative hero-gradient text-[#F4F9FB] py-16 lg:py-24 border-b border-[#064e8b]">
+<div class="max-w-7xl mx-auto px-6">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
+<!-- Left Column: Copywriting & Actions -->
+<div class="lg:col-span-6 space-y-6">
+<!-- Badge -->
+<div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-brand-tealAccent bg-[#02244e]/70 text-xs font-medium text-[#F4F9FB]">
+<span class="w-2 h-2 rounded-full bg-brand-sunrise"></span>
+<span class="">Audio-first, WCAG 2.1 AA</span>
+</div>
+<!-- Headline -->
+<h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-[#F4F9FB] leading-[1.15]" id="hero-heading">
+              Dengarkan Kondisi Lingkungan Anda
+            </h1>
+<!-- Descriptive Subtitle -->
+<p class="text-lg text-brand-textDarkSecondary leading-relaxed max-w-xl">
+              Sonifikasi data udara, cuaca, dan lalu lintas secara real-time yang dipadukan dengan voice briefing AI 30–60 detik. Didesain secara inklusif untuk tunanetra maupun pengguna umum.
+            </p>
+<!-- Status Indicator -->
+<div class="p-3.5 bg-[#02244e]/80 border-l-4 border-brand-sunrise rounded-r-xl border-y border-r border-[#064e8b] flex items-center justify-between text-xs text-[#BFD9E8]">
+<div class="flex items-center gap-2.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#14C5D9] animate-pulse"></span>
+<span class="">Sensor Jakarta Pusat: Indeks akustik harmonis</span>
+</div>
+<span class="font-mono text-[#FEB161]">432 Hz teralun</span>
+</div>
+<!-- CTAs -->
+<div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+<!-- Primary CTA -->
+<button class="inline-flex items-center justify-center gap-3 px-7 py-3.5 bg-brand-sunrise hover:bg-[#ffa549] text-brand-primary font-semibold text-base rounded-[10px] shadow-md transition-all focus-ring" data-purpose="btn-primary-audio" type="button">
+<svg aria-hidden="true" class="w-5 h-5 text-brand-primary" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24">
+<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+<path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+<path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+</svg>
+<span class="">Mulai Mendengarkan</span>
+</button>
+<!-- Secondary CTA -->
+<button class="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 bg-transparent hover:bg-white/10 text-[#F4F9FB] font-medium text-base rounded-[10px] border-2 border-[#F4F9FB] transition-colors focus-ring" data-purpose="btn-keyboard-guide" onclick="alert('Panduan Keyboard:\n• Spasi: Memulai / Menghentikan audio\n• Tab: Berpindah elemen fokus\n• Alt + K: Buka bantuan cepat');" type="button">
+<svg aria-hidden="true" class="w-5 h-5 text-[#F4F9FB]" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<rect height="16" rx="2" stroke-width="2" width="20" x="2" y="4"></rect>
+<path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M18 12h.01M7 16h10"></path>
+</svg>
+<span class="">Panduan Keyboard</span>
+</button>
+</div>
+<!-- Assistive Tech Shortcut Info -->
+<p class="text-xs text-[#BFD9E8] flex items-center gap-2">
+<svg class="w-4 h-4 text-brand-tealAccent shrink-0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<line x1="12" x2="12" y1="16" y2="12"></line>
+<line x1="12" x2="12.01" y1="8" y2="8"></line>
+</svg>
+<span class="">Gunakan tombol Spasi untuk putar atau jeda sonifikasi suara kapan saja.</span>
+</p>
+</div>
+<!-- Right Column: Visualizer gelombang 7 batang vertikal gradient Sunrise Pulse & panel metrik -->
+<div class="lg:col-span-6" data-purpose="visualizer-container">
+<div class="rounded-card bg-[#02244e]/95 border border-[#0675A3]/50 p-6 shadow-2xl">
+<!-- Visualizer Header Window Bar -->
+<div class="flex items-center justify-between pb-4 border-b border-[#064e8b] text-xs text-[#BFD9E8]">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-brand-sunrise"></span>
+<span class="font-medium text-[#F4F9FB]">Gelombang Sonifikasi EchoSense</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-2.5 py-0.5 rounded-full bg-brand-secondary/40 text-brand-tealAccent text-[11px] font-medium border border-brand-tealAccent/30">Siaran Aktif</span>
+<span class="font-mono text-[11px]">96.4 kHz</span>
+</div>
+</div>
+<!-- 7 Vertical Bars Visualizer with Sunrise Pulse Gradient (#FEB161 to #FD7659) -->
+<div class="py-8">
+<div class="flex items-end justify-center gap-4 sm:gap-6 h-40 px-4 border-b border-[#064e8b] pb-4">
+<!-- 7 Animated Bars -->
+<div class="w-5 sm:w-6 rounded-full sunrise-gradient h-[45%] origin-bottom animate-bar-1" title="Gelombang 1: Frekuensi Rendah"></div>
+<div class="w-5 sm:w-6 rounded-full sunrise-gradient h-[75%] origin-bottom animate-bar-2" title="Gelombang 2: Partikulat Udara"></div>
+<div class="w-5 sm:w-6 rounded-full sunrise-gradient h-[95%] origin-bottom animate-bar-3" title="Gelombang 3: Suhu Utama"></div>
+<div class="w-5 sm:w-6 rounded-full sunrise-gradient h-[60%] origin-bottom animate-bar-4" title="Gelombang 4: Dinamika Cuaca"></div>
+<div class="w-5 sm:w-6 rounded-full sunrise-gradient h-[88%] origin-bottom animate-bar-5" title="Gelombang 5: Arus Lalu Lintas"></div>
+<div class="w-5 sm:w-6 rounded-full sunrise-gradient h-[50%] origin-bottom animate-bar-6" title="Gelombang 6: Harmonik Lingkungan"></div>
+<div class="w-5 sm:w-6 rounded-full sunrise-gradient h-[35%] origin-bottom animate-bar-7" title="Gelombang 7: Ambien"></div>
+</div>
+<!-- Frequency Spectral Range Tags -->
+<div class="flex justify-between text-xs font-mono text-[#BFD9E8] px-2 pt-3">
+<span class="">20 Hz</span>
+<span class="">Frekuensi Suara Harmonis</span>
+<span class="">16 kHz</span>
+</div>
+</div>
+<!-- Compact Environmental Metric Panel -->
+<div class="grid grid-cols-3 gap-3 pt-2">
+<!-- Card 1: AQI -->
+<div class="p-3 rounded-xl bg-[#033067] border border-[#064e8b]">
+<div class="flex items-center justify-between text-xs text-[#BFD9E8]">
+<span class="">Udara</span>
+<span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+</div>
+<div class="mt-1 text-base sm:text-lg font-bold text-[#F4F9FB]">42 <span class="text-xs font-normal text-emerald-300">Baik</span></div>
+<div class="text-[11px] text-[#BFD9E8] mt-0.5">Nada harmonis stabil</div>
+</div>
+<!-- Card 2: Suhu & Cuaca -->
+<div class="p-3 rounded-xl bg-[#033067] border border-[#064e8b]">
+<div class="flex items-center justify-between text-xs text-[#BFD9E8]">
+<span class="">Suhu</span>
+<span class="w-2 h-2 rounded-full bg-sky-400"></span>
+</div>
+<div class="mt-1 text-base sm:text-lg font-bold text-[#F4F9FB]">28°C <span class="text-xs font-normal text-sky-300">Cerah</span></div>
+<div class="text-[11px] text-[#BFD9E8] mt-0.5">Frekuensi konstan</div>
+</div>
+<!-- Card 3: Status Sonik -->
+<div class="p-3 rounded-xl bg-[#033067] border border-[#064e8b]">
+<div class="flex items-center justify-between text-xs text-[#BFD9E8]">
+<span class="">Kebisingan</span>
+<span class="w-2 h-2 rounded-full bg-brand-sunrise"></span>
+</div>
+<div class="mt-1 text-base sm:text-lg font-bold text-[#F4F9FB]">48 dB <span class="text-xs font-normal text-brand-sunrise">Tenang</span></div>
+<div class="text-[11px] text-[#BFD9E8] mt-0.5">Ambang aman</div>
+</div>
+</div>
+<!-- Live Voice Synthesis Bar -->
+<div class="mt-4 p-3 rounded-xl bg-[#033067]/90 border border-[#0675A3] flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="p-2 rounded-lg bg-brand-secondary/40 text-brand-sunrise">
+<svg aria-hidden="true" class="w-4 h-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+<path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+</svg>
+</div>
+<div>
+<div class="text-xs font-semibold text-[#F4F9FB]">Voice briefing AI tersedia</div>
+<div class="text-[11px] text-[#BFD9E8]">Ringkasan natural durasi 45 detik</div>
+</div>
+</div>
+<button class="px-4 py-1.5 bg-brand-sunrise hover:bg-[#ffa549] text-brand-primary text-xs font-semibold rounded-lg transition-colors focus-ring" type="button">
+                  Dengar
+                </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- END: HeroSection -->
+<!-- BEGIN: FeaturesSection (Light Mode #F4F9FB) -->
+<section aria-labelledby="features-heading" class="py-20 lg:py-28 bg-brand-bgLight text-brand-textPrimary" id="fitur">
+<div class="max-w-7xl mx-auto px-6">
+<!-- Section Header with 48px accent bar -->
+<div class="mb-14">
+<div aria-hidden="true" class="w-12 h-1 bg-brand-secondary rounded-full mb-3"></div>
+<h2 class="text-[28px] font-bold text-brand-primary tracking-tight" id="features-heading">
+            Fitur Utama
+          </h2>
+<p class="mt-2 text-brand-textSecondary text-base max-w-2xl">
+            Solusi sonifikasi akustik menyeluruh yang dirancang untuk kemudahan persepsi sensorik dan kenyamanan beraktivitas sehari-hari.
+          </p>
+</div>
+<!-- 4 Feature Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Card 1: Sonifikasi Real-time -->
+<article class="group bg-white rounded-card border border-brand-cardBorder p-7 shadow-sm hover:shadow-md hover:border-brand-secondary transition-all duration-200 flex flex-col justify-between" data-purpose="feature-card">
+<div>
+<!-- Circular icon container with #E6F2F7 and #0675A3 icon -->
+<div class="w-14 h-14 rounded-full bg-[#E6F2F7] flex items-center justify-center text-brand-secondary mb-6 group-hover:bg-brand-secondary group-hover:text-white transition-colors">
+<svg aria-hidden="true" class="w-7 h-7" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M2 10v3"></path>
+<path d="M6 6v11"></path>
+<path d="M10 3v18"></path>
+<path d="M14 8v7"></path>
+<path d="M18 5v13"></path>
+<path d="M22 10v3"></path>
+</svg>
+</div>
+<h3 class="text-[22px] font-bold text-brand-primary group-hover:text-brand-secondary transition-colors">
+                Sonifikasi Real-time
+              </h3>
+<p class="mt-3 text-sm text-brand-textSecondary leading-relaxed">
+                Modulasi nada suara dinamis berdasarkan partikulat udara, suhu, dan intensitas kebisingan sekitar tanpa jeda waktu.
+              </p>
+</div>
+<div class="mt-6 pt-4 border-t border-brand-cardBorder/60 text-xs font-medium text-brand-secondary flex items-center justify-between">
+<span class="">Sintesis Audio Adaptif</span>
+<span class="font-mono text-brand-textSecondary">432 Hz</span>
+</div>
+</article>
+<!-- Card 2: Voice Briefing AI -->
+<article class="group bg-white rounded-card border border-brand-cardBorder p-7 shadow-sm hover:shadow-md hover:border-brand-secondary transition-all duration-200 flex flex-col justify-between" data-purpose="feature-card">
+<div>
+<!-- Circular icon container -->
+<div class="w-14 h-14 rounded-full bg-[#E6F2F7] flex items-center justify-center text-brand-secondary mb-6 group-hover:bg-brand-secondary group-hover:text-white transition-colors">
+<svg aria-hidden="true" class="w-7 h-7" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+<path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+<line x1="12" x2="12" y1="19" y2="22"></line>
+</svg>
+</div>
+<h3 class="text-[22px] font-bold text-brand-primary group-hover:text-brand-secondary transition-colors">
+                Voice Briefing AI
+              </h3>
+<p class="mt-3 text-sm text-brand-textSecondary leading-relaxed">
+                Ringkasan audio natural 30 sampai 60 detik yang merangkum dinamika cuaca, rute mobilitas, serta saran aktivitas ramah lingkungan.
+              </p>
+</div>
+<div class="mt-6 pt-4 border-t border-brand-cardBorder/60 text-xs font-medium text-brand-secondary flex items-center justify-between">
+<span class="">Bahasa Alami Audio</span>
+<span class="font-mono text-brand-textSecondary">30-60 detik</span>
+</div>
+</article>
+<!-- Card 3: Lokasi Favorit -->
+<article class="group bg-white rounded-card border border-brand-cardBorder p-7 shadow-sm hover:shadow-md hover:border-brand-secondary transition-all duration-200 flex flex-col justify-between" data-purpose="feature-card">
+<div>
+<!-- Circular icon container -->
+<div class="w-14 h-14 rounded-full bg-[#E6F2F7] flex items-center justify-center text-brand-secondary mb-6 group-hover:bg-brand-secondary group-hover:text-white transition-colors">
+<svg aria-hidden="true" class="w-7 h-7" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+<circle cx="12" cy="10" r="3"></circle>
+</svg>
+</div>
+<h3 class="text-[22px] font-bold text-brand-primary group-hover:text-brand-secondary transition-colors">
+                Lokasi Favorit
+              </h3>
+<p class="mt-3 text-sm text-brand-textSecondary leading-relaxed">
+                Simpan titik rute, tempat tinggal, dan area kerja untuk peralihan pemantauan akustik instan dengan penandaan pintasan keyboard.
+              </p>
+</div>
+<div class="mt-6 pt-4 border-t border-brand-cardBorder/60 text-xs font-medium text-brand-secondary flex items-center justify-between">
+<span class="">Titik Tersimpan</span>
+<span class="font-mono text-brand-textSecondary">Akses Cepat</span>
+</div>
+</article>
+<!-- Card 4: Peringatan Dini -->
+<article class="group bg-white rounded-card border border-brand-cardBorder p-7 shadow-sm hover:shadow-md hover:border-brand-secondary transition-all duration-200 flex flex-col justify-between" data-purpose="feature-card">
+<div>
+<!-- Circular icon container -->
+<div class="w-14 h-14 rounded-full bg-[#E6F2F7] flex items-center justify-center text-brand-secondary mb-6 group-hover:bg-brand-secondary group-hover:text-white transition-colors">
+<svg aria-hidden="true" class="w-7 h-7" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+<path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+</svg>
+</div>
+<h3 class="text-[22px] font-bold text-brand-primary group-hover:text-brand-secondary transition-colors">
+                Peringatan Dini
+              </h3>
+<p class="mt-3 text-sm text-brand-textSecondary leading-relaxed">
+                Sinyal akustik berfrekuensi tegas dan notifikasi haptik bila kadar polusi udara melonjak atau terjadi anomali cuaca ekstrem mendadak.
+              </p>
+</div>
+<div class="mt-6 pt-4 border-t border-brand-cardBorder/60 text-xs font-medium text-brand-secondary flex items-center justify-between">
+<span class="">Ambang Keamanan</span>
+<span class="font-mono text-brand-textSecondary">Prioritas</span>
+</div>
+</article>
+</div>
+</div>
+</section>
+<!-- END: FeaturesSection -->
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: MainFooter (Navy Surface #033067) -->
+<footer class="bg-brand-primary text-brand-textDarkSecondary border-t border-[#064e8b] py-12" role="contentinfo">
+<div class="max-w-7xl mx-auto px-6">
+<div class="flex flex-col md:flex-row items-center justify-between gap-6">
+<!-- Left: Branding & Tagline -->
+<div class="flex items-center gap-3.5 text-center md:text-left">
+<img alt="Logo EchoSense" class="w-9 h-9 object-contain rounded-lg bg-white p-1 shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC299aOHhOH4MRwvD4Q8TqpIwv1DD8odXbFr06ZbuxJD21FCcJugVNbcKRO1gvIJbOSvHSugy87-XCXlmdcVz_L_MONVbU14g8BVyANBk-QnOB2gtTBR9Del85nSEDY38jDnOzQupvtrpqgac7biwPvWU0wLGE1RnMoRSYTWlS9asURt5RK8-uFDHkXbZFojTGEa8HhheHVnyGzpzzv1ynUe24PJKvAm-IYuXq_hGGL1EXJVSvUysmtAEaXylR6tKJldw">
+<div>
+<div class="text-sm font-semibold text-[#F4F9FB]">
+              © 2026 EchoSense. Sistem Sonifikasi Lingkungan untuk Tunanetra dan Pengguna Umum.
+            </div>
+<div class="text-xs text-[#BFD9E8] mt-0.5">
+              Desain aksesibilitas terverifikasi standar W3C dan WCAG 2.1 AA.
+            </div>
+</div>
+</div>
+<!-- Right: Accessibility & Policy Links -->
+<nav aria-label="Navigasi footer" class="flex flex-wrap items-center justify-center gap-6 text-sm">
+<a class="hover:text-brand-sunrise transition-colors focus-ring" href="#kebijakan">Kebijakan Privasi</a>
+<a class="hover:text-brand-sunrise transition-colors focus-ring" href="#aksesibilitas">Panduan Aksesibilitas</a>
+<a class="hover:text-brand-sunrise transition-colors focus-ring" href="#kontak">Kontak</a>
+</nav>
+</div>
+</div>
+</footer>
+<!-- END: MainFooter -->
+<!-- Accessible Keyboard Shortcut Handler -->
+<script data-purpose="keyboard-shortcuts">
+    document.addEventListener('keydown', function(event) {
+      if (event.altKey && (event.key === 'k' || event.key === 'K')) {
+        event.preventDefault();
+        alert("Pintasan Keyboard EchoSense:\n• Spasi: Putar atau jeda sonifikasi suara\n• Alt + K: Tampilkan panduan ini\n• Tab: Navigasi tombol dan fitur aksesibel");
+      }
+    });
+  </script>
+
+
+</body></html>

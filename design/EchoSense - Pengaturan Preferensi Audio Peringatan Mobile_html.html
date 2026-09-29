@@ -1,0 +1,407 @@
+<!DOCTYPE html><html lang="id" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>Pengaturan Preferensi Audio &amp; Peringatan - EchoSense</title>
+<!-- Tailwind CSS CDN with Forms & Container Queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#033067',
+              ocean: '#0675A3',
+              sunrise: '#FEB161',
+              coral: '#FD7659',
+              danger: '#C4442A',
+              bg: '#F4F9FB',
+              border: '#D6E6ED',
+              card: '#FFFFFF',
+            }
+          },
+          fontFamily: {
+            sans: ['"Atkinson Hyperlegible"', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          borderRadius: {
+            'panel': '20px',
+          }
+        }
+      }
+    };
+  </script>
+<!-- Typography: Atkinson Hyperlegible -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" rel="stylesheet">
+<style data-purpose="custom-sliders">
+    /* Custom Styling for Accessibility Range Sliders */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+    }
+    input[type=range]:focus {
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 8px;
+      cursor: pointer;
+      background: #D6E6ED;
+      border-radius: 9999px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      height: 22px;
+      width: 22px;
+      border-radius: 50%;
+      background: #0675A3;
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -7px;
+      box-shadow: 0 2px 5px rgba(3, 48, 103, 0.25);
+      border: 2px solid #FFFFFF;
+    }
+    input[type=range]:focus::-webkit-slider-thumb {
+      box-shadow: 0 0 0 3px rgba(6, 117, 163, 0.35);
+    }
+  </style>
+</head>
+<body class="bg-brand-bg font-sans text-[#1A2E3B] antialiased min-h-screen pb-28 selection:bg-brand-ocean selection:text-white">
+<!-- BEGIN: MobileHeader -->
+<header class="sticky top-0 z-50 bg-brand-navy h-16 w-full px-4 flex items-center justify-between border-b border-white/10 shadow-sm" data-purpose="mobile-navbar">
+<div class="flex items-center gap-3">
+<!-- Logo resmi EchoSense -->
+<img alt="Logo EchoSense" class="w-9 h-9 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAN1zPq7O6ao1aFQltNTifFa47EiseUDrE2fkJlgXPF832CcoCuwRM7qySghczk419JDrFu8VqnFUq1x9-W8LQaSHUARU5FIEaJaAc4Q4ddgTbhypyBfMgsPZCsg9aMaa4A8WjBMd7z29zWO-xq1y4xzdDEJTLMMrwomNOdOfY5wt0RYvmHrBcOjJT2PcNspNurZbT1XMXPWH7tHRSvrtiiWWyboFvXSANwmKI4S4s82URSERNqW2s5IHhBMvPoAUSr9g">
+<span class="text-white text-lg font-bold tracking-tight">EchoSense</span>
+</div>
+<!-- Right Controls: Profil Akun & Menu Toggle -->
+<div class="flex items-center gap-2">
+
+<button aria-label="Buka menu navigasi" class="p-2 text-white rounded-lg hover:bg-white/10 active:bg-white/20" type="button">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</header>
+<!-- END: MobileHeader -->
+<!-- BEGIN: MainContent -->
+<main class="max-w-[420px] mx-auto px-4 pt-5 pb-6">
+<!-- Page Title & Overview -->
+<section class="mb-5" data-purpose="page-intro">
+<div class="inline-flex items-center gap-2 mb-1">
+<span class="w-2 h-2 rounded-full bg-brand-ocean"></span>
+<span class="text-xs uppercase tracking-wider font-bold text-brand-ocean">Konfigurasi Sistem</span>
+</div>
+<h1 class="text-2xl font-bold text-brand-navy leading-snug">Pengaturan preferensi</h1>
+<p class="text-sm text-slate-600 mt-1 leading-relaxed">
+        Personalisasi parameter sonifikasi audio, sintesis narasi, dan ambang peringatan lingkungan.
+      </p>
+</section>
+<!-- BEGIN: PanelSonifikasi -->
+<!-- Panel 1: Sonifikasi & Narasi -->
+<section class="bg-brand-card rounded-panel border border-brand-border p-5 mb-5 shadow-sm" data-purpose="sonifikasi-dan-narasi">
+<header class="border-b border-brand-border pb-3 mb-4 flex items-center justify-between">
+<div>
+<h2 class="text-base font-bold text-brand-navy">Sonifikasi dan narasi</h2>
+<p class="text-xs text-slate-500">Karakter nada dan artikulasi informasi</p>
+</div>
+<span class="text-[11px] font-semibold text-brand-ocean bg-blue-50 px-2 py-0.5 rounded-md border border-brand-ocean/20">
+          Modul 1
+        </span>
+</header>
+<!-- Sliders List -->
+<div class="space-y-4">
+<!-- Tempo Slider -->
+<div data-purpose="tempo-setting">
+<div class="flex justify-between items-center text-xs mb-1.5">
+<label class="font-bold text-brand-navy" for="tempo-range">Tempo sonifikasi</label>
+<span class="font-mono text-xs font-semibold text-brand-ocean bg-slate-100 px-2 py-0.5 rounded border border-brand-border">
+              60% (120 BPM)
+            </span>
+</div>
+<input aria-label="Tempo sonifikasi 60 persen" id="tempo-range" max="100" min="0" type="range" value="60">
+<div class="flex justify-between text-[11px] text-slate-400 mt-1">
+<span class="">Tenang</span>
+<span class="">Standar</span>
+<span class="">Cepat</span>
+</div>
+</div>
+<!-- Pitch Slider -->
+<div data-purpose="pitch-setting">
+<div class="flex justify-between items-center text-xs mb-1.5">
+<label class="font-bold text-brand-navy" for="pitch-range">Pitch dan nada dasar</label>
+<span class="font-mono text-xs font-semibold text-brand-ocean bg-slate-100 px-2 py-0.5 rounded border border-brand-border">
+              45% (440 Hz)
+            </span>
+</div>
+<input aria-label="Pitch dan nada dasar 45 persen" id="pitch-range" max="100" min="0" type="range" value="45">
+<div class="flex justify-between text-[11px] text-slate-400 mt-1">
+<span class="">Rendah</span>
+<span class="">Tengah (A4)</span>
+<span class="">Tinggi</span>
+</div>
+</div>
+<!-- Intensity Slider -->
+<div data-purpose="intensity-setting">
+<div class="flex justify-between items-center text-xs mb-1.5">
+<label class="font-bold text-brand-navy" for="intensity-range">Intensitas suara</label>
+<span class="font-mono text-xs font-semibold text-brand-ocean bg-slate-100 px-2 py-0.5 rounded border border-brand-border">
+              70% (-3.5 dB)
+            </span>
+</div>
+<input aria-label="Intensitas suara 70 persen" id="intensity-range" max="100" min="0" type="range" value="70">
+<div class="flex justify-between text-[11px] text-slate-400 mt-1">
+<span class="">Halus</span>
+<span class="">Seimbang</span>
+<span class="">Tegas</span>
+</div>
+</div>
+</div>
+<!-- Dropdowns Section -->
+<div class="mt-5 pt-4 border-t border-brand-border space-y-4">
+<!-- Instrument Dropdown -->
+<div data-purpose="instrument-select">
+<label class="block text-xs font-bold text-brand-navy mb-1.5" for="select-instrument">Instrumen utama</label>
+<div class="flex items-center gap-2">
+<div class="relative flex-1">
+<select class="w-full text-xs font-semibold text-brand-navy bg-slate-50 border border-brand-border rounded-xl py-2.5 pl-3 pr-8 focus:ring-2 focus:ring-brand-ocean focus:border-brand-ocean appearance-none" id="select-instrument">
+<option selected="" value="piano">Piano akustik</option>
+<option value="marimba">Marimba resonan</option>
+<option value="synth">Synthesizer ambient</option>
+<option value="flute">Woodwind lembut</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<button aria-label="Pratinjau nada instrumen" class="h-10 px-3 bg-slate-100 hover:bg-slate-200 text-brand-navy rounded-xl border border-brand-border text-xs font-bold flex items-center justify-center transition" type="button">
+              Uji
+            </button>
+</div>
+</div>
+<!-- Language Narration Dropdown -->
+<div data-purpose="language-select">
+<label class="block text-xs font-bold text-brand-navy mb-1.5" for="select-language">Bahasa narasi</label>
+<div class="flex items-center gap-2">
+<div class="relative flex-1">
+<select class="w-full text-xs font-semibold text-brand-navy bg-slate-50 border border-brand-border rounded-xl py-2.5 pl-3 pr-8 focus:ring-2 focus:ring-brand-ocean focus:border-brand-ocean appearance-none" id="select-language">
+<option selected="" value="id">Bahasa Indonesia</option>
+<option value="en">English (Global)</option>
+<option value="jv">Basa Jawa (Aksara/Vokal)</option>
+<option value="su">Basa Sunda</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+<button aria-label="Uji suara narasi" class="h-10 px-3 bg-slate-100 hover:bg-slate-200 text-brand-navy rounded-xl border border-brand-border text-xs font-bold flex items-center justify-center transition" type="button">
+              Vokal
+            </button>
+</div>
+</div>
+<!-- Playback Mode (Radio Group) -->
+<div class="pt-2" data-purpose="playback-mode">
+<span class="block text-xs font-bold text-brand-navy mb-2">Mode pemutaran</span>
+<div class="grid grid-cols-1 gap-2.5">
+<label class="flex items-center p-3 rounded-xl border border-brand-border bg-slate-50 cursor-pointer hover:bg-blue-50/40 transition">
+<input checked="" class="h-4 w-4 text-brand-ocean border-brand-border focus:ring-brand-ocean" name="playback_mode" type="radio" value="bersamaan">
+<div class="ml-3">
+<p class="text-xs font-bold text-brand-navy">Bersamaan</p>
+<p class="text-[11px] text-slate-500">Sonifikasi melodi dan suara narasi berpadu sinkron</p>
+</div>
+</label>
+<label class="flex items-center p-3 rounded-xl border border-brand-border bg-slate-50 cursor-pointer hover:bg-blue-50/40 transition">
+<input class="h-4 w-4 text-brand-ocean border-brand-border focus:ring-brand-ocean" name="playback_mode" type="radio" value="berurutan">
+<div class="ml-3">
+<p class="text-xs font-bold text-brand-navy">Berurutan</p>
+<p class="text-[11px] text-slate-500">Mainkan sonifikasi lingkungan terlebih dahulu disusul deskripsi narasi</p>
+</div>
+</label>
+</div>
+</div>
+</div>
+</section>
+<!-- END: PanelSonifikasi -->
+<!-- BEGIN: PanelPeringatan -->
+<!-- Panel 2: Peringatan Lingkungan & Notifikasi -->
+<section class="bg-brand-card rounded-panel border border-brand-border p-5 mb-5 shadow-sm" data-purpose="peringatan-dan-notifikasi">
+<header class="border-b border-brand-border pb-3 mb-4 flex items-center justify-between">
+<div>
+<h2 class="text-base font-bold text-brand-navy">Peringatan dan batas ambang</h2>
+<p class="text-xs text-slate-500">Kondisi pemicu bunyi alarm akselerasi</p>
+</div>
+<span class="text-[11px] font-semibold text-brand-navy bg-slate-100 px-2 py-0.5 rounded-md border border-brand-border">
+          Modul 2
+        </span>
+</header>
+<!-- Checkbox Group: Ambang Batas Kondisi -->
+<div class="space-y-3" data-purpose="threshold-checkboxes">
+<label class="flex items-start p-3 bg-slate-50 border border-brand-border rounded-xl cursor-pointer">
+<input checked="" class="mt-0.5 h-4 w-4 rounded text-brand-ocean border-brand-border focus:ring-brand-ocean" type="checkbox">
+<div class="ml-3 flex-1">
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold text-brand-navy">Polusi udara tinggi</span>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-sunrise text-slate-900">Waspada</span>
+</div>
+<p class="text-[11px] text-slate-500 mt-0.5">Bunyikan sinyal jika AQI melampaui 150</p>
+</div>
+</label>
+<label class="flex items-start p-3 bg-slate-50 border border-brand-border rounded-xl cursor-pointer">
+<input checked="" class="mt-0.5 h-4 w-4 rounded text-brand-ocean border-brand-border focus:ring-brand-ocean" type="checkbox">
+<div class="ml-3 flex-1">
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold text-brand-navy">Cuaca berbahaya</span>
+<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-danger text-white">Kritis</span>
+</div>
+<p class="text-[11px] text-slate-500 mt-0.5">Potensi badai, petir, dan intensitas hujan ekstrem</p>
+</div>
+</label>
+<label class="flex items-start p-3 bg-slate-50/60 border border-brand-border/60 rounded-xl cursor-pointer opacity-75">
+<input class="mt-0.5 h-4 w-4 rounded text-brand-ocean border-brand-border focus:ring-brand-ocean" type="checkbox">
+<div class="ml-3 flex-1">
+<div class="flex items-center justify-between">
+<span class="text-xs font-bold text-brand-navy">Lalu lintas berat</span>
+<span class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">Nonaktif</span>
+</div>
+<p class="text-[11px] text-slate-500 mt-0.5">Kemacetan rute harian lebih dari 30 menit</p>
+</div>
+</label>
+</div>
+<!-- Notification Types (Audio & Haptic) -->
+<div class="mt-5 pt-4 border-t border-brand-border" data-purpose="notification-types">
+<label class="block text-xs font-bold text-brand-navy mb-2">Jenis notifikasi</label>
+<div class="grid grid-cols-2 gap-2">
+<!-- Audio Card -->
+<label class="flex flex-col p-3 rounded-xl border-2 border-brand-ocean bg-blue-50/40 cursor-pointer">
+<div class="flex items-center justify-between mb-1">
+<span class="text-xs font-bold text-brand-navy">Audio</span>
+<input checked="" class="h-4 w-4 rounded text-brand-ocean border-brand-border focus:ring-brand-ocean" type="checkbox">
+</div>
+<span class="text-[11px] text-slate-600">Chime dan narasi vokal</span>
+</label>
+<!-- Haptic Card -->
+<label class="flex flex-col p-3 rounded-xl border-2 border-brand-ocean bg-blue-50/40 cursor-pointer">
+<div class="flex items-center justify-between mb-1">
+<span class="text-xs font-bold text-brand-navy">Haptic</span>
+<input checked="" class="h-4 w-4 rounded text-brand-ocean border-brand-border focus:ring-brand-ocean" type="checkbox">
+</div>
+<span class="text-[11px] text-slate-600">Getaran pola taktil</span>
+</label>
+</div>
+</div>
+<!-- Monitored Locations Section -->
+<div class="mt-5 pt-4 border-t border-brand-border" data-purpose="monitored-locations">
+<label class="block text-xs font-bold text-brand-navy mb-2">Lokasi dipantau</label>
+<div class="flex flex-wrap gap-2">
+<!-- Jakarta Chip -->
+<label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-brand-ocean bg-white text-xs font-bold text-brand-navy shadow-xs cursor-pointer">
+<input checked="" class="h-3.5 w-3.5 rounded text-brand-ocean border-brand-border focus:ring-brand-ocean" type="checkbox">
+<span class="">Jakarta Pusat</span>
+</label>
+<!-- Bandung Chip -->
+<label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-brand-ocean bg-white text-xs font-bold text-brand-navy shadow-xs cursor-pointer">
+<input checked="" class="h-3.5 w-3.5 rounded text-brand-ocean border-brand-border focus:ring-brand-ocean" type="checkbox">
+<span class="">Bandung</span>
+</label>
+<!-- Surabaya Chip -->
+<label class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-300 bg-slate-50 text-xs font-medium text-slate-600 cursor-pointer">
+<input class="h-3.5 w-3.5 rounded text-brand-ocean border-brand-border focus:ring-brand-ocean" type="checkbox">
+<span class="">Surabaya</span>
+</label>
+</div>
+</div>
+</section>
+<!-- END: PanelPeringatan -->
+<!-- BEGIN: MobileActionDock -->
+<!-- Tombol Aksi Ditumpuk Vertikal Sesuai Wireframe Mobile -->
+<section class="space-y-3 pt-1" data-purpose="action-buttons-stack">
+<button class="w-full h-12 bg-brand-ocean hover:bg-[#056086] active:bg-[#044c6b] text-white text-sm font-bold rounded-xl transition duration-150 flex items-center justify-center shadow-md" type="button">
+        Simpan pengaturan
+      </button>
+<button class="w-full h-12 bg-white hover:bg-slate-50 active:bg-slate-100 text-brand-navy border-2 border-brand-navy text-sm font-bold rounded-xl transition duration-150 flex items-center justify-center" type="button">
+        Pratinjau suara
+      </button>
+<button class="w-full py-2.5 text-xs font-semibold text-slate-600 hover:text-brand-navy transition text-center" type="button">
+        Setel ulang ke default sistem
+      </button>
+</section>
+<!-- END: MobileActionDock -->
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: BottomNavigation -->
+<!-- Fixed Bottom Navigation Bar (4 Tab Sesuai Panduan) -->
+<nav class="fixed bottom-0 inset-x-0 bg-white border-t border-brand-border py-2 px-4 z-40 shadow-lg" data-purpose="bottom-bar">
+<div class="max-w-[420px] mx-auto grid grid-cols-4 gap-1 text-center">
+<!-- Tab 1: Dashboard -->
+<a class="flex flex-col items-center justify-center py-1 text-slate-500 hover:text-brand-navy transition" href="#dashboard">
+<svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="text-[11px] font-medium">Dashboard</span>
+</a>
+<!-- Tab 2: Pengaturan (Aktif) -->
+<a class="flex flex-col items-center justify-center py-1 text-brand-ocean font-bold" href="#pengaturan">
+<svg class="w-5 h-5 mb-1 stroke-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="text-[11px] tracking-tight">Pengaturan</span>
+</a>
+<!-- Tab 3: Riwayat -->
+<a class="flex flex-col items-center justify-center py-1 text-slate-500 hover:text-brand-navy transition" href="#riwayat">
+<svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="text-[11px] font-medium">Riwayat</span>
+</a>
+<!-- Tab 4: Bantuan / Peringatan -->
+<a class="flex flex-col items-center justify-center py-1 text-slate-500 hover:text-brand-navy transition" href="#peringatan">
+<svg class="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="text-[11px] font-medium">Bantuan</span>
+</a>
+</div>
+</nav>
+<!-- END: BottomNavigation -->
+<!-- Simple script for micro-interaction demo feedback -->
+<script data-purpose="range-feedback">
+    document.addEventListener('DOMContentLoaded', function () {
+      const tempoSlider = document.getElementById('tempo-range');
+      const pitchSlider = document.getElementById('pitch-range');
+      const intensitySlider = document.getElementById('intensity-range');
+
+      if (tempoSlider) {
+        tempoSlider.addEventListener('input', function(e) {
+          const bpm = Math.round(60 + (e.target.value * 1.0));
+          const label = e.target.previousElementSibling.querySelector('span');
+          if (label) label.textContent = `${e.target.value}% (${bpm} BPM)`;
+        });
+      }
+
+      if (pitchSlider) {
+        pitchSlider.addEventListener('input', function(e) {
+          const hz = Math.round(220 + (e.target.value * 4.4));
+          const label = e.target.previousElementSibling.querySelector('span');
+          if (label) label.textContent = `${e.target.value}% (${hz} Hz)`;
+        });
+      }
+
+      if (intensitySlider) {
+        intensitySlider.addEventListener('input', function(e) {
+          const db = ((e.target.value - 100) * 0.1).toFixed(1);
+          const label = e.target.previousElementSibling.querySelector('span');
+          if (label) label.textContent = `${e.target.value}% (${db} dB)`;
+        });
+      }
+    });
+  </script>
+
+
+
+
+
+
+</body></html>

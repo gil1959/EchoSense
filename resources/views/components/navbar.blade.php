@@ -1,0 +1,45 @@
+<header class="bg-[#033067] sticky top-0 z-50 shadow-md">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+<!-- Brand Identity -->
+<a aria-label="EchoSense Dashboard" class="flex items-center space-x-3.5 group rounded-lg focus:outline-none" href="/dashboard">
+<img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIEaDRbvfX8jj4PdyGI5ahez-NSPyrcEFCSGGByFrLjFBWWv_t-sWcoamyzlHaIT0XlJM-20hno2TKb6XTWkmSGRf9roDrAGE9LOUZWAZqZ5bVN4C9lE9KLd8AEONCvzKXKOQra4VaDMbs4x7kVF0iXjUzYdY2v55mz47j1QaydhuSY99AWlil5vwi0SgHTnm7DPyp7DaF3AgjCHwyV4MkHGkmfebpsnsTeqF9Cka8FfMTzdd18VRC2XUk5ZlvOw03Fw" alt="Logo EchoSense" class="w-10 h-10 object-contain bg-transparent">
+<div>
+<div class="flex items-center gap-2">
+<span class="font-bold text-xl tracking-tight text-white font-sans">
+              EchoSense
+            </span>
+<span aria-label="Status aktif" class="inline-block w-2.5 h-2.5 rounded-full bg-[#FEB161]" title="Status aktif"></span>
+</div>
+<p class="text-xs text-sky-100/80">Sonifikasi lingkungan aksesibel</p>
+</div>
+</a>
+<!-- Navigation Links -->
+<nav aria-label="Navigasi utama" class="hidden md:flex items-center space-x-1 lg:space-x-3">
+<a class="px-4 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('dashboard') || request()->is('/') ? 'text-white bg-white/10 relative' : 'text-white/80 hover:text-white hover:bg-white/10 transition-colors' }}" href="/dashboard" aria-label="EchoSense Dashboard">
+          Dashboard
+          @if(request()->is('dashboard') || request()->is('/'))
+            <span aria-hidden="true" class="absolute bottom-1 left-4 right-4 h-0.5 bg-[#FEB161] rounded-full"></span>
+          @endif
+        </a>
+<a class="px-4 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('pengaturan') ? 'text-white bg-white/10 relative' : 'text-white/80 hover:text-white hover:bg-white/10 transition-colors' }}" href="/pengaturan">
+          Pengaturan
+          @if(request()->is('pengaturan'))
+            <span aria-hidden="true" class="absolute bottom-1 left-4 right-4 h-0.5 bg-[#FEB161] rounded-full"></span>
+          @endif
+</a>
+<a class="px-4 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('riwayat') ? 'text-white bg-white/10 relative' : 'text-white/80 hover:text-white hover:bg-white/10 transition-colors' }}" href="/riwayat">
+          Riwayat
+          @if(request()->is('riwayat'))
+            <span aria-hidden="true" class="absolute bottom-1 left-4 right-4 h-0.5 bg-[#FEB161] rounded-full"></span>
+          @endif
+        </a>
+<a class="px-4 py-2.5 rounded-lg text-sm font-semibold {{ request()->is('peringatan') ? 'text-white bg-white/10 relative' : 'text-white/80 hover:text-white hover:bg-white/10 transition-colors' }}" href="/peringatan">
+          Peringatan
+          @if(request()->is('peringatan'))
+            <span aria-hidden="true" class="absolute bottom-1 left-4 right-4 h-0.5 bg-[#FEB161] rounded-full"></span>
+          @endif
+        </a>
+</nav>
+
+</div>
+</header>

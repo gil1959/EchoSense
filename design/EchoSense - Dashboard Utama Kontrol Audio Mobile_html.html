@@ -1,0 +1,346 @@
+<!DOCTYPE html><html lang="id" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+<title>EchoSense - Dashboard Utama &amp; Kontrol Audio</title>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration for EchoSense Design System -->
+<script data-purpose="tailwind-config">
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              navy: '#033067',
+              ocean: '#0675A3',
+              sunrise: '#FEB161',
+              teal: '#21B9BE',
+              canvas: '#F4F9FB',
+              border: '#D6E6ED',
+              highlight: '#E6F2F7',
+            }
+          },
+          fontFamily: {
+            sans: ['Atkinson Hyperlegible', 'system-ui', 'sans-serif'],
+          },
+          borderRadius: {
+            'card': '20px',
+          }
+        }
+      }
+    };
+  </script>
+<!-- Typography and Base Styling -->
+<style data-purpose="typography">
+    @import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+    
+    body {
+      font-family: 'Atkinson Hyperlegible', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #F4F9FB;
+      color: #033067;
+      -webkit-tap-highlight-color: transparent;
+    }
+  </style>
+<!-- Component Layout Styling -->
+<style data-purpose="custom-layout">
+    /* Subtle touch targets and accessibility focus rings */
+    button:focus-visible, select:focus-visible, a:focus-visible {
+      outline: 2px solid #0675A3;
+      outline-offset: 2px;
+    }
+    /* Animated mini waveform equalizer */
+    @keyframes wavePulse {
+      0%, 100% { height: 6px; }
+      50% { height: 26px; }
+    }
+    .wave-bar {
+      animation: wavePulse 1.2s ease-in-out infinite;
+    }
+    .wave-bar:nth-child(2) { animation-delay: 0.15s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.3s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.45s; }
+    .wave-bar:nth-child(5) { animation-delay: 0.6s; }
+    .wave-bar:nth-child(6) { animation-delay: 0.75s; }
+    .wave-bar:nth-child(7) { animation-delay: 0.9s; }
+  </style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&amp;display=swap" data-snapdom="injected-import"></head>
+<body class="min-h-screen bg-brand-canvas text-brand-navy flex flex-col justify-between antialiased pb-24">
+<!-- BEGIN: MainHeader -->
+<header class="sticky top-0 z-40 bg-brand-navy text-white h-16 px-4 flex items-center justify-between shadow-md" data-purpose="mobile-navbar">
+<div class="flex items-center space-x-3">
+<!-- Logo Container on White Chip -->
+<div class="flex items-center justify-center w-10 h-10 shrink-0" data-purpose="logo-wrapper"><img alt="Logo EchoSense Sonifikasi" class="w-10 h-10 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKaLuj_SYFDP8YtqbrwL7ap75T6_IlIal6B4O62ta_oqqtCQbCPizG9Kiq1ATuGeZ6S5eioRfvoLIvbfmx75Nwkvv9y8WfZSw7_rHnQ4flvUHa30VeSko6WAbdyHWVm2E04r-77Hs5QItOfU_BreorEWp5i21u6HzBLEBtS9HQNUjRwVs3mPGvc5AB-4njk3xVOfUnVr3sEMMYatiGP4iejkIiK7kvdnh4t08L1zO1iY4GZPMRILcL8af2eQUCaAm0gg"></div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-bold text-lg leading-tight tracking-tight">EchoSense</span>
+<span class="text-[10px] uppercase font-bold tracking-wider bg-brand-ocean text-white px-1.5 py-0.5 rounded">v2.1</span>
+</div>
+<p class="text-[11px] text-brand-border leading-none">Sonifikasi Lingkungan Aksesibel</p>
+</div>
+</div>
+<!-- Right Hamburger Action -->
+<button aria-label="Buka menu navigasi" class="w-10 h-10 flex items-center justify-center rounded-lg border border-brand-ocean hover:bg-brand-ocean/40 transition-colors" type="button">
+<svg aria-hidden="true" class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</header>
+<!-- END: MainHeader -->
+<!-- BEGIN: MainContent -->
+<main class="w-full max-w-md mx-auto px-4 py-4 space-y-4" data-purpose="content-stack">
+<!-- BEGIN: LocationSelectorDropdown -->
+<!-- Mobile dropdown selector to quickly switch active location per wireframe -->
+<section aria-label="Pemilih Lokasi" class="bg-white rounded-card p-3 border border-brand-border shadow-sm">
+<label class="block text-xs font-bold uppercase tracking-wider text-brand-ocean mb-1" for="location-select">
+        Lokasi Terpilih
+      </label>
+<div class="relative">
+<select class="w-full appearance-none bg-brand-canvas border-2 border-brand-border rounded-xl py-2.5 pl-3.5 pr-10 font-bold text-brand-navy focus:border-brand-ocean focus:ring-0 text-sm" id="location-select">
+<option selected="">Jakarta (saat ini) - Aktif</option>
+<option>Bandung, Jawa Barat</option>
+<option>Surabaya, Jawa Timur</option>
+<option value="new">+ Tambah lokasi baru</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-brand-navy">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+</section>
+<!-- END: LocationSelectorDropdown -->
+<!-- BEGIN: AudioControlPanel -->
+<!-- Main Audio Sonification Player Panel -->
+<section aria-label="Kontrol Audio" class="bg-white rounded-card p-4 border-2 border-brand-navy shadow-sm space-y-4" data-purpose="audio-controller">
+<!-- Section Label & Refresh Time -->
+<div class="flex items-center justify-between border-b border-brand-border pb-2">
+<span class="text-xs font-bold uppercase tracking-wider text-brand-navy">Kontrol Audio</span>
+<span class="text-xs text-brand-ocean">Diperbarui: 14:35 WIB</span>
+</div>
+<!-- Current Location Subhead -->
+<div class="flex items-center justify-between">
+<div>
+<h2 class="text-base font-bold text-brand-navy">Jakarta, ID</h2>
+<p class="text-xs text-gray-600">Mode Sonifikasi Sintesis Multi-Kanal</p>
+</div>
+<!-- Waveform Visualizer Display -->
+<div aria-hidden="true" class="flex items-end gap-1 h-7 px-2 py-1 bg-brand-canvas rounded-lg border border-brand-border" title="Aktivitas gelombang audio">
+<div class="w-1 bg-brand-sunrise rounded-full wave-bar h-2"></div>
+<div class="w-1 bg-brand-sunrise rounded-full wave-bar h-4"></div>
+<div class="w-1 bg-brand-sunrise rounded-full wave-bar h-6"></div>
+<div class="w-1 bg-brand-sunrise rounded-full wave-bar h-3"></div>
+<div class="w-1 bg-brand-sunrise rounded-full wave-bar h-5"></div>
+<div class="w-1 bg-brand-sunrise rounded-full wave-bar h-4"></div>
+<div class="w-1 bg-brand-sunrise rounded-full wave-bar h-2"></div>
+</div>
+</div>
+<!-- Primary Action: Big Play / Pause Button -->
+<button aria-label="Putar atau jeda audio sonifikasi" class="w-full h-14 bg-brand-ocean active:bg-brand-navy text-white rounded-xl font-bold flex items-center justify-center gap-3 shadow transition duration-150" type="button">
+<svg aria-hidden="true" class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+<path d="M8 5v14l11-7z"></path>
+</svg>
+<span class="text-base tracking-wide uppercase">Play / Pause [Spasi]</span>
+</button>
+<!-- Audio Progress and Sliders -->
+<div class="space-y-3 pt-1">
+<!-- Progress Bar -->
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-bold">
+<span class="text-brand-navy">Progres</span>
+<span class="text-brand-ocean">01:12 / 03:20 (35%)</span>
+</div>
+<div class="w-full bg-brand-border rounded-full h-2.5 overflow-hidden">
+<div aria-valuemax="100" aria-valuemin="0" aria-valuenow="35" class="bg-brand-ocean h-2.5 rounded-full" role="progressbar" style="width: 35%"></div>
+</div>
+</div>
+<!-- Volume Bar -->
+<div class="space-y-1">
+<div class="flex justify-between text-xs font-bold">
+<span class="text-brand-navy">Volume</span>
+<span class="text-brand-ocean">80%</span>
+</div>
+<div class="w-full bg-brand-border rounded-full h-2.5 overflow-hidden">
+<div aria-valuemax="100" aria-valuemin="0" aria-valuenow="80" class="bg-brand-teal h-2.5 rounded-full" role="progressbar" style="width: 80%"></div>
+</div>
+</div>
+</div>
+<!-- Secondary Controls: Repeat & Next Location -->
+<div class="grid grid-cols-2 gap-3 pt-2">
+<button class="w-full py-2.5 px-3 border-2 border-brand-navy rounded-xl text-xs font-bold text-brand-navy hover:bg-brand-canvas transition flex items-center justify-center gap-1.5" type="button">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="">Ulang</span>
+</button>
+<button class="w-full py-2.5 px-3 border-2 border-brand-navy rounded-xl text-xs font-bold text-brand-navy hover:bg-brand-canvas transition flex items-center justify-center gap-1.5" type="button">
+<span class="">Lokasi Berikutnya</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+</section>
+<!-- END: AudioControlPanel -->
+<!-- BEGIN: AISummaryPanel -->
+<!-- Voice AI Synthesized Narrative Transcript -->
+<section aria-label="Ringkasan Suara AI" class="bg-white rounded-card p-4 border border-brand-border shadow-sm space-y-3" data-purpose="ai-summary">
+<div class="flex items-center justify-between">
+<h3 class="text-xs font-bold uppercase tracking-wider text-brand-ocean">Ringkasan Suara AI (30-60 Detik)</h3>
+<!-- Speech Rate Controller -->
+<span class="text-[11px] font-bold bg-brand-highlight text-brand-ocean px-2 py-0.5 rounded border border-brand-border">
+          Kecepatan: 1.0x
+        </span>
+</div>
+<!-- Transcript Card with Active Voice Highlight -->
+<div class="text-xs leading-relaxed text-brand-navy space-y-1.5 p-3 rounded-xl bg-brand-canvas border border-brand-border">
+<p class="">
+<span class="bg-brand-highlight text-brand-navy px-1 py-0.5 rounded font-bold">Kualitas udara Jakarta tergolong sedang dengan indeks 80.</span>
+          Suhu saat ini 28°C kondisi berawan, hembusan angin 12 km/j dari barat laut. Kondisi lalu lintas jalan protokol lancar dengan kecepatan rata-rata kendaraan 45 km/j.
+        </p>
+</div>
+<!-- Expand and Audio Speed Trigger -->
+<div class="flex items-center justify-between text-xs pt-1">
+<button class="text-brand-ocean font-bold underline hover:text-brand-navy" type="button">
+          Baca transkrip lengkap
+        </button>
+<div class="flex gap-1.5">
+<button class="px-2 py-1 bg-brand-canvas hover:bg-brand-highlight rounded border border-brand-border font-bold text-[10px]" type="button">1.0x</button>
+<button class="px-2 py-1 bg-brand-canvas hover:bg-brand-highlight rounded border border-brand-border font-bold text-[10px]" type="button">1.25x</button>
+</div>
+</div>
+</section>
+<!-- END: AISummaryPanel -->
+<!-- BEGIN: EnvironmentalDataCards -->
+<!-- Environmental Sensor Data Stack -->
+<div class="space-y-3" data-purpose="sensor-metrics">
+<!-- Card 1: Air Quality -->
+<section aria-label="Metrik Kualitas Udara" class="bg-white rounded-card p-4 border border-brand-border shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<div>
+<p class="text-xs font-bold uppercase tracking-wider text-gray-500">Kualitas Udara</p>
+<h4 class="text-lg font-bold text-brand-navy">AQI 80</h4>
+</div>
+<span class="inline-block px-2.5 py-1 text-xs font-bold rounded-full bg-brand-sunrise text-brand-navy">
+            Sedang
+          </span>
+</div>
+<div class="text-xs text-gray-600 mb-3">
+<span class="">PM2.5: 35 µg/m³</span>
+<span class="mx-1.5">|</span>
+<span class="">PM10: 55 µg/m³</span>
+</div>
+<button class="text-xs font-bold text-brand-ocean hover:underline flex items-center justify-between w-full pt-1 border-t border-brand-border" type="button">
+<span class="">Expandable: Ketuk untuk detail</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</section>
+<!-- Card 2: Weather -->
+<section aria-label="Metrik Cuaca" class="bg-white rounded-card p-4 border border-brand-border shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<div>
+<p class="text-xs font-bold uppercase tracking-wider text-gray-500">Cuaca</p>
+<h4 class="text-lg font-bold text-brand-navy">Cerah Berawan, 28°C</h4>
+</div>
+<span class="inline-block px-2.5 py-1 text-xs font-bold rounded-full bg-brand-teal text-white">
+            Baik
+          </span>
+</div>
+<div class="text-xs text-gray-600 mb-3">
+<span class="">Kelembapan: 65%</span>
+<span class="mx-1.5">|</span>
+<span class="">Angin: 12 km/j</span>
+</div>
+<button class="text-xs font-bold text-brand-ocean hover:underline flex items-center justify-between w-full pt-1 border-t border-brand-border" type="button">
+<span class="">Expandable: Ketuk untuk detail</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</section>
+<!-- Card 3: Traffic -->
+<section aria-label="Metrik Lalu Lintas" class="bg-white rounded-card p-4 border border-brand-border shadow-sm">
+<div class="flex justify-between items-start mb-2">
+<div>
+<p class="text-xs font-bold uppercase tracking-wider text-gray-500">Lalu Lintas</p>
+<h4 class="text-lg font-bold text-brand-navy">Lancar</h4>
+</div>
+<span class="inline-block px-2.5 py-1 text-xs font-bold rounded-full bg-brand-teal text-white">
+            Lancar / Baik
+          </span>
+</div>
+<div class="text-xs text-gray-600 mb-3">
+<span class="">Kecepatan rata-rata: 45 km/j</span>
+</div>
+<button class="text-xs font-bold text-brand-ocean hover:underline flex items-center justify-between w-full pt-1 border-t border-brand-border" type="button">
+<span class="">Expandable: Ketuk untuk detail</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</section>
+</div>
+<!-- END: EnvironmentalDataCards -->
+<!-- BEGIN: KeyboardShortcutsHint -->
+<!-- Accessibility Quick Guide for Keyboard Support -->
+<div class="bg-brand-canvas border border-brand-border rounded-xl p-2.5 text-center text-[11px] text-gray-600 font-medium" data-purpose="keyboard-guidance">
+<span class="font-bold text-brand-navy">[Spasi]</span> Play/Pause &nbsp;•&nbsp; 
+      <span class="font-bold text-brand-navy">[H]</span> Bantuan &nbsp;•&nbsp; 
+      <span class="font-bold text-brand-navy">[S]</span> Pengaturan
+    </div>
+<!-- END: KeyboardShortcutsHint -->
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: BottomNavigationBar -->
+<!-- Fixed Mobile App Bottom Nav with 4 Primary Items -->
+<nav aria-label="Navigasi Aplikasi" class="fixed bottom-0 inset-x-0 bg-white border-t border-brand-border z-50 px-2 py-1.5 shadow-lg" data-purpose="mobile-bottom-navigation">
+<div class="max-w-md mx-auto grid grid-cols-4 items-center">
+<!-- Nav Item 1: Dashboard (Active) -->
+<a aria-current="page" class="flex flex-col items-center justify-center py-1 text-brand-ocean border-t-2 border-brand-ocean -mt-1.5" href="#dashboard">
+<svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="text-[11px] font-bold">Dashboard</span>
+</a>
+<!-- Nav Item 2: Pengaturan -->
+<a class="flex flex-col items-center justify-center py-1 text-gray-500 hover:text-brand-ocean transition-colors" href="#pengaturan">
+<svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+<path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="text-[11px] font-bold">Pengaturan</span>
+</a>
+<!-- Nav Item 3: Riwayat -->
+<a class="flex flex-col items-center justify-center py-1 text-gray-500 hover:text-brand-ocean transition-colors" href="#riwayat">
+<svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="text-[11px] font-bold">Riwayat</span>
+</a>
+<!-- Nav Item 4: Bantuan -->
+<a class="flex flex-col items-center justify-center py-1 text-gray-500 hover:text-brand-ocean transition-colors" href="#bantuan">
+<svg class="w-5 h-5 mb-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+<span class="text-[11px] font-bold">Bantuan</span>
+</a>
+</div>
+</nav>
+<!-- END: BottomNavigationBar -->
+<!-- Accessible Keyboard Interactivity Script -->
+<script data-purpose="keyboard-handler">
+    document.addEventListener('keydown', function(event) {
+      // Space bar triggers Play/Pause toggle without accidental window scrolling
+      if (event.code === 'Space' && event.target === document.body) {
+        event.preventDefault();
+        const playBtn = document.querySelector('[data-purpose="audio-controller"] button');
+        if (playBtn) playBtn.click();
+      }
+    });
+  </script>
+
+
+
+
+</body></html>
