@@ -181,13 +181,13 @@
 <div class="flex space-x-2">
 <div class="relative flex-1">
 <select class="w-full h-12 rounded-[10px] bg-white border-[1.5px] border-slatecol text-deep px-4 pr-10 text-sm focus:border-ocean focus:ring-0 transition" id="select-instrument" name="instrument">
-<option selected="" value="piano">Piano akustik</option>
-<option value="sintesis">Sintesis halus</option>
-<option value="harmonis">Nada harmonis</option>
+<option value="triangle">Piano akustik (Triangle)</option>
+<option value="sine">Sintesis halus (Sine)</option>
+<option value="square">Nada harmonis (Square)</option>
 </select>
 </div>
 <!-- Tone Test Button -->
-<button aria-label="Dengarkan contoh instrumen terpilih" class="h-12 px-4 bg-trackbg hover:bg-slate-200 border-[1.5px] border-slatecol text-navy font-semibold rounded-[10px] flex items-center justify-center transition" title="Dengarkan contoh instrumen" type="button">
+<button id="btn-test-instrument" aria-label="Dengarkan contoh instrumen terpilih" class="h-12 px-4 bg-trackbg hover:bg-slate-200 border-[1.5px] border-slatecol text-navy font-semibold rounded-[10px] flex items-center justify-center transition" title="Dengarkan contoh instrumen" type="button">
 <svg aria-hidden="true" class="w-4 h-4 text-ocean" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24">
 <polygon points="5 3 19 12 5 21 5 3"></polygon>
 </svg>
@@ -207,7 +207,7 @@
 </select>
 </div>
 <!-- Voice Sample Button -->
-<button aria-label="Uji suara narasi bahasa" class="h-12 px-4 bg-trackbg hover:bg-slate-200 border-[1.5px] border-slatecol text-navy font-semibold rounded-[10px] flex items-center justify-center transition" title="Uji suara narasi" type="button">
+<button id="btn-test-language" aria-label="Uji suara narasi bahasa" class="h-12 px-4 bg-trackbg hover:bg-slate-200 border-[1.5px] border-slatecol text-navy font-semibold rounded-[10px] flex items-center justify-center transition" title="Uji suara narasi" type="button">
 <svg aria-hidden="true" class="w-4 h-4 text-ocean" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewBox="0 0 24 24">
 <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
 <path d="M19 12a7 7 0 0 0-7-7"></path>
@@ -260,30 +260,24 @@
 <div class="space-y-3">
 <label class="flex items-center justify-between p-3.5 rounded-xl border border-bordercol hover:border-slatecol bg-white transition cursor-pointer">
 <div class="flex items-center space-x-3">
-<input checked="" class="h-6 w-6 rounded text-ocean border-slatecol focus:ring-ocean" name="alert_aqi" type="checkbox">
+<input class="h-6 w-6 rounded text-ocean border-slatecol focus:ring-ocean alert-cb" name="alert_aqi" type="checkbox" onchange="updateAlertBadge(this, 'badge-aqi', 'Waspada', 'bg-sunrise text-navy')">
 <span class="text-sm font-semibold text-deep">Polusi udara tinggi (AQI di atas 150)</span>
 </div>
-<span class="text-xs font-bold px-2.5 py-1 rounded-md bg-sunrise text-navy">
-                  Waspada
-                </span>
+<span id="badge-aqi" class="text-xs font-medium px-2.5 py-1 rounded-md bg-trackbg text-muted border border-bordercol">Nonaktif</span>
 </label>
 <label class="flex items-center justify-between p-3.5 rounded-xl border border-bordercol hover:border-slatecol bg-white transition cursor-pointer">
 <div class="flex items-center space-x-3">
-<input checked="" class="h-6 w-6 rounded text-ocean border-slatecol focus:ring-ocean" name="alert_weather" type="checkbox">
+<input class="h-6 w-6 rounded text-ocean border-slatecol focus:ring-ocean alert-cb" name="alert_weather" type="checkbox" onchange="updateAlertBadge(this, 'badge-weather', 'Kritis', 'bg-crimson text-white')">
 <span class="text-sm font-semibold text-deep">Cuaca berbahaya &amp; potensi badai</span>
 </div>
-<span class="text-xs font-bold px-2.5 py-1 rounded-md bg-crimson text-white">
-                  Kritis
-                </span>
+<span id="badge-weather" class="text-xs font-medium px-2.5 py-1 rounded-md bg-trackbg text-muted border border-bordercol">Nonaktif</span>
 </label>
 <label class="flex items-center justify-between p-3.5 rounded-xl border border-bordercol hover:border-slatecol bg-white transition cursor-pointer">
 <div class="flex items-center space-x-3">
-<input class="h-6 w-6 rounded text-ocean border-slatecol focus:ring-ocean" name="alert_traffic" type="checkbox">
+<input class="h-6 w-6 rounded text-ocean border-slatecol focus:ring-ocean alert-cb" name="alert_traffic" type="checkbox" onchange="updateAlertBadge(this, 'badge-traffic', 'Aktif', 'bg-ocean text-white')">
 <span class="text-sm font-medium text-muted">Lalu lintas berat / kemacetan total</span>
 </div>
-<span class="text-xs font-medium px-2.5 py-1 rounded-md bg-trackbg text-muted border border-bordercol">
-                  Nonaktif
-                </span>
+<span id="badge-traffic" class="text-xs font-medium px-2.5 py-1 rounded-md bg-trackbg text-muted border border-bordercol">Nonaktif</span>
 </label>
 </div>
 </fieldset>
@@ -317,27 +311,10 @@
 <legend class="text-sm font-semibold text-deep">
                 Lokasi dipantau
               </legend>
-<span class="text-xs text-muted font-medium">2 dari 3 aktif</span>
+<span id="locations-count" class="text-xs text-muted font-medium">Memuat...</span>
 </div>
-<div aria-label="Pemilihan kota pemantauan" class="flex flex-wrap gap-2.5">
-<!-- Jakarta Active -->
-<label class="flex items-center space-x-2 px-4 py-2 rounded-xl border-2 border-ocean bg-page text-navy text-sm font-semibold cursor-pointer hover:bg-sky-50 transition">
-<input checked="" class="h-5 w-5 rounded text-ocean border-slatecol focus:ring-ocean" name="loc_jakarta" type="checkbox">
-<span class="">Jakarta</span>
-<span class="text-xs font-bold text-ocean bg-white px-2 py-0.5 rounded-md border border-ocean/30">Aktif</span>
-</label>
-<!-- Bandung Active -->
-<label class="flex items-center space-x-2 px-4 py-2 rounded-xl border-2 border-ocean bg-page text-navy text-sm font-semibold cursor-pointer hover:bg-sky-50 transition">
-<input checked="" class="h-5 w-5 rounded text-ocean border-slatecol focus:ring-ocean" name="loc_bandung" type="checkbox">
-<span class="">Bandung</span>
-<span class="text-xs font-bold text-ocean bg-white px-2 py-0.5 rounded-md border border-ocean/30">Aktif</span>
-</label>
-<!-- Surabaya Inactive -->
-<label class="flex items-center space-x-2 px-4 py-2 rounded-xl border border-bordercol bg-white text-muted text-sm font-medium cursor-pointer hover:border-slatecol transition">
-<input class="h-5 w-5 rounded text-ocean border-slatecol focus:ring-ocean" name="loc_surabaya" type="checkbox">
-<span class="">Surabaya</span>
-<span class="text-xs text-muted bg-trackbg px-2 py-0.5 rounded-md">Siaga</span>
-</label>
+<div id="locations-list-container" aria-label="Pemilihan kota pemantauan" class="flex flex-wrap gap-2.5">
+<!-- Dynamic Locations go here -->
 </div>
 </fieldset>
 </section>
@@ -382,44 +359,285 @@
 <!-- END: MainFooter -->
 <!-- JavaScript for Interactive Controls & Dynamic Slider Gradients -->
 <script data-purpose="slider-interaction">
+    // Default Preferences
+    const defaultPrefs = {
+        tempo: 60,
+        pitch: 45,
+        volume: 70,
+        instrument: 'sine',
+        language: 'id-ID',
+        playMode: 'bersamaan'
+    };
+
+    // Load preferences
+    let prefs = JSON.parse(localStorage.getItem('echosense_prefs')) || defaultPrefs;
+
+    function initSettings() {
+        const tempo = document.getElementById('tempo-range');
+        const pitch = document.getElementById('pitch-range');
+        const intensitas = document.getElementById('intensitas-range');
+        const instrument = document.getElementById('select-instrument');
+        const language = document.getElementById('select-language');
+        
+        if (tempo) {
+            tempo.value = prefs.tempo;
+            updateSliderTrack(tempo, 'tempo-val', '%');
+        }
+        if (pitch) {
+            pitch.value = prefs.pitch;
+            updateSliderTrack(pitch, 'pitch-val', '%');
+        }
+        if (intensitas) {
+            intensitas.value = prefs.volume;
+            updateSliderTrack(intensitas, 'intensitas-val', '%');
+        }
+        if (instrument) instrument.value = prefs.instrument || 'triangle';
+        if (language) language.value = prefs.language || 'id';
+
+        const playModeRadio = document.querySelector(`input[name="playback_mode"][value="${prefs.playMode}"]`);
+        if (playModeRadio) playModeRadio.checked = true;
+        
+        // Load Alerts
+        const alerts = JSON.parse(localStorage.getItem('echosense_alerts')) || { alert_aqi: true, alert_weather: true, alert_traffic: false };
+        const alertAqiEl = document.querySelector('input[name="alert_aqi"]');
+        const alertWeatherEl = document.querySelector('input[name="alert_weather"]');
+        const alertTrafficEl = document.querySelector('input[name="alert_traffic"]');
+        
+        if (alertAqiEl) {
+            alertAqiEl.checked = alerts.alert_aqi;
+            updateAlertBadge(alertAqiEl, 'badge-aqi', 'Waspada', 'bg-sunrise text-navy');
+        }
+        if (alertWeatherEl) {
+            alertWeatherEl.checked = alerts.alert_weather;
+            updateAlertBadge(alertWeatherEl, 'badge-weather', 'Kritis', 'bg-crimson text-white');
+        }
+        if (alertTrafficEl) {
+            alertTrafficEl.checked = alerts.alert_traffic;
+            updateAlertBadge(alertTrafficEl, 'badge-traffic', 'Aktif', 'bg-ocean text-white');
+        }
+    }
+
+    function updateAlertBadge(checkbox, badgeId, activeText, activeClass) {
+        const badge = document.getElementById(badgeId);
+        if (!badge) return;
+        if (checkbox.checked) {
+            badge.className = `text-xs font-bold px-2.5 py-1 rounded-md ${activeClass}`;
+            badge.textContent = activeText;
+        } else {
+            badge.className = 'text-xs font-medium px-2.5 py-1 rounded-md bg-trackbg text-muted border border-bordercol';
+            badge.textContent = 'Nonaktif';
+        }
+    }
+
     function updateSliderTrack(slider, valueDisplayId, unit) {
       const val = slider.value;
       const displayElem = document.getElementById(valueDisplayId);
       if (displayElem) {
         displayElem.innerText = val + unit;
       }
-      
-      // Update dynamic track gradient with Aqua Tide
       slider.style.background = `linear-gradient(90deg, #0675A3 0%, #14C5D9 ${val}%, #E6F2F7 ${val}%, #E6F2F7 100%)`;
     }
 
-    // Audio preview mock trigger
-    document.getElementById('btn-preview')?.addEventListener('click', function() {
-      const originalText = this.innerHTML;
-      this.classList.add('bg-navy/10');
-      this.innerHTML = `
-        <svg class="w-4 h-4 text-navy animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle>
-          <path d="M12 2a10 10 0 0 1 10 10"></path>
-        </svg>
-        <span>Memutar sampel...</span>
-      `;
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', initSettings);
+
+    // Form Submit (Save Settings)
+    document.querySelector('form')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        prefs.tempo = parseInt(document.getElementById('tempo-range').value);
+        prefs.pitch = parseInt(document.getElementById('pitch-range').value);
+        prefs.volume = parseInt(document.getElementById('intensitas-range').value);
+        prefs.instrument = document.getElementById('select-instrument').value;
+        prefs.language = document.getElementById('select-language').value;
+        
+        const modeRadio = document.querySelector('input[name="playback_mode"]:checked');
+        if (modeRadio) prefs.playMode = modeRadio.value;
+        
+        localStorage.setItem('echosense_prefs', JSON.stringify(prefs));
+        
+        // Save Alerts
+        const alert_aqi = document.querySelector('input[name="alert_aqi"]').checked;
+        const alert_weather = document.querySelector('input[name="alert_weather"]').checked;
+        const alert_traffic = document.querySelector('input[name="alert_traffic"]').checked;
+        localStorage.setItem('echosense_alerts', JSON.stringify({ alert_aqi, alert_weather, alert_traffic }));
+        
+        // Save Active Locations
+        const activeLocs = {};
+        document.querySelectorAll('.loc-checkbox').forEach(cb => {
+            activeLocs[cb.dataset.id] = cb.checked;
+        });
+        localStorage.setItem('echosense_active_locations', JSON.stringify(activeLocs));
+        
+        const btn = document.querySelector('button[type="submit"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<span>Tersimpan!</span>';
+        setTimeout(() => btn.innerHTML = originalText, 2000);
+    });
+
+    function playTestTone(buttonEl, testVoice = false) {
+      const originalHTML = buttonEl.innerHTML;
+      buttonEl.classList.add('bg-navy/10');
+      
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      
+      const pitchVal = document.getElementById('pitch-range').value;
+      const volVal = document.getElementById('intensitas-range').value;
+      const instrVal = document.getElementById('select-instrument').value;
+      const langVal = document.getElementById('select-language').value;
+      const modeVal = document.querySelector('input[name="playback_mode"]:checked')?.value || 'bersamaan';
+      
+      const maxVol = volVal / 100;
+      osc.type = instrVal; // sine, square, triangle
+      osc.frequency.value = 220 + (pitchVal * 2); // Map 0-100 to 220-420Hz
+      
+      const now = ctx.currentTime;
+      // ADSR
+      if (instrVal === 'sine') {
+          gain.gain.setValueAtTime(0, now);
+          gain.gain.linearRampToValueAtTime(maxVol, now + 0.3);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+          osc.start(now);
+          osc.stop(now + 0.8);
+      } else if (instrVal === 'square') {
+          gain.gain.setValueAtTime(0, now);
+          gain.gain.linearRampToValueAtTime(maxVol * 0.7, now + 0.1);
+          gain.gain.exponentialRampToValueAtTime(maxVol * 0.2, now + 0.3);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+          osc.start(now);
+          osc.stop(now + 0.6);
+      } else {
+          gain.gain.setValueAtTime(0, now);
+          gain.gain.linearRampToValueAtTime(maxVol, now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+          osc.start(now);
+          osc.stop(now + 0.5);
+      }
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      
+      // Voice test logic if the main button is clicked
+      if (testVoice) {
+          const text = langVal === 'id' ? "Pratinjau suara EchoSense." : "EchoSense voice preview.";
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = langVal === 'id' ? 'id-ID' : 'en-US';
+          
+          if (modeVal === 'berurutan') {
+              setTimeout(() => {
+                  window.speechSynthesis.speak(utterance);
+              }, 600); // Play voice after tone
+          } else {
+              window.speechSynthesis.speak(utterance);
+          }
+      }
+      
       setTimeout(() => {
-        this.innerHTML = originalText;
-        this.classList.remove('bg-navy/10');
+        buttonEl.innerHTML = originalHTML;
+        buttonEl.classList.remove('bg-navy/10');
       }, 1500);
+    }
+
+    // Audio preview trigger (Main big button)
+    document.getElementById('btn-preview')?.addEventListener('click', function() {
+        playTestTone(this, true); // True means test voice as well
+    });
+
+    // Audio preview trigger (Instrument small button)
+    document.getElementById('btn-test-instrument')?.addEventListener('click', function() {
+        playTestTone(this, false); // False means only tone
+    });
+
+    // Language Test trigger
+    document.getElementById('btn-test-language')?.addEventListener('click', function() {
+        const langVal = document.getElementById('select-language').value;
+        let text = "Ini adalah contoh suara dalam Bahasa Indonesia.";
+        if (langVal === 'en') {
+            text = "This is a sample voice in English.";
+        }
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = langVal === 'id' ? 'id-ID' : 'en-US';
+        
+        // Change button color to active
+        this.classList.add('bg-ocean', 'text-white');
+        this.classList.remove('bg-trackbg', 'text-navy');
+        
+        utterance.onend = () => {
+            this.classList.remove('bg-ocean', 'text-white');
+            this.classList.add('bg-trackbg', 'text-navy');
+        };
+        
+        window.speechSynthesis.speak(utterance);
     });
 
     // Reset settings trigger
     document.getElementById('btn-reset')?.addEventListener('click', function() {
-      const tempo = document.getElementById('tempo-range');
-      const pitch = document.getElementById('pitch-range');
-      const intensitas = document.getElementById('intensitas-range');
-
-      if (tempo) { tempo.value = 60; updateSliderTrack(tempo, 'tempo-val', '%'); }
-      if (pitch) { pitch.value = 45; updateSliderTrack(pitch, 'pitch-val', '%'); }
-      if (intensitas) { intensitas.value = 70; updateSliderTrack(intensitas, 'intensitas-val', '%'); }
+      localStorage.setItem('echosense_prefs', JSON.stringify(defaultPrefs));
+      prefs = defaultPrefs;
+      initSettings();
     });
+
+    function loadDynamicLocations() {
+        const locs = JSON.parse(localStorage.getItem('echosense_locations')) || [];
+        const container = document.getElementById('locations-list-container');
+        const countSpan = document.getElementById('locations-count');
+        const activeLocs = JSON.parse(localStorage.getItem('echosense_active_locations')) || {};
+        
+        if (!container || !countSpan) return;
+        
+        let activeCount = 0;
+        let html = '';
+        
+        locs.forEach((loc, idx) => {
+            const shortName = loc.name.split(',')[0];
+            const isChecked = activeLocs[loc.id] !== false; // Default true if not set
+            if (isChecked) activeCount++;
+            
+            const badgeClass = isChecked ? 'text-ocean bg-white border-ocean/30' : 'text-muted bg-trackbg border-bordercol';
+            const badgeText = isChecked ? 'Aktif' : 'Tersimpan';
+            const wrapperClass = isChecked ? 'border-ocean bg-page text-navy' : 'border-bordercol bg-white text-muted opacity-75';
+            
+            html += `
+            <label class="flex items-center space-x-2 px-4 py-2 rounded-xl border-2 ${wrapperClass} text-sm font-semibold cursor-pointer hover:bg-sky-50 transition" onclick="setTimeout(updateLocationCount, 50)">
+            <input ${isChecked ? 'checked' : ''} data-id="${loc.id}" class="loc-checkbox h-5 w-5 rounded text-ocean border-slatecol focus:ring-ocean" type="checkbox">
+            <span class="">${shortName}</span>
+            <span class="loc-badge text-xs font-bold px-2 py-0.5 rounded-md border ${badgeClass}">${badgeText}</span>
+            </label>`;
+        });
+        
+        countSpan.textContent = `${activeCount} dari ${locs.length} aktif`;
+        
+        if (locs.length === 0) {
+            html = '<p class="text-xs text-muted">Belum ada lokasi tersimpan.</p>';
+        }
+        
+        container.innerHTML = html;
+    }
+
+    function updateLocationCount() {
+        const checkboxes = document.querySelectorAll('.loc-checkbox');
+        let activeCount = 0;
+        checkboxes.forEach(cb => {
+            const badge = cb.parentElement.querySelector('.loc-badge');
+            if (cb.checked) {
+                activeCount++;
+                badge.className = 'loc-badge text-xs font-bold px-2 py-0.5 rounded-md border text-ocean bg-white border-ocean/30';
+                badge.textContent = 'Aktif';
+                cb.parentElement.className = 'flex items-center space-x-2 px-4 py-2 rounded-xl border-2 border-ocean bg-page text-navy text-sm font-semibold cursor-pointer hover:bg-sky-50 transition';
+            } else {
+                badge.className = 'loc-badge text-xs font-bold px-2 py-0.5 rounded-md border text-muted bg-trackbg border-bordercol';
+                badge.textContent = 'Tersimpan';
+                cb.parentElement.className = 'flex items-center space-x-2 px-4 py-2 rounded-xl border-2 border-bordercol bg-white text-muted opacity-75 text-sm font-semibold cursor-pointer hover:bg-sky-50 transition';
+            }
+        });
+        const countSpan = document.getElementById('locations-count');
+        if (countSpan) countSpan.textContent = `${activeCount} dari ${checkboxes.length} aktif`;
+    }
+    
+    // Call loadDynamicLocations on DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', loadDynamicLocations);
   </script>
 
 

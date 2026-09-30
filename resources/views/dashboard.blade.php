@@ -130,56 +130,10 @@
 </svg>
             Lokasi tersimpan
           </h2>
-<span class="text-xs text-textSecondary bg-trackBg px-2 py-0.5 rounded-full border border-cardBorder">3 terpantau</span>
+<span id="location-count" class="text-xs text-textSecondary bg-trackBg px-2 py-0.5 rounded-full border border-cardBorder">Memuat...</span>
 </div>
-<div class="flex flex-col gap-3">
-<!-- Active Location Card: Jakarta -->
-<button aria-pressed="true" class="w-full text-left p-4 rounded-card bg-deepNavy text-pageBg border-2 border-deepNavy shadow-subtle transition relative group focus:outline-none" type="button">
-<div class="flex items-center justify-between mb-2">
-<div class="flex items-center gap-2.5">
-<span aria-hidden="true" class="relative flex h-3 w-3">
-<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sunrise-start opacity-75"></span>
-<span class="relative inline-flex rounded-full h-3 w-3 bg-sunrise-start"></span>
-</span>
-<span class="font-bold text-base text-white">Jakarta (saat ini)</span>
-</div>
-<span class="text-xs px-2.5 py-0.5 rounded-full bg-sunrise-start text-deepNavy font-semibold">Aktif</span>
-</div>
-<div class="flex items-center justify-between text-xs text-slate-200 pt-2 border-t border-white/15">
-<span class="">AQI 80 • 28°C</span>
-<span class="text-xs text-sunrise-start font-medium">Memutar audio</span>
-</div>
-</button>
-<!-- Inactive Location Card: Bandung -->
-<button aria-pressed="false" class="w-full text-left p-4 rounded-card bg-cardBg border border-cardBorder hover:border-aquaBlue text-textPrimary shadow-subtle transition group focus:outline-none" type="button">
-<div class="flex items-center justify-between mb-1.5">
-<span class="font-bold text-base text-textPrimary group-hover:text-aquaBlue transition">Bandung</span>
-<span class="text-xs text-textSecondary">Jawa Barat</span>
-</div>
-<div class="flex items-center justify-between text-xs text-textSecondary pt-1">
-<span class="">AQI 42 (baik) • 22°C</span>
-<span class="text-xs px-2 py-0.5 rounded bg-trackBg text-textSecondary">Siaga lembut</span>
-</div>
-</button>
-<!-- Inactive Location Card: Surabaya -->
-<button aria-pressed="false" class="w-full text-left p-4 rounded-card bg-cardBg border border-cardBorder hover:border-aquaBlue text-textPrimary shadow-subtle transition group focus:outline-none" type="button">
-<div class="flex items-center justify-between mb-1.5">
-<span class="font-bold text-base text-textPrimary group-hover:text-aquaBlue transition">Surabaya</span>
-<span class="text-xs text-textSecondary">Jawa Timur</span>
-</div>
-<div class="flex items-center justify-between text-xs text-textSecondary pt-1">
-<span class="">AQI 95 (sedang) • 31°C</span>
-<span class="text-xs px-2 py-0.5 rounded bg-trackBg text-textSecondary">Audio statis</span>
-</div>
-</button>
-<!-- Add Location Button -->
-<button aria-label="Tambah lokasi baru" class="w-full py-3.5 px-4 rounded-card border-2 border-dashed border-cardBorder hover:border-aquaBlue bg-cardBg text-aquaBlue hover:bg-trackBg/40 transition flex items-center justify-center gap-2 text-sm font-semibold focus:outline-none" type="button">
-<svg aria-hidden="true" class="w-4 h-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24">
-<line x1="12" x2="12" y1="5" y2="19"></line>
-<line x1="5" x2="19" y1="12" y2="12"></line>
-</svg>
-<span class="">+ Tambah lokasi</span>
-</button>
+<div class="flex flex-col gap-3" id="location-list-container">
+<!-- Location cards will be dynamically injected here by Javascript -->
 </div>
 <!-- Accessible Hint Card -->
 <div class="rounded-card border border-cardBorder bg-cardBg p-4 text-xs text-textSecondary shadow-subtle">
@@ -295,15 +249,15 @@
 <!-- Transcript Preview with Highlight on Current Sentence -->
 <div aria-live="polite" class="p-4 rounded-xl bg-trackBg/40 border border-cardBorder text-sm text-textPrimary leading-relaxed">
 <p class="">
-<span class="bg-trackBg px-1.5 py-0.5 rounded border border-cardBorder font-medium text-textPrimary">Kualitas udara Jakarta tergolong sedang dengan indeks 80.</span> Suhu saat ini 28°C kondisi berawan, hembusan angin 12 km/j dari barat laut. Kondisi lalu lintas jalan protokol lancar dengan kecepatan rata-rata kendaraan 45 km/j.
+<span class="bg-trackBg px-1.5 py-0.5 rounded border border-cardBorder font-medium text-textPrimary" id="ai-summary-text">Memuat ringkasan AI...</span>
             </p>
 </div>
 <!-- Subtext Details -->
 <div class="flex flex-wrap items-center justify-between text-xs text-textSecondary pt-1">
-<span class="flex items-center gap-1.5">
+<span class="flex items-center gap-1.5" id="ui-synth-lang">
 <span aria-hidden="true" class="w-2 h-2 rounded-full bg-tealMint"></span>
-              Sintesis suara: Bahasa Indonesia (Aksara Sonik v1)
-            </span>
+Sintesis suara: Bahasa Indonesia (Aksara Sonik v1)
+</span>
 <button aria-expanded="false" class="text-aquaBlue font-semibold hover:underline focus:outline-none" type="button">Perluas teks lengkap</button>
 </div>
 </article>
@@ -319,10 +273,10 @@
 </svg>
 </div>
 <div class="flex items-baseline gap-2 mb-2">
-<span class="text-2xl font-bold text-textPrimary">AQI 80</span>
-<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-sunrise-start text-deepNavy">Sedang</span>
+<span class="text-2xl font-bold text-textPrimary" id="ui-aqi-value">AQI --</span>
+<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-sunrise-start text-deepNavy" id="ui-aqi-category">Memuat</span>
 </div>
-<p class="text-xs text-textSecondary">PM2.5: <span class="font-medium text-textPrimary">35</span> • PM10: <span class="font-medium text-textPrimary">55</span></p>
+<p class="text-xs text-textSecondary">Data real-time <span class="font-medium text-textPrimary">OpenAQ API</span></p>
 </div>
 <button aria-expanded="false" class="text-xs font-semibold text-aquaBlue text-left pt-3 border-t border-cardBorder mt-4 hover:underline focus:outline-none" type="button">
               Perluas detail
@@ -338,12 +292,12 @@
 </svg>
 </div>
 <div class="flex items-baseline gap-2 mb-2">
-<span class="text-lg font-bold text-textPrimary">Cerah berawan 28°C</span>
+<span class="text-lg font-bold text-textPrimary" id="ui-weather-value">--°C</span>
 </div>
 <div class="mb-2">
-<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-tealMint text-deepNavy">Baik</span>
+<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-tealMint text-deepNavy" id="ui-weather-condition">Memuat</span>
 </div>
-<p class="text-xs text-textSecondary">Kelembapan: <span class="font-medium text-textPrimary">65%</span> • Angin: <span class="font-medium text-textPrimary">12 km/j</span></p>
+<p class="text-xs text-textSecondary">Data real-time <span class="font-medium text-textPrimary">Open-Meteo API</span></p>
 </div>
 <button aria-expanded="false" class="text-xs font-semibold text-aquaBlue text-left pt-3 border-t border-cardBorder mt-4 hover:underline focus:outline-none" type="button">
               Perluas detail
@@ -362,10 +316,10 @@
 </svg>
 </div>
 <div class="flex items-baseline gap-2 mb-2">
-<span class="text-2xl font-bold text-textPrimary">Lancar</span>
-<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-tealMint text-deepNavy">Lancar / Baik</span>
+<span class="text-2xl font-bold text-textPrimary" id="ui-traffic-congestion">--</span>
+<span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-tealMint text-deepNavy" id="ui-traffic-speed">-- km/j</span>
 </div>
-<p class="text-xs text-textSecondary">Kecepatan rata-rata: <span class="font-medium text-textPrimary">45 km/j</span></p>
+<p class="text-xs text-textSecondary">Data real-time <span class="font-medium text-textPrimary">TomTom Traffic</span></p>
 </div>
 <button aria-expanded="false" class="text-xs font-semibold text-aquaBlue text-left pt-3 border-t border-cardBorder mt-4 hover:underline focus:outline-none" type="button">
               Perluas detail
@@ -411,26 +365,615 @@
 <!-- END: MainFooter -->
 <!-- BEGIN: InteractiveAccessibilityScript -->
 <script data-purpose="keyboard-handlers">
-    function updateVolume(val) {
-      document.getElementById('volume-readout').textContent = val + '%';
-      document.getElementById('volume-slider').style.setProperty('--vol', val + '%');
+    // --- State Management ---
+    let locations = JSON.parse(localStorage.getItem('echosense_locations')) || [];
+    let activeLocationIndex = 0;
+    let beatInterval = null;
+    
+    async function reverseGeocode(lat, lon) {
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+            const data = await res.json();
+            return data.display_name || 'Lokasi Anda'; // Use full detailed address
+        } catch(e) {
+            return 'Lokasi Anda';
+        }
     }
 
-    // Spacebar listener for accessible Play/Pause toggle
+
+
+    let prefs = JSON.parse(localStorage.getItem('echosense_prefs')) || {
+        tempo: 60, pitch: 45, volume: 70, instrument: 'sine', language: 'id-ID', playMode: 'bersamaan'
+    };
+
+    // --- Audio Nodes ---
+    let audioCtx, compressor, masterGain, analyser;
+    let aqiDroneOsc, aqiDroneGain;
+    let weatherOsc, weatherGain;
+    let trafficPulseOsc, trafficPulseGain;
+    let isPlaying = false;
+    let currentData = null;
+    let progressInterval;
+    let playbackTime = 0;
+    let totalTime = 30; // 30 seconds loop
+    let animationId;
+    let utterance = null;
+
+    // --- UI Elements ---
+    const playBtn = document.getElementById('btn-play-pause');
+    const volumeSlider = document.getElementById('volume-slider');
+    const volumeReadout = document.getElementById('volume-readout');
+    const progressBar = document.querySelector('[role="progressbar"] > div');
+    const progressText = document.querySelector('[role="progressbar"]').previousElementSibling.querySelector('span:last-child');
+    const locationListContainer = document.getElementById('location-list-container');
+    
+    function init() {
+        volumeSlider.value = prefs.volume;
+        updateVolume(prefs.volume);
+        renderLocations();
+        
+        if (locations.length > 0) {
+            loadDataAndPlay(false); // Fetch on load, but don't play automatically (Browser policy)
+        } else {
+            // Automatically detect location if first time
+            if ("geolocation" in navigator) {
+                playBtn.innerHTML = '<span aria-hidden="true" class="w-8 h-8 rounded-full bg-white text-[#0675A3] flex items-center justify-center shadow-inner"><svg class="w-4 h-4 fill-current animate-spin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" stroke-dasharray="31.4 31.4"></circle></svg></span><span>Meminta Akses GPS...</span>';
+                document.getElementById('ai-summary-text').innerHTML = '<span class="animate-pulse">Menunggu persetujuan lokasi dari browser...</span>';
+                
+                navigator.geolocation.getCurrentPosition(async (position) => {
+                    document.getElementById('ai-summary-text').innerHTML = '<span class="animate-pulse">Menyelaraskan titik koordinat GPS...</span>';
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    const cityName = await reverseGeocode(lat, lon);
+                    
+                    locations = [{
+                        id: Date.now(),
+                        name: cityName,
+                        lat: lat,
+                        lon: lon,
+                        region: 'GPS Real-time'
+                    }];
+                    localStorage.setItem('echosense_locations', JSON.stringify(locations));
+                    renderLocations();
+                    loadDataAndPlay(false); // Fetch initial data right after getting GPS
+                }, () => {
+                    playBtn.innerHTML = '<span aria-hidden="true" class="w-8 h-8 rounded-full bg-white text-[#0675A3] flex items-center justify-center shadow-inner"><svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></span><span>Izin Lokasi Ditolak</span>';
+                    document.getElementById('ai-summary-text').innerHTML = 'Gagal mengakses GPS. Silakan tambah lokasi pemantauan secara manual.';
+                    renderLocations();
+                });
+            }
+        }
+    }
+
+    function renderLocations() {
+        if(!locationListContainer) return;
+        
+        const countSpan = document.getElementById('location-count');
+        if (countSpan) countSpan.textContent = `${locations.length} terpantau`;
+
+        let html = '';
+        locations.forEach((loc, idx) => {
+            const isActive = idx === activeLocationIndex;
+            if (isActive) {
+                html += `
+                <button onclick="switchLocation(${idx})" aria-pressed="true" class="w-full text-left p-4 rounded-card bg-[#033067] text-[#F4F9FB] border-2 border-[#033067] shadow-subtle transition relative group focus:outline-none" type="button">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2.5">
+                            <span aria-hidden="true" class="relative flex h-3 w-3">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FEB161] opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-[#FEB161]"></span>
+                            </span>
+                            <span class="font-bold text-base text-white">${loc.name} (saat ini)</span>
+                        </div>
+                        <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#FEB161] text-[#033067] font-semibold">Aktif</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-slate-200 pt-2 border-t border-white/15">
+                        <span class="">Memuat data...</span>
+                        <span class="text-xs text-[#FEB161] font-medium">${isPlaying ? 'Memutar audio' : 'Jeda'}</span>
+                    </div>
+                </button>`;
+            } else {
+                // If it's saved in active status in settings it's "Siaga lembut", else "Audio statis"
+                const activeLocs = JSON.parse(localStorage.getItem('echosense_active_locations')) || {};
+                const isActiveInSettings = activeLocs[loc.id] !== false; // Default true
+                const statusLabel = isActiveInSettings ? 'Siaga lembut' : 'Audio statis';
+                
+                html += `
+                <button onclick="switchLocation(${idx})" aria-pressed="false" class="w-full text-left p-4 rounded-card bg-[#FFFFFF] border border-[#D6E6ED] hover:border-[#0675A3] text-[#0A1F33] shadow-subtle transition group focus:outline-none" type="button">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="font-bold text-base text-[#0A1F33] group-hover:text-[#0675A3] transition">${loc.name.split(',')[0]}</span>
+                        <span class="text-xs text-[#42586A]">${loc.region || 'Indonesia'}</span>
+                    </div>
+                    <div class="flex items-center justify-between text-xs text-[#42586A] pt-1">
+                        <span class="">Ketuk untuk memantau</span>
+                        <span class="text-xs text-[#42586A] bg-slate-100 px-2 py-0.5 rounded-full font-medium">${statusLabel}</span>
+                    </div>
+                </button>`;
+            }
+        });
+
+        html += `
+        <button onclick="document.getElementById('location-modal').classList.remove('hidden')" aria-label="Tambah lokasi lainnya" class="w-full mt-3 py-3.5 px-4 rounded-card border-2 border-dashed border-[#D6E6ED] hover:border-[#0675A3] bg-[#FFFFFF] text-[#0675A3] transition flex items-center justify-center gap-2 text-sm font-semibold focus:outline-none" type="button">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>+ Tambah Lokasi Lainnya</span>
+        </button>`;
+        
+        locationListContainer.innerHTML = html;
+        
+        // Update Main Header
+        const mainHeader = document.querySelector('[data-purpose="audio-controller"] h1');
+        if (locations.length > 0) {
+            const activeLoc = locations[activeLocationIndex];
+            if(mainHeader) {
+                const shortName = activeLoc.name.split(',')[0]; // Ambil nama terpendek untuk header besar
+                mainHeader.textContent = `Saat ini: ${shortName}`;
+            }
+        } else {
+            if(mainHeader) mainHeader.textContent = `Pilih atau Tambah Lokasi`;
+        }
+    }
+
+    async function searchLocation(e) {
+        e.preventDefault();
+        const input = document.getElementById('search-loc-input');
+        const status = document.getElementById('search-loc-status');
+        const query = input.value.trim();
+        if(!query) return;
+
+        status.textContent = 'Mencari...';
+        status.classList.remove('hidden');
+
+        try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            if(data && data.length > 0) {
+                const loc = data[0];
+                locations.push({
+                    id: Date.now(),
+                    name: loc.display_name,
+                    lat: loc.lat,
+                    lon: loc.lon,
+                    region: 'Manual Input'
+                });
+                localStorage.setItem('echosense_locations', JSON.stringify(locations));
+                input.value = '';
+                status.classList.add('hidden');
+                document.getElementById('location-modal').classList.add('hidden');
+                switchLocation(locations.length - 1);
+            } else {
+                status.textContent = 'Lokasi tidak ditemukan.';
+            }
+        } catch(e) {
+            status.textContent = 'Error mencari lokasi.';
+        }
+    }
+
+    async function switchLocation(idx) {
+        if(idx === activeLocationIndex) return; // Ignore if same
+        activeLocationIndex = idx;
+        renderLocations();
+        await loadDataAndPlay(true);
+    }
+
+    function addCurrentLocation() {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                const cityName = await reverseGeocode(lat, lon);
+                
+                locations.push({
+                    id: Date.now(),
+                    name: cityName,
+                    lat: lat,
+                    lon: lon,
+                    region: 'GPS Real-time'
+                });
+                localStorage.setItem('echosense_locations', JSON.stringify(locations));
+                switchLocation(locations.length - 1);
+            }, () => {
+                alert("Gagal mendapatkan lokasi. Pastikan izin GPS diberikan.");
+            });
+        } else {
+            alert("Geolokasi tidak didukung di browser ini.");
+        }
+    }
+
+    function updateVolume(val) {
+      volumeReadout.textContent = val + '%';
+      volumeSlider.style.setProperty('--vol', val + '%');
+      prefs.volume = val;
+      localStorage.setItem('echosense_prefs', JSON.stringify(prefs));
+      
+      if (masterGain && isPlaying) {
+          const now = audioCtx.currentTime;
+          const isDucked = window.speechSynthesis.speaking;
+          masterGain.gain.cancelScheduledValues(now);
+          masterGain.gain.setValueAtTime(masterGain.gain.value, now);
+          masterGain.gain.linearRampToValueAtTime((val / 100) * (isDucked ? 0.25 : 0.8), now + 0.5);
+      }
+    }
+    
+    function formatTime(seconds) {
+        const m = Math.floor(seconds / 60);
+        const s = Math.floor(seconds % 60);
+        return `0${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+
+    function startProgress() {
+        clearInterval(progressInterval);
+        playbackTime = 0;
+        // Progress bar is now handled in a smaller interval for smoothness
+        progressInterval = setInterval(() => {
+            playbackTime += 0.1;
+            if (playbackTime >= totalTime) {
+                playbackTime = totalTime;
+            }
+            const percent = Math.floor((playbackTime / totalTime) * 100);
+            progressBar.style.width = percent + '%';
+            progressText.innerHTML = `${formatTime(Math.floor(playbackTime))} / ${formatTime(Math.floor(totalTime))} <span class="text-[#033067] font-bold ml-1">(${percent}%)</span>`;
+        }, 100);
+    }
+
+    function drawWaveform() {
+        if(!analyser) return;
+        animationId = requestAnimationFrame(drawWaveform);
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        analyser.getByteFrequencyData(dataArray);
+        
+        for(let i = 1; i <= 7; i++) {
+            const bar = document.querySelector(`.wave-bar-${i}`);
+            if(bar) {
+                const value = dataArray[i * 2] || 10;
+                const height = Math.max(10, (value / 255) * 60);
+                bar.style.height = `${height}px`;
+                bar.style.animation = 'none';
+            }
+        }
+    }
+
+    async function loadDataAndPlay(autoPlay = true) {
+        if (locations.length === 0) return alert('Silakan deteksi atau tambah lokasi terlebih dahulu!');
+        
+        playBtn.innerHTML = '<span aria-hidden="true" class="w-8 h-8 rounded-full bg-white text-[#0675A3] flex items-center justify-center shadow-inner"><svg class="w-4 h-4 fill-current animate-spin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" stroke-dasharray="31.4 31.4"></circle></svg></span><span>Memuat Data...</span>';
+        document.getElementById('ai-summary-text').innerHTML = '<span class="animate-pulse">Mengambil data telemetri terbaru dari satelit...</span>';
+        document.getElementById('ui-aqi-value').innerHTML = '<span class="animate-pulse text-sm">Memuat...</span>';
+        document.getElementById('ui-weather-value').innerHTML = '<span class="animate-pulse text-sm">Memuat...</span>';
+        document.getElementById('ui-traffic-congestion').innerHTML = '<span class="animate-pulse text-sm">Memuat...</span>';
+        document.getElementById('ui-traffic-speed').innerHTML = '';
+        
+        try {
+            const activeLoc = locations[activeLocationIndex];
+            const response = await fetch(`/api/sonify?lat=${activeLoc.lat}&lon=${activeLoc.lon}&lang=${prefs.language}`);
+            const data = await response.json();
+            currentData = data;
+            
+            document.getElementById('ai-summary-text').textContent = data.briefing;
+            document.getElementById('ui-aqi-value').textContent = `AQI ${Math.round(data.raw_data.aqi.pm25)}`;
+            document.getElementById('ui-aqi-category').textContent = data.raw_data.aqi.category;
+            
+            const synthLangEl = document.getElementById('ui-synth-lang');
+            if (synthLangEl) {
+                if (prefs.language.startsWith('en')) {
+                    synthLangEl.innerHTML = '<span aria-hidden="true" class="w-2 h-2 rounded-full bg-tealMint"></span>Sintesis suara: English (Aksara Sonik v1)';
+                } else {
+                    synthLangEl.innerHTML = '<span aria-hidden="true" class="w-2 h-2 rounded-full bg-tealMint"></span>Sintesis suara: Bahasa Indonesia (Aksara Sonik v1)';
+                }
+            }
+            
+            const aqiTag = document.getElementById('ui-aqi-category');
+            if (data.raw_data.aqi.pm25 > 150) {
+                aqiTag.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-600 text-white";
+                if(JSON.parse(localStorage.getItem('echosense_alerts') || '{}').alert_aqi && autoPlay) playAlertTone();
+            } else if (data.raw_data.aqi.pm25 > 50) {
+                aqiTag.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-300 text-red-900";
+            } else if (data.raw_data.aqi.pm25 > 25) {
+                aqiTag.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-yellow-300 text-yellow-900";
+            } else {
+                aqiTag.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-sunrise-start text-deepNavy";
+            }
+
+            document.getElementById('ui-weather-value').textContent = `${data.raw_data.weather.temperature}°C`;
+            document.getElementById('ui-weather-condition').textContent = data.raw_data.weather.condition;
+            document.getElementById('ui-traffic-congestion').textContent = data.raw_data.traffic.congestion;
+            document.getElementById('ui-traffic-speed').textContent = `${Math.round(data.raw_data.traffic.currentSpeed)} km/j`;
+            
+            const currentLocEl = document.querySelector('button[aria-pressed="true"] .border-t span:first-child');
+            if(currentLocEl) currentLocEl.textContent = `AQI ${Math.round(data.raw_data.aqi.pm25)} • ${data.raw_data.weather.temperature}°C`;
+            
+            const timeStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+            const timeTag = document.querySelector('.bg-trackBg > span:last-child');
+            if (timeTag) timeTag.textContent = `Diperbarui: ${timeStr}`;
+            
+            if (autoPlay) {
+                if (!isPlaying) {
+                    startSoundscape(data);
+                    isPlaying = true;
+                    startProgress();
+                    drawWaveform();
+                } else {
+                    updateSoundscape(data);
+                }
+                playBtn.innerHTML = '<span aria-hidden="true" class="w-8 h-8 rounded-full bg-white text-[#0675A3] flex items-center justify-center shadow-inner"><svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></span><span>Jeda Audio</span>';
+                playBtn.setAttribute('aria-pressed', 'true');
+            } else {
+                playBtn.innerHTML = '<span aria-hidden="true" class="w-8 h-8 rounded-full bg-white text-[#0675A3] flex items-center justify-center shadow-inner"><svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span><span>Play / Pause</span>';
+                playBtn.setAttribute('aria-pressed', 'false');
+            }
+            
+        } catch(e) {
+            console.error(e);
+            playBtn.innerHTML = '<span>Error memuat data</span>';
+        }
+    }
+
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            compressor = audioCtx.createDynamicsCompressor();
+            masterGain = audioCtx.createGain();
+            analyser = audioCtx.createAnalyser();
+            analyser.fftSize = 64;
+            
+            masterGain.connect(compressor);
+            compressor.connect(analyser);
+            analyser.connect(audioCtx.destination);
+        }
+    }
+
+    function startSoundscape(data) {
+        initAudio();
+        const now = audioCtx.currentTime;
+        
+        masterGain.gain.cancelScheduledValues(now);
+        masterGain.gain.setValueAtTime(0, now);
+        masterGain.gain.linearRampToValueAtTime((prefs.volume/100) * 0.8, now + 1); 
+        
+        const pitchOffset = (prefs.pitch - 50);
+        
+        // AQI (Sine Drone)
+        aqiDroneOsc = audioCtx.createOscillator();
+        aqiDroneGain = audioCtx.createGain();
+        aqiDroneOsc.type = 'sine';
+        aqiDroneOsc.frequency.value = data.audio_params.frequency + pitchOffset;
+        aqiDroneGain.gain.value = 0;
+        aqiDroneGain.gain.linearRampToValueAtTime(0.25, now + 1);
+        aqiDroneOsc.connect(aqiDroneGain);
+        aqiDroneGain.connect(masterGain);
+        aqiDroneOsc.start();
+        
+        // Weather (Triangle)
+        weatherOsc = audioCtx.createOscillator();
+        weatherGain = audioCtx.createGain();
+        weatherOsc.type = 'triangle';
+        weatherOsc.frequency.value = (data.audio_params.frequency + pitchOffset) * 1.5; 
+        weatherGain.gain.value = 0;
+        weatherGain.gain.linearRampToValueAtTime(0.15, now + 1);
+        weatherOsc.connect(weatherGain);
+        weatherGain.connect(masterGain);
+        weatherOsc.start();
+        
+        trafficPulseGain = audioCtx.createGain();
+        trafficPulseGain.gain.value = 0;
+        trafficPulseGain.connect(masterGain);
+        
+        startTrafficPulse(data);
+        playVoice(data);
+    }
+    
+    function updateSoundscape(data) {
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        const pitchOffset = (prefs.pitch - 50);
+        
+        if (aqiDroneOsc) {
+            aqiDroneOsc.frequency.linearRampToValueAtTime(data.audio_params.frequency + pitchOffset, now + 1);
+        }
+        if (weatherOsc) {
+            weatherOsc.frequency.linearRampToValueAtTime((data.audio_params.frequency + pitchOffset) * 1.5, now + 1);
+        }
+        
+        startTrafficPulse(data);
+        playVoice(data);
+    }
+
+    function startTrafficPulse(data) {
+        if (beatInterval) clearInterval(beatInterval);
+        const tempoMs = (60 / data.audio_params.tempo) * 1000;
+        
+        beatInterval = setInterval(() => {
+            if (!isPlaying) return;
+            const now = audioCtx.currentTime;
+            
+            trafficPulseOsc = audioCtx.createOscillator();
+            trafficPulseOsc.type = 'triangle';
+            trafficPulseOsc.frequency.value = (data.audio_params.frequency + (prefs.pitch - 50)) * 0.5;
+            
+            trafficPulseGain.gain.cancelScheduledValues(now);
+            trafficPulseGain.gain.setValueAtTime(0, now);
+            trafficPulseGain.gain.linearRampToValueAtTime(0.3, now + 0.05); // attack
+            trafficPulseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.2); // decay
+            
+            trafficPulseOsc.connect(trafficPulseGain);
+            trafficPulseOsc.start(now);
+            trafficPulseOsc.stop(now + 0.25);
+        }, tempoMs);
+    }
+
+    function playAlertTone() {
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.value = 600;
+        
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.4, now + 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+        
+        osc.connect(gain);
+        gain.connect(masterGain);
+        osc.start(now);
+        osc.stop(now + 0.5);
+    }
+    
+    function playVoice(data) {
+        if(utterance) window.speechSynthesis.cancel();
+        
+        utterance = new SpeechSynthesisUtterance(data.briefing);
+        utterance.lang = (prefs.language === 'en') ? 'en-US' : 'id-ID';
+        
+        // Settings for rate
+        const rateBtn = document.querySelector('button[aria-pressed="true"]');
+        utterance.rate = (rateBtn && rateBtn.textContent.includes('1.25x')) ? 1.25 : 1.0;
+        
+        totalTime = Math.max(5, data.briefing.length / 14);
+
+        // Ducking Effect
+        utterance.onstart = () => {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+            const currentVol = masterGain.gain.value;
+            masterGain.gain.cancelScheduledValues(now);
+            masterGain.gain.setValueAtTime(currentVol, now);
+            masterGain.gain.linearRampToValueAtTime((prefs.volume/100) * 0.25, now + 0.3); // Duck
+        };
+        
+        // Unducking Effect
+        utterance.onend = () => {
+            if (!audioCtx || !isPlaying) return;
+            const now = audioCtx.currentTime;
+            const currentVol = masterGain.gain.value;
+            masterGain.gain.cancelScheduledValues(now);
+            masterGain.gain.setValueAtTime(currentVol, now);
+            masterGain.gain.linearRampToValueAtTime((prefs.volume/100) * 0.8, now + 0.8);
+        };
+        
+        if (prefs.playMode === 'berurutan') {
+            setTimeout(() => {
+                if (isPlaying) window.speechSynthesis.speak(utterance);
+            }, (totalTime / 2) * 1000);
+        } else {
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    function stopSoundscape() {
+        if (!audioCtx) return;
+        const now = audioCtx.currentTime;
+        const currentVol = masterGain.gain.value;
+        
+        masterGain.gain.cancelScheduledValues(now);
+        masterGain.gain.setValueAtTime(currentVol, now);
+        masterGain.gain.linearRampToValueAtTime(0.001, now + 0.5); 
+        
+        if (beatInterval) clearInterval(beatInterval);
+        window.speechSynthesis.cancel();
+        
+        setTimeout(() => {
+            if (aqiDroneOsc) { aqiDroneOsc.stop(); aqiDroneOsc.disconnect(); }
+            if (weatherOsc) { weatherOsc.stop(); weatherOsc.disconnect(); }
+        }, 600);
+    }
+
+    function stopAudioPlayback() {
+        stopSoundscape();
+        if (progressInterval) clearInterval(progressInterval);
+        if (animationId) cancelAnimationFrame(animationId);
+        isPlaying = false;
+        
+        for(let i = 1; i <= 7; i++) {
+            const bar = document.querySelector(`.wave-bar-${i}`);
+            if(bar) bar.style.height = '10px';
+        }
+        
+        playBtn.innerHTML = '<span aria-hidden="true" class="w-8 h-8 rounded-full bg-white text-[#0675A3] flex items-center justify-center shadow-inner"><svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span><span>Play / Pause</span>';
+        playBtn.setAttribute('aria-pressed', 'false');
+    }
+
+    function toggleSonification() {
+        if (!isPlaying) {
+            if (currentData) {
+               startSoundscape(currentData);
+               isPlaying = true;
+               startProgress();
+               drawWaveform();
+               playBtn.innerHTML = '<span aria-hidden="true" class="w-8 h-8 rounded-full bg-white text-[#0675A3] flex items-center justify-center shadow-inner"><svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></span><span>Jeda Audio</span>';
+               playBtn.setAttribute('aria-pressed', 'true');
+            } else {
+               loadDataAndPlay();
+            }
+        } else {
+            stopAudioPlayback();
+        }
+    }
+
+    playBtn.addEventListener('click', toggleSonification);
+    
+    // Bind Ulang
+    document.querySelector('button[aria-label="Ulang pemutaran audio sonifikasi"]')?.addEventListener('click', () => {
+        playbackTime = 0;
+        if(isPlaying) {
+            toggleSonification(); 
+            setTimeout(toggleSonification, 300);
+        }
+    });
+
+    // Bind Lokasi Berikutnya
+    document.querySelector('button[aria-label="Pindah ke pemutaran lokasi berikutnya"]')?.addEventListener('click', () => {
+        let next = activeLocationIndex + 1;
+        if(next >= locations.length) next = 0;
+        switchLocation(next);
+    });
+
+    // Spacebar listener
     document.addEventListener('keydown', function(event) {
       if (event.code === 'Space' && event.target.tagName !== 'INPUT' && event.target.tagName !== 'TEXTAREA') {
         event.preventDefault();
-        const playBtn = document.getElementById('btn-play-pause');
-        if (playBtn) {
-          playBtn.classList.add('ring-4', 'ring-aquaBlue');
-          const isPressed = playBtn.getAttribute('aria-pressed') === 'true';
-          playBtn.setAttribute('aria-pressed', !isPressed);
-          setTimeout(() => {
-            playBtn.classList.remove('ring-4', 'ring-aquaBlue');
-          }, 200);
-        }
+        playBtn.classList.add('ring-4', 'ring-[#0675A3]');
+        toggleSonification();
+        setTimeout(() => playBtn.classList.remove('ring-4', 'ring-[#0675A3]'), 200);
       }
     });
+    
+    // Init on load
+    document.addEventListener('DOMContentLoaded', init);
   </script>
+
+  <!-- Location Search Modal -->
+  <div id="location-modal" class="fixed inset-0 bg-[#0A1F33]/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+      <div class="bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl relative">
+          <button onclick="document.getElementById('location-modal').classList.add('hidden')" class="absolute top-6 right-6 text-[#42586A] hover:text-[#0A1F33] focus:outline-none">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+          
+          <h2 class="text-2xl font-bold text-[#0A1F33] font-outfit mb-2">Tambah Lokasi Lainnya</h2>
+          <p class="text-sm text-[#42586A] mb-6">Cari kota, kabupaten, kecamatan, atau kelurahan spesifik untuk dipantau secara real-time.</p>
+          
+          <form id="add-location-form" onsubmit="searchLocation(event)" class="space-y-4">
+              <div>
+                  <label for="search-loc-input" class="block text-sm font-semibold text-[#0A1F33] mb-1.5">Nama Lokasi</label>
+                  <input type="text" id="search-loc-input" placeholder="Contoh: Plaju, Palembang..." class="w-full text-base rounded-2xl border-2 border-[#D6E6ED] px-4 py-3.5 text-[#0A1F33] focus:outline-none focus:border-[#0675A3] transition">
+              </div>
+              <p id="search-loc-status" class="text-sm text-[#0675A3] font-medium hidden">Mencari di peta...</p>
+              
+              <button type="submit" class="w-full bg-[#0675A3] hover:bg-[#033067] text-white py-3.5 rounded-2xl font-bold text-base transition">
+                  Cari & Tambahkan
+              </button>
+          </form>
+
+          <div class="relative flex py-5 items-center">
+              <div class="flex-grow border-t border-[#D6E6ED]"></div>
+              <span class="flex-shrink-0 mx-4 text-[#42586A] text-sm font-medium">ATAU</span>
+              <div class="flex-grow border-t border-[#D6E6ED]"></div>
+          </div>
+
+          <button onclick="addCurrentLocation(); document.getElementById('location-modal').classList.add('hidden')" aria-label="Gunakan GPS saat ini" class="w-full py-3.5 px-4 rounded-2xl border-2 border-dashed border-[#0675A3] bg-[#E6F2F7] hover:bg-[#D6E6ED] text-[#0675A3] transition flex items-center justify-center gap-2 text-base font-bold focus:outline-none" type="button">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              <span>Deteksi GPS Saat Ini</span>
+          </button>
+      </div>
+  </div>
 <!-- END: InteractiveAccessibilityScript -->
 </body></html>

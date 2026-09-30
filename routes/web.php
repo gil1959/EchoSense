@@ -13,3 +13,13 @@ Route::get('/dashboard', function () {
 Route::get('/pengaturan', function () {
     return view('pengaturan');
 });
+
+Route::get('/riwayat', function () {
+    return view('pengaturan'); // placeholder
+});
+
+Route::get('/peringatan', function () {
+    return view('pengaturan'); // placeholder
+});
+
+Route::get('/api/sonify', [\App\Http\Controllers\DashboardController::class, 'getSonificationData']);
