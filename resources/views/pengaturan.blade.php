@@ -1,6 +1,7 @@
 <!DOCTYPE html><html lang="id"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <title>EchoSense - Pengaturan Preferensi Audio &amp; Peringatan</title>
 <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}"/>
 <!-- Google Fonts: Atkinson Hyperlegible Next -->
@@ -216,6 +217,19 @@
 </button>
 </div>
 </div>
+<!-- Jenis Suara Dropdown -->
+<div class="space-y-1.5">
+<label class="block text-sm font-semibold text-deep" for="select-voice">
+                Jenis Suara (Karakter TTS)
+              </label>
+<div class="flex space-x-2">
+<div class="relative flex-1">
+<select class="w-full h-12 rounded-[10px] bg-white border-[1.5px] border-slatecol text-deep px-4 pr-10 text-sm focus:border-ocean focus:ring-0 transition" id="select-voice" name="voice">
+<option value="default">Default OS</option>
+</select>
+</div>
+</div>
+</div>
 </div>
 <!-- Mode Pemutaran Radio Fieldset -->
 <fieldset class="pt-4 border-t border-bordercol space-y-3">
@@ -363,14 +377,19 @@
     const defaultPrefs = {
         tempo: 60,
         pitch: 45,
-        volume: 70,
+        volume: 30,
         instrument: 'sine',
-        language: 'id-ID',
-        playMode: 'bersamaan'
+        language: 'id',
+        playMode: 'bersamaan',
+        voiceURI: 'elevenlabs:Xb7hH8MSUJpSbSDYk0k2' // Default to ElevenLabs Alice (Free Tier Approved)
     };
 
     // Load preferences
     let prefs = JSON.parse(localStorage.getItem('echosense_prefs')) || defaultPrefs;
+    if (prefs.voiceURI === undefined) {
+        prefs.voiceURI = defaultPrefs.voiceURI;
+        localStorage.setItem('echosense_prefs', JSON.stringify(prefs));
+    }
 
     function initSettings() {
         const tempo = document.getElementById('tempo-range');
@@ -393,6 +412,8 @@
         }
         if (instrument) instrument.value = prefs.instrument || 'triangle';
         if (language) language.value = prefs.language || 'id';
+        // prefs.voiceURI is handled in populateVoices
+        setTimeout(populateVoices, 100);
 
         const playModeRadio = document.querySelector(`input[name="playback_mode"][value="${prefs.playMode}"]`);
         if (playModeRadio) playModeRadio.checked = true;
@@ -441,6 +462,61 @@
     // Initialize on load
     document.addEventListener('DOMContentLoaded', initSettings);
 
+    let availableVoices = [];
+    async function populateVoices() {
+        const languageEl = document.getElementById('select-language');
+        if(!languageEl) return;
+        const selectLang = languageEl.value;
+        const targetLang = selectLang === 'id' ? 'id' : 'en'; 
+        const selectVoice = document.getElementById('select-voice');
+        if(!selectVoice) return;
+        
+        availableVoices = window.speechSynthesis.getVoices();
+        const filteredVoices = availableVoices.filter(v => v.lang.toLowerCase().startsWith(targetLang));
+        
+        selectVoice.innerHTML = '<option value="default">Default OS (Disarankan)</option>';
+        
+        // Add Local/Browser Voices
+        const optGroup1 = document.createElement('optgroup');
+        optGroup1.label = "Suara Bawaan (Browser/OS)";
+        filteredVoices.forEach((voice) => {
+            const isLocal = voice.localService ? 'Lokal' : 'Cloud';
+            const isDefault = voice.default ? ' - Bawaan' : '';
+            const option = document.createElement('option');
+            option.value = 'local:' + voice.voiceURI;
+            option.textContent = `${voice.name} (${isLocal}${isDefault})`;
+            if (prefs.voiceURI === option.value) option.selected = true;
+            optGroup1.appendChild(option);
+        });
+        selectVoice.appendChild(optGroup1);
+        
+        // Fetch ElevenLabs Voices
+        try {
+            const response = await fetch('/api/voices');
+            const data = await response.json();
+            if (data && data.voices && data.voices.length > 0) {
+                const optGroup2 = document.createElement('optgroup');
+                optGroup2.label = "ElevenLabs (Premium API)";
+                data.voices.forEach(voice => {
+                    const option = document.createElement('option');
+                    option.value = 'elevenlabs:' + voice.voice_id;
+                    option.textContent = `${voice.name} (${voice.category})`;
+                    if (prefs.voiceURI === option.value) option.selected = true;
+                    optGroup2.appendChild(option);
+                });
+                selectVoice.appendChild(optGroup2);
+            }
+        } catch(e) {
+            console.error("ElevenLabs API error:", e);
+        }
+    }
+
+    if (window.speechSynthesis) {
+        window.speechSynthesis.onvoiceschanged = populateVoices;
+    }
+    
+    document.getElementById('select-language')?.addEventListener('change', populateVoices);
+
     // Form Submit (Save Settings)
     document.querySelector('form')?.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -449,6 +525,7 @@
         prefs.volume = parseInt(document.getElementById('intensitas-range').value);
         prefs.instrument = document.getElementById('select-instrument').value;
         prefs.language = document.getElementById('select-language').value;
+        prefs.voiceURI = document.getElementById('select-voice').value;
         
         const modeRadio = document.querySelector('input[name="playback_mode"]:checked');
         if (modeRadio) prefs.playMode = modeRadio.value;
@@ -518,18 +595,52 @@
       osc.connect(gain);
       gain.connect(ctx.destination);
       
-      // Voice test logic if the main button is clicked
       if (testVoice) {
-          const text = langVal === 'id' ? "Pratinjau suara EchoSense." : "EchoSense voice preview.";
-          const utterance = new SpeechSynthesisUtterance(text);
-          utterance.lang = langVal === 'id' ? 'id-ID' : 'en-US';
+          const text = langVal === 'id' ? "Uji coba sonifikasi beserta panduan narasi suara EchoSense." : "EchoSense sonification and voice guidance preview.";
+          const voiceURI = document.getElementById('select-voice').value;
           
-          if (modeVal === 'berurutan') {
-              setTimeout(() => {
-                  window.speechSynthesis.speak(utterance);
-              }, 600); // Play voice after tone
+          if (voiceURI.startsWith('elevenlabs:')) {
+              const elVoiceId = voiceURI.replace('elevenlabs:', '');
+              fetch('/api/tts', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                  body: JSON.stringify({ text: text, voice_id: elVoiceId })
+              }).then(async res => {
+                  if (!res.ok) {
+                      const err = await res.json();
+                      throw new Error(err.error || "ElevenLabs API Error");
+                  }
+                  return res.blob();
+              }).then(blob => {
+                  const url = URL.createObjectURL(blob);
+                  const audio = new Audio(url);
+                  if (modeVal === 'berurutan') {
+                      setTimeout(() => audio.play(), 800);
+                  } else {
+                      audio.play();
+                  }
+              }).catch(e => {
+                  console.error(e);
+                  alert("ElevenLabs API Error: " + e.message);
+              });
           } else {
-              window.speechSynthesis.speak(utterance);
+              const utterance = new SpeechSynthesisUtterance(text);
+              utterance.lang = langVal === 'id' ? 'id-ID' : 'en-US';
+              
+              if (voiceURI && voiceURI !== 'default') {
+                  const actualUri = voiceURI.replace('local:', '');
+                  const voices = window.speechSynthesis.getVoices();
+                  const voice = voices.find(v => v.voiceURI === actualUri);
+                  if (voice) utterance.voice = voice;
+              }
+              
+              if (modeVal === 'berurutan') {
+                  setTimeout(() => {
+                      window.speechSynthesis.speak(utterance);
+                  }, 800);
+              } else {
+                  window.speechSynthesis.speak(utterance);
+              }
           }
       }
       
@@ -552,24 +663,58 @@
     // Language Test trigger
     document.getElementById('btn-test-language')?.addEventListener('click', function() {
         const langVal = document.getElementById('select-language').value;
-        let text = "Ini adalah contoh suara dalam Bahasa Indonesia.";
-        if (langVal === 'en') {
-            text = "This is a sample voice in English.";
-        }
+        const voiceURI = document.getElementById('select-voice').value;
         
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = langVal === 'id' ? 'id-ID' : 'en-US';
+        let text = "Ini adalah contoh karakter suara untuk aplikasi EchoSense.";
+        if (langVal === 'en') {
+            text = "This is a sample voice character for the EchoSense application.";
+        }
         
         // Change button color to active
         this.classList.add('bg-ocean', 'text-white');
         this.classList.remove('bg-trackbg', 'text-navy');
         
-        utterance.onend = () => {
+        const resetBtn = () => {
             this.classList.remove('bg-ocean', 'text-white');
             this.classList.add('bg-trackbg', 'text-navy');
         };
         
-        window.speechSynthesis.speak(utterance);
+        if (voiceURI.startsWith('elevenlabs:')) {
+            const elVoiceId = voiceURI.replace('elevenlabs:', '');
+            fetch('/api/tts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                body: JSON.stringify({ text: text, voice_id: elVoiceId })
+            }).then(async res => {
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error || "ElevenLabs API Error");
+                }
+                return res.blob();
+            }).then(blob => {
+                const url = URL.createObjectURL(blob);
+                const audio = new Audio(url);
+                audio.onended = resetBtn;
+                audio.play();
+            }).catch(e => {
+                console.error(e);
+                alert("ElevenLabs API Error: " + e.message + "\n\nPastikan API Key ElevenLabs Anda valid dan berlangganan paket berbayar (Free Tier ElevenLabs tidak mengizinkan pemanggilan API untuk suara library).");
+                resetBtn();
+            });
+        } else {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = langVal === 'id' ? 'id-ID' : 'en-US';
+            
+            if (voiceURI && voiceURI !== 'default') {
+                const actualUri = voiceURI.replace('local:', '');
+                const voices = window.speechSynthesis.getVoices();
+                const voice = voices.find(v => v.voiceURI === actualUri);
+                if (voice) utterance.voice = voice;
+            }
+            
+            utterance.onend = resetBtn;
+            window.speechSynthesis.speak(utterance);
+        }
     });
 
     // Reset settings trigger

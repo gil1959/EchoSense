@@ -23,3 +23,5 @@ Route::get('/peringatan', function () {
 });
 
 Route::get('/api/sonify', [\App\Http\Controllers\DashboardController::class, 'getSonificationData']);
+Route::get('/api/voices', [\App\Http\Controllers\DashboardController::class, 'getVoices']);
+Route::post('/api/tts', [\App\Http\Controllers\DashboardController::class, 'generateTTS']);

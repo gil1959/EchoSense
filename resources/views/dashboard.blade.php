@@ -3,6 +3,7 @@
 <html lang="id"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <title>EchoSense - Dashboard utama dan kontrol audio</title>
 <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}"/>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
@@ -192,9 +193,9 @@
 </svg>
                   Volume
                 </span>
-<span class="text-deepNavy font-bold" id="volume-readout">80%</span>
+<span class="text-deepNavy font-bold" id="volume-readout">30%</span>
 </div>
-<input aria-label="Tingkat volume audio" class="w-full cursor-pointer focus:outline-none" id="volume-slider" max="100" min="0" oninput="updateVolume(this.value)" style="--vol: 80%;" type="range" value="80"/>
+<input aria-label="Tingkat volume audio" class="w-full cursor-pointer focus:outline-none" id="volume-slider" max="100" min="0" oninput="updateVolume(this.value)" style="--vol: 30%;" type="range" value="30"/>
 </div>
 <!-- Progress Timeline Control -->
 <div class="flex flex-col gap-2 bg-trackBg/50 p-4 rounded-xl border border-cardBorder">
@@ -383,8 +384,13 @@ Sintesis suara: Bahasa Indonesia (Aksara Sonik v1)
 
 
     let prefs = JSON.parse(localStorage.getItem('echosense_prefs')) || {
-        tempo: 60, pitch: 45, volume: 70, instrument: 'sine', language: 'id-ID', playMode: 'bersamaan'
+        tempo: 60, pitch: 45, volume: 30, instrument: 'sine', language: 'id', playMode: 'bersamaan', voiceURI: 'elevenlabs:Xb7hH8MSUJpSbSDYk0k2'
     };
+    
+    if (prefs.voiceURI === undefined) {
+        prefs.voiceURI = 'elevenlabs:Xb7hH8MSUJpSbSDYk0k2';
+        localStorage.setItem('echosense_prefs', JSON.stringify(prefs));
+    }
 
     // --- Audio Nodes ---
     let audioCtx, compressor, masterGain, analyser;
@@ -710,7 +716,11 @@ Sintesis suara: Bahasa Indonesia (Aksara Sonik v1)
     function initAudio() {
         if (!audioCtx) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            
             compressor = audioCtx.createDynamicsCompressor();
+            compressor.threshold.value = -24;
+            compressor.ratio.value = 4;
+            
             masterGain = audioCtx.createGain();
             analyser = audioCtx.createAnalyser();
             analyser.fftSize = 64;
@@ -731,16 +741,41 @@ Sintesis suara: Bahasa Indonesia (Aksara Sonik v1)
         
         const pitchOffset = (prefs.pitch - 50);
         
-        // AQI (Sine Drone)
+        // AQI Drone (Base Sine + User Instrument Overtone + Filter)
         aqiDroneOsc = audioCtx.createOscillator();
-        aqiDroneGain = audioCtx.createGain();
         aqiDroneOsc.type = 'sine';
         aqiDroneOsc.frequency.value = data.audio_params.frequency + pitchOffset;
-        aqiDroneGain.gain.value = 0;
-        aqiDroneGain.gain.linearRampToValueAtTime(0.25, now + 1);
-        aqiDroneOsc.connect(aqiDroneGain);
+        
+        window.aqiOvertoneOsc = audioCtx.createOscillator();
+        window.aqiOvertoneOsc.type = prefs.instrument || 'triangle';
+        window.aqiOvertoneOsc.frequency.value = data.audio_params.frequency + pitchOffset;
+        
+        const aqiFilter = audioCtx.createBiquadFilter();
+        aqiFilter.type = 'lowpass';
+        aqiFilter.frequency.value = 1000;
+        aqiFilter.Q.value = 0.8;
+        
+        aqiDroneGain = audioCtx.createGain();
+        aqiDroneGain.gain.setValueAtTime(0, now);
+        aqiDroneGain.gain.linearRampToValueAtTime(0.2, now + 1);
+        
+        // Base sine at full internal gain
+        const baseGain = audioCtx.createGain();
+        baseGain.gain.value = 1.0;
+        aqiDroneOsc.connect(baseGain);
+        baseGain.connect(aqiFilter);
+        
+        // Overtone at low internal gain for subtle texture
+        const overtoneGain = audioCtx.createGain();
+        overtoneGain.gain.value = 0.05;
+        window.aqiOvertoneOsc.connect(overtoneGain);
+        overtoneGain.connect(aqiFilter);
+        
+        aqiFilter.connect(aqiDroneGain);
         aqiDroneGain.connect(masterGain);
+        
         aqiDroneOsc.start();
+        window.aqiOvertoneOsc.start();
         
         // Weather (Triangle)
         weatherOsc = audioCtx.createOscillator();
@@ -767,7 +802,14 @@ Sintesis suara: Bahasa Indonesia (Aksara Sonik v1)
         const pitchOffset = (prefs.pitch - 50);
         
         if (aqiDroneOsc) {
+            aqiDroneOsc.frequency.cancelScheduledValues(now);
+            aqiDroneOsc.frequency.setValueAtTime(aqiDroneOsc.frequency.value, now);
             aqiDroneOsc.frequency.linearRampToValueAtTime(data.audio_params.frequency + pitchOffset, now + 1);
+        }
+        if (window.aqiOvertoneOsc) {
+            window.aqiOvertoneOsc.frequency.cancelScheduledValues(now);
+            window.aqiOvertoneOsc.frequency.setValueAtTime(window.aqiOvertoneOsc.frequency.value, now);
+            window.aqiOvertoneOsc.frequency.linearRampToValueAtTime(data.audio_params.frequency + pitchOffset, now + 1);
         }
         if (weatherOsc) {
             weatherOsc.frequency.linearRampToValueAtTime((data.audio_params.frequency + pitchOffset) * 1.5, now + 1);
@@ -821,41 +863,120 @@ Sintesis suara: Bahasa Indonesia (Aksara Sonik v1)
     function playVoice(data) {
         if(utterance) window.speechSynthesis.cancel();
         
-        utterance = new SpeechSynthesisUtterance(data.briefing);
-        utterance.lang = (prefs.language === 'en') ? 'en-US' : 'id-ID';
-        
-        // Settings for rate
+        const voiceURI = prefs.voiceURI || 'default';
         const rateBtn = document.querySelector('button[aria-pressed="true"]');
-        utterance.rate = (rateBtn && rateBtn.textContent.includes('1.25x')) ? 1.25 : 1.0;
+        const playbackRate = (rateBtn && rateBtn.textContent.includes('1.25x')) ? 1.25 : 1.0;
         
         totalTime = Math.max(5, data.briefing.length / 14);
-
-        // Ducking Effect
-        utterance.onstart = () => {
+        
+        const duckAmbient = () => {
             if (!audioCtx) return;
             const now = audioCtx.currentTime;
-            const currentVol = masterGain.gain.value;
-            masterGain.gain.cancelScheduledValues(now);
-            masterGain.gain.setValueAtTime(currentVol, now);
-            masterGain.gain.linearRampToValueAtTime((prefs.volume/100) * 0.25, now + 0.3); // Duck
+            if (aqiDroneGain) {
+                aqiDroneGain.gain.cancelScheduledValues(now);
+                aqiDroneGain.gain.setValueAtTime(aqiDroneGain.gain.value, now);
+                aqiDroneGain.gain.linearRampToValueAtTime(0.05, now + 0.3);
+            }
+            if (weatherGain) {
+                weatherGain.gain.cancelScheduledValues(now);
+                weatherGain.gain.setValueAtTime(weatherGain.gain.value, now);
+                weatherGain.gain.linearRampToValueAtTime(0.03, now + 0.3);
+            }
         };
         
-        // Unducking Effect
-        utterance.onend = () => {
+        const unduckAmbient = () => {
             if (!audioCtx || !isPlaying) return;
             const now = audioCtx.currentTime;
-            const currentVol = masterGain.gain.value;
-            masterGain.gain.cancelScheduledValues(now);
-            masterGain.gain.setValueAtTime(currentVol, now);
-            masterGain.gain.linearRampToValueAtTime((prefs.volume/100) * 0.8, now + 0.8);
+            if (aqiDroneGain) {
+                aqiDroneGain.gain.cancelScheduledValues(now);
+                aqiDroneGain.gain.setValueAtTime(aqiDroneGain.gain.value, now);
+                aqiDroneGain.gain.linearRampToValueAtTime(0.2, now + 0.8);
+            }
+            if (weatherGain) {
+                weatherGain.gain.cancelScheduledValues(now);
+                weatherGain.gain.setValueAtTime(weatherGain.gain.value, now);
+                weatherGain.gain.linearRampToValueAtTime(0.15, now + 0.8);
+            }
         };
-        
-        if (prefs.playMode === 'berurutan') {
-            setTimeout(() => {
-                if (isPlaying) window.speechSynthesis.speak(utterance);
-            }, (totalTime / 2) * 1000);
+
+        if (voiceURI.startsWith('elevenlabs:')) {
+            const elVoiceId = voiceURI.replace('elevenlabs:', '');
+            
+            // Get CSRF Token from meta tag
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            
+            fetch('/api/tts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken || '' },
+                body: JSON.stringify({ text: data.briefing, voice_id: elVoiceId })
+            }).then(async res => {
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error || "ElevenLabs API Error");
+                }
+                return res.arrayBuffer();
+            })
+              .then(buffer => audioCtx.decodeAudioData(buffer))
+              .then(audioBuffer => {
+                  if (!isPlaying) return;
+                  const source = audioCtx.createOscillator();
+                  const ttsSource = audioCtx.createBufferSource();
+                  ttsSource.buffer = audioBuffer;
+                  ttsSource.playbackRate.value = playbackRate;
+                  
+                  const ttsGain = audioCtx.createGain();
+                  ttsGain.gain.value = 1.0;
+                  
+                  ttsSource.connect(ttsGain);
+                  ttsGain.connect(masterGain);
+                  
+                  ttsSource.onended = unduckAmbient;
+                  
+                  const playDelay = (prefs.playMode === 'berurutan') ? (totalTime / 2) : 0;
+                  
+                  setTimeout(() => {
+                      if (!isPlaying) return;
+                      duckAmbient();
+                      ttsSource.start();
+                  }, playDelay * 1000);
+                  
+              }).catch(e => {
+                  console.error("ElevenLabs Playback Error:", e);
+                  alert("Gagal memutar suara ElevenLabs: " + e.message + "\n\nSistem beralih ke suara Default OS.");
+                  
+                  // Fallback to local TTS
+                  utterance = new SpeechSynthesisUtterance(data.briefing);
+                  utterance.lang = (prefs.language === 'en') ? 'en-US' : 'id-ID';
+                  utterance.rate = playbackRate;
+                  utterance.onstart = duckAmbient;
+                  utterance.onend = unduckAmbient;
+                  window.speechSynthesis.speak(utterance);
+              });
+              
         } else {
-            window.speechSynthesis.speak(utterance);
+            utterance = new SpeechSynthesisUtterance(data.briefing);
+            utterance.lang = (prefs.language === 'en') ? 'en-US' : 'id-ID';
+            
+            if (voiceURI && voiceURI !== 'default') {
+                const actualUri = voiceURI.replace('local:', '');
+                const voices = window.speechSynthesis.getVoices();
+                const selectedVoice = voices.find(v => v.voiceURI === actualUri);
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                }
+            }
+            
+            utterance.rate = playbackRate;
+            utterance.onstart = duckAmbient;
+            utterance.onend = unduckAmbient;
+            
+            if (prefs.playMode === 'berurutan') {
+                setTimeout(() => {
+                    if (isPlaying) window.speechSynthesis.speak(utterance);
+                }, (totalTime / 2) * 1000);
+            } else {
+                window.speechSynthesis.speak(utterance);
+            }
         }
     }
 
@@ -873,6 +994,7 @@ Sintesis suara: Bahasa Indonesia (Aksara Sonik v1)
         
         setTimeout(() => {
             if (aqiDroneOsc) { aqiDroneOsc.stop(); aqiDroneOsc.disconnect(); }
+            if (window.aqiOvertoneOsc) { window.aqiOvertoneOsc.stop(); window.aqiOvertoneOsc.disconnect(); }
             if (weatherOsc) { weatherOsc.stop(); weatherOsc.disconnect(); }
         }, 600);
     }
