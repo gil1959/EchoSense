@@ -298,7 +298,7 @@ Sintesis suara: Bahasa Indonesia (Aksara Sonik v1)
 <div class="mb-2">
 <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-tealMint text-deepNavy" id="ui-weather-condition">Memuat</span>
 </div>
-<p class="text-xs text-textSecondary">Data real-time <span class="font-medium text-textPrimary">Open-Meteo API</span></p>
+<p class="text-xs text-textSecondary">Data real-time <span class="font-medium text-textPrimary">BMKG</span></p>
 </div>
 <button aria-expanded="false" class="text-xs font-semibold text-aquaBlue text-left pt-3 border-t border-cardBorder mt-4 hover:underline focus:outline-none" type="button">
               Perluas detail
