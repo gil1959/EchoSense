@@ -1382,13 +1382,13 @@
         currentState = STATES.MONITORING;
         
         const msg = prefs.language === 'en'
-            ? "I am now in active monitoring mode. I will regularly monitor environmental conditions and alert you if anything changes. You can speak or ask me questions anytime by pressing the spacebar on your keyboard, tapping the microphone button, or tapping your screen, for example ask about the weather, air quality, or traffic."
-            : "Saya sekarang dalam mode pemantauan aktif. Saya akan terus memeriksa kondisi secara berkala dan langsung memberi peringatan jika ada perubahan. Kamu bisa berbicara atau bertanya kapan saja dengan menekan tombol Spasi di keyboard, mengetuk layar, atau menekan tombol mikrofon. Misalnya tanyakan tentang cuaca, kualitas udara, atau lalu lintas.";
+            ? "I am now in active monitoring mode. I will regularly monitor environmental conditions and alert you if anything changes. You can speak or ask me questions anytime by simply tapping anywhere on your screen, or pressing the spacebar on your keyboard. For example, ask about the weather, air quality, or traffic."
+            : "Saya sekarang dalam mode pemantauan aktif. Saya akan terus memeriksa kondisi secara berkala dan langsung memberi peringatan jika ada perubahan. Kamu bisa berbicara atau bertanya kapan saja cukup dengan mengetuk layar di mana saja, atau menekan tombol Spasi di keyboard. Misalnya tanyakan tentang cuaca, kualitas udara, atau lalu lintas.";
         
         addMessage('assistant', msg);
         speak(msg, () => {
             enableMic();
-            updateStatus('Memantau (Tekan Spasi untuk bicara)', '#21B9BE');
+            updateStatus('Memantau (Ketuk layar / Spasi untuk bicara)', '#21B9BE');
         });
         
         const intervalMs = (prefs.monitorInterval || 60) * 1000;
@@ -1625,6 +1625,28 @@
             }, 1000);
         } else if (event.code === 'KeyS') {
             window.location.href = '/pengaturan';
+        }
+    });
+
+    // ============================================================
+    // TAP ANYWHERE ON SCREEN TO TALK (FOR MOBILE & ACCESSIBILITY)
+    // ============================================================
+    document.addEventListener('click', (event) => {
+        // Do not intercept clicks on interactive links, inputs, or control buttons
+        if (event.target.closest('a, button, input, textarea, select, #location-modal, [role="button"]')) {
+            return;
+        }
+
+        if (currentState === STATES.MONITORING) {
+            if (isSpeaking) {
+                stopSpeaking();
+            }
+            if (isListening) {
+                stopListening();
+            } else {
+                playMicChime();
+                startListening();
+            }
         }
     });
 

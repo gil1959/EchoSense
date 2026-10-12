@@ -35,6 +35,64 @@ class EchoSenseService
     }
 
     /**
+     * Convert integer to Indonesian spelled-out words
+     */
+    private function intToIndonesianWords($n)
+    {
+        if ($n === 0) return "nol";
+        $words = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas"];
+        if ($n < 0) return "minus " . $this->intToIndonesianWords(-$n);
+        if ($n < 12) return $words[$n];
+        if ($n < 20) return $this->intToIndonesianWords($n - 10) . " belas";
+        if ($n < 100) {
+            $ten = (int)($n / 10);
+            $rem = $n % 10;
+            return $words[$ten] . " puluh" . ($rem > 0 ? " " . $words[$rem] : "");
+        }
+        if ($n < 200) return "seratus" . ($n % 100 > 0 ? " " . $this->intToIndonesianWords($n % 100) : "");
+        if ($n < 1000) {
+            $hundred = (int)($n / 100);
+            $rem = $n % 100;
+            return $words[$hundred] . " ratus" . ($rem > 0 ? " " . $this->intToIndonesianWords($rem) : "");
+        }
+        if ($n < 2000) return "seribu" . ($n % 1000 > 0 ? " " . $this->intToIndonesianWords($n % 1000) : "");
+        if ($n < 1000000) {
+            $thousand = (int)($n / 1000);
+            $rem = $n % 1000;
+            return $this->intToIndonesianWords($thousand) . " ribu" . ($rem > 0 ? " " . $this->intToIndonesianWords($rem) : "");
+        }
+        if ($n < 1000000000) {
+            $million = (int)($n / 1000000);
+            $rem = $n % 1000000;
+            return $this->intToIndonesianWords($million) . " juta" . ($rem > 0 ? " " . $this->intToIndonesianWords($rem) : "");
+        }
+        return (string)$n;
+    }
+
+    /**
+     * Convert float or numeric string to Indonesian words (including decimals)
+     */
+    public function numberToIndonesianWords($numStr)
+    {
+        $numStr = str_replace(',', '.', trim((string)$numStr));
+        if (!is_numeric($numStr)) return $numStr;
+        
+        if (str_contains($numStr, '.')) {
+            [$intPart, $decPart] = explode('.', $numStr, 2);
+            $intWords = $this->intToIndonesianWords((int)$intPart);
+            $decDigits = str_split($decPart);
+            $digitsMap = [
+                '0' => 'nol', '1' => 'satu', '2' => 'dua', '3' => 'tiga', '4' => 'empat',
+                '5' => 'lima', '6' => 'enam', '7' => 'tujuh', '8' => 'delapan', '9' => 'sembilan'
+            ];
+            $decWords = array_map(fn($d) => $digitsMap[$d] ?? $d, $decDigits);
+            return $intWords . ' koma ' . implode(' ', $decWords);
+        }
+        
+        return $this->intToIndonesianWords((int)$numStr);
+    }
+
+    /**
      * Sanitize text to ensure natural, flawless pronunciation by TTS engine
      */
     public function sanitizeForTTS($text, $lang = 'id')
@@ -44,35 +102,46 @@ class EchoSenseService
         // 1. Remove markdown formatting
         $text = preg_replace('/[*_#`~>]/', '', $text);
 
-        // 2. Normalize temperature (e.g. 30°C, 30 °C, 30%c, 30% C, 30 derajat c)
-        $text = preg_replace('/(\d+)\s*°\s*C\b/iu', '$1 derajat Celcius', $text);
-        $text = preg_replace('/(\d+)\s*%\s*c\b/iu', '$1 derajat Celcius', $text);
-        $text = preg_replace('/(\d+)\s*derajat\s+c\b/iu', '$1 derajat Celcius', $text);
+        if (str_starts_with($lang, 'en')) {
+            $text = preg_replace('/(\d+(?:[\.,]\d+)?)\s*°\s*C\b/iu', '$1 degrees Celsius', $text);
+            $text = preg_replace('/(\d+(?:[\.,]\d+)?)\s*km\/h\b/iu', '$1 kilometers per hour', $text);
+            $text = preg_replace('/(\d+(?:[\.,]\d+)?)\s*%/iu', '$1 percent', $text);
+            $text = preg_replace('/PM\s*2[\.,]5/iu', 'PM two point five particles', $text);
+            $text = preg_replace('/AQI\s*(\d+)/iu', 'air quality index $1', $text);
+            return trim($text);
+        }
 
-        // 3. Normalize speed
-        $text = preg_replace('/(\d+)\s*km\/j(am)?\b/iu', '$1 kilometer per jam', $text);
-        $text = preg_replace('/(\d+)\s*km\/h\b/iu', '$1 kilometer per jam', $text);
+        // --- BAHASA INDONESIA SPELLING OF ALL NUMBERS ---
+        // 2. Temperature: 30°C, 30.5°C, 30%c, 30 derajat Celcius, 30 derajat c
+        $text = preg_replace_callback('/(\d+(?:[\.,]\d+)?)\s*(?:°\s*C|%\s*c|derajat\s*Celcius|derajat\s*c)\b/iu', function($m) {
+            return $this->numberToIndonesianWords($m[1]) . ' derajat Celcius';
+        }, $text);
 
-        // 4. Normalize percentage
-        $text = preg_replace('/(\d+)\s*%/iu', '$1 persen', $text);
+        // 3. Speed: 40km/jam, 40 km/h, 40 kilometer per jam
+        $text = preg_replace_callback('/(\d+(?:[\.,]\d+)?)\s*(?:km\/j(?:am)?|km\/h|kilometer\s*per\s*jam)\b/iu', function($m) {
+            return $this->numberToIndonesianWords($m[1]) . ' kilometer per jam';
+        }, $text);
 
-        // 5. Normalize PM2.5 and AQI
+        // 4. Percentage: 65%
+        $text = preg_replace_callback('/(\d+(?:[\.,]\d+)?)\s*%/iu', function($m) {
+            return $this->numberToIndonesianWords($m[1]) . ' persen';
+        }, $text);
+
+        // 5. AQI & PM2.5
         $text = preg_replace('/PM\s*2[\.,]5/iu', 'partikel PM dua koma lima', $text);
-        $text = preg_replace('/AQI\s*(\d+)/iu', 'indeks kualitas udara $1', $text);
+        $text = preg_replace_callback('/(?:indeks\s+)?AQI\s*(\d+)/iu', function($m) {
+            return 'indeks kualitas udara ' . $this->numberToIndonesianWords($m[1]);
+        }, $text);
 
-        // 6. Common abbreviations in Indonesian
+        // 6. Common abbreviations
         $text = preg_replace('/\bdll\.?\b/iu', 'dan lain-lain', $text);
         $text = preg_replace('/\bdst\.?\b/iu', 'dan seterusnya', $text);
         $text = preg_replace('/\bsbb\.?\b/iu', 'sebagai berikut', $text);
 
-        // 7. English replacements if lang is en
-        if (str_starts_with($lang, 'en')) {
-            $text = preg_replace('/(\d+)\s*derajat\s+Celcius/iu', '$1 degrees Celsius', $text);
-            $text = preg_replace('/(\d+)\s*kilometer\s+per\s+jam/iu', '$1 kilometers per hour', $text);
-            $text = preg_replace('/(\d+)\s*persen/iu', '$1 percent', $text);
-            $text = preg_replace('/partikel\s+PM\s+dua\s+koma\s+lima/iu', 'PM 2.5 particles', $text);
-            $text = preg_replace('/indeks\s+kualitas\s+udara\s+(\d+)/iu', 'air quality index $1', $text);
-        }
+        // 7. Any remaining standalone numbers convert to words so TTS never stumbles on digits
+        $text = preg_replace_callback('/\b\d+(?:[\.,]\d+)?\b/u', function($m) {
+            return $this->numberToIndonesianWords($m[0]);
+        }, $text);
 
         return trim($text);
     }

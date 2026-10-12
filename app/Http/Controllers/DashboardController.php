@@ -95,7 +95,7 @@ class DashboardController extends Controller
      */
     public function generateAlert(Request $request)
     {
-        $type = $request->input('type'); // 'aqi', 'weather', 'traffic'
+        $type = $request->input('type'); 
         $data = $request->input('data');
         $lang = $request->input('lang', 'id');
 
