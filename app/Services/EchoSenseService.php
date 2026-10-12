@@ -8,20 +8,20 @@ use Illuminate\Support\Facades\Log;
 class EchoSenseService
 {
     /**
-     * Get aggregated environmental data for a location
+     * Mengambil gabungan data lingkungan untuk suatu lokasi koordinat
      */
     public function getEnvironmentData($lat, $lon, $lang = 'id')
     {
-        // 1. Fetch Air Quality (OpenAQ)
+        // Kualitas udara dari OpenAQ
         $aqiData = $this->fetchOpenAQ($lat, $lon);
         
-        // 2. Fetch Traffic (TomTom)
+        // Lalu lintas dari TomTom
         $trafficData = $this->fetchTomTom($lat, $lon);
         
-        // 3. Fetch Weather (Real Data via Open-Meteo)
+        // Cuaca dari Open-Meteo
         $weatherData = $this->fetchWeather($lat, $lon);
 
-        // 4. Generate Voice Briefing (Gemini) based on preferred language
+        // Ringkasan suara dari Gemini
         $briefing = $this->generateVoiceBriefing($aqiData, $trafficData, $weatherData, $lang);
 
         return [
@@ -35,7 +35,7 @@ class EchoSenseService
     }
 
     /**
-     * Convert integer to Indonesian spelled-out words
+     * Mengubah angka bulat menjadi kata terbilang dalam bahasa Indonesia
      */
     private function intToIndonesianWords($n)
     {
@@ -70,7 +70,7 @@ class EchoSenseService
     }
 
     /**
-     * Convert float or numeric string to Indonesian words (including decimals)
+     * Mengubah angka desimal atau pecahan menjadi kata terbilang dalam bahasa Indonesia
      */
     public function numberToIndonesianWords($numStr)
     {
@@ -93,13 +93,13 @@ class EchoSenseService
     }
 
     /**
-     * Sanitize text to ensure natural, flawless pronunciation by TTS engine
+     * Sanitasi teks agar pelafalan oleh mesin TTS terdengar fasih dan alami
      */
     public function sanitizeForTTS($text, $lang = 'id')
     {
         if (empty($text)) return '';
 
-        // 1. Remove markdown formatting
+        // Hapus karakter format markdown
         $text = preg_replace('/[*_#`~>]/', '', $text);
 
         if (str_starts_with($lang, 'en')) {
@@ -111,34 +111,33 @@ class EchoSenseService
             return trim($text);
         }
 
-        // --- BAHASA INDONESIA SPELLING OF ALL NUMBERS ---
-        // 2. Temperature: 30°C, 30.5°C, 30%c, 30 derajat Celcius, 30 derajat c
+        // Konversi suhu ke terbilang kata
         $text = preg_replace_callback('/(\d+(?:[\.,]\d+)?)\s*(?:°\s*C|%\s*c|derajat\s*Celcius|derajat\s*c)\b/iu', function($m) {
             return $this->numberToIndonesianWords($m[1]) . ' derajat Celcius';
         }, $text);
 
-        // 3. Speed: 40km/jam, 40 km/h, 40 kilometer per jam
+        // Konversi kecepatan ke terbilang kata
         $text = preg_replace_callback('/(\d+(?:[\.,]\d+)?)\s*(?:km\/j(?:am)?|km\/h|kilometer\s*per\s*jam)\b/iu', function($m) {
             return $this->numberToIndonesianWords($m[1]) . ' kilometer per jam';
         }, $text);
 
-        // 4. Percentage: 65%
+        // Konversi persentase ke terbilang kata
         $text = preg_replace_callback('/(\d+(?:[\.,]\d+)?)\s*%/iu', function($m) {
             return $this->numberToIndonesianWords($m[1]) . ' persen';
         }, $text);
 
-        // 5. AQI & PM2.5
+        // Standarisasi istilah kualitas udara
         $text = preg_replace('/PM\s*2[\.,]5/iu', 'partikel PM dua koma lima', $text);
         $text = preg_replace_callback('/(?:indeks\s+)?AQI\s*(\d+)/iu', function($m) {
             return 'indeks kualitas udara ' . $this->numberToIndonesianWords($m[1]);
         }, $text);
 
-        // 6. Common abbreviations
+        // Singkatan umum
         $text = preg_replace('/\bdll\.?\b/iu', 'dan lain-lain', $text);
         $text = preg_replace('/\bdst\.?\b/iu', 'dan seterusnya', $text);
         $text = preg_replace('/\bsbb\.?\b/iu', 'sebagai berikut', $text);
 
-        // 7. Any remaining standalone numbers convert to words so TTS never stumbles on digits
+        // Konversi angka mandiri yang tersisa menjadi kata terbilang
         $text = preg_replace_callback('/\b\d+(?:[\.,]\d+)?\b/u', function($m) {
             return $this->numberToIndonesianWords($m[0]);
         }, $text);
@@ -147,7 +146,7 @@ class EchoSenseService
     }
 
     /**
-     * Loosely extract core destination name from colloquial phrases
+     * Mengekstrak nama lokasi tujuan dari percakapan santai
      */
     public function extractDestination($text)
     {
@@ -171,7 +170,7 @@ class EchoSenseService
     }
 
     /**
-     * Geocode a location name to coordinates using Nominatim with resilient multi-step fallback
+     * Mengubah nama lokasi menjadi koordinat lintang dan bujur
      */
     public function geocodeLocation($query)
     {
@@ -201,7 +200,7 @@ class EchoSenseService
             }
         }
 
-        // Fallback to Gemini location entity extraction if direct geocode fails
+        // Ekstraksi entitas lokasi melalui Gemini jika pencarian langsung belum berhasil
         $key = env('GEMINI_API_KEY');
         if ($key) {
             try {
@@ -231,7 +230,7 @@ class EchoSenseService
     }
 
     /**
-     * Generate TTS alert narration for environmental warnings
+     * Menghasilkan narasi peringatan kondisi lingkungan
      */
     public function generateAlertNarration($type, $data, $lang = 'id')
     {
@@ -275,7 +274,7 @@ class EchoSenseService
     }
 
     /**
-     * Generate destination briefing comparing origin and destination conditions
+     * Menghasilkan ringkasan kondisi lingkungan di lokasi tujuan
      */
     public function generateDestinationBriefing($destData, $destName, $lang = 'id')
     {
@@ -307,7 +306,7 @@ Aturan penting:
     }
 
     /**
-     * Generate the onboarding greeting message
+     * Menghasilkan teks sapaan pengenalan awal aplikasi
      */
     public function generateOnboardingGreeting($lang = 'id')
     {
@@ -321,23 +320,23 @@ Aturan penting:
     }
 
     /**
-     * Process voice command text and determine intent
+     * Memproses teks perintah suara dan menentukan intensi pengguna
      */
     public function processVoiceIntent($text, $lang = 'id')
     {
         $textLower = mb_strtolower(trim($text));
 
-        // 1. Precise Affirmative responses (e.g. 'ya', 'iya benar', 'betul')
+        // Jawaban konfirmasi setuju (ya, benar, dll)
         if (preg_match('/^(ya|iya|benar|betul|bener|yoi|yes|ok|oke|yep|yup)(\s+(ya|iya|benar|betul|bener|dong|sih|deh|aja|saja|banget|kok))*$/iu', $textLower)) {
             return ['intent' => 'confirm_yes', 'text' => $text];
         }
 
-        // 2. Precise Negative responses (e.g. 'tidak', 'bukan', 'salah', 'nggak')
+        // Jawaban konfirmasi menolak (tidak, bukan, dll)
         if (preg_match('/^(tidak|bukan|salah|no|nope|nggak|enggak|gak|ndak)(\s+(tidak|bukan|salah|kok|dong|sih|deh|aja|saja))*$/iu', $textLower)) {
             return ['intent' => 'confirm_no', 'text' => $text];
         }
 
-        // 3. Current condition queries
+        // Pertanyaan kondisi lingkungan
         $conditionQueries = ['kondisi', 'bagaimana', 'cuaca', 'udara', 'lalu lintas', 'macet', 'hujan', 'panas', 'suhu', 'how', 'condition', 'weather', 'traffic', 'sekarang', 'saat ini'];
         foreach ($conditionQueries as $word) {
             if (str_contains($textLower, $word)) {
@@ -345,7 +344,7 @@ Aturan penting:
             }
         }
 
-        // 4. Help command
+        // Permintaan bantuan
         $helpQueries = ['bantuan', 'bantu', 'help', 'tolong', 'apa saja', 'bisa apa', 'panduan'];
         foreach ($helpQueries as $word) {
             if (str_contains($textLower, $word)) {
@@ -353,13 +352,13 @@ Aturan penting:
             }
         }
 
-        // 5. Destination intent (loosely extracted)
+        // Deteksi lokasi tujuan
         $extractedDest = $this->extractDestination($text);
         if (!empty($extractedDest)) {
             return ['intent' => 'set_destination', 'destination' => $extractedDest, 'text' => $text];
         }
 
-        // Default: treat as general input
+        // Input umum lainnya
         return ['intent' => 'general_input', 'text' => $text];
     }
 
@@ -388,7 +387,7 @@ Aturan penting:
             Log::error('OpenAQ Error: ' . $e->getMessage());
         }
 
-        // Fallback
+        // Data cadangan jika layanan tidak dapat dihubungi
         return ['status' => 'fallback', 'pm25' => 15, 'category' => 'Baik'];
     }
 
@@ -427,7 +426,7 @@ Aturan penting:
     private function fetchWeather($lat, $lon)
     {
         try {
-            // Open-Meteo is free and doesn't require an API key
+            // Mengambil prakiraan cuaca dari Open-Meteo
             $response = Http::get("https://api.open-meteo.com/v1/forecast", [
                 'latitude' => $lat,
                 'longitude' => $lon,
@@ -440,12 +439,12 @@ Aturan penting:
                 $temp = $current['temperature'];
                 $code = $current['weathercode'];
 
-                // Map WMO weather codes to Indonesian conditions
+                // Pemetaan kode cuaca WMO ke bahasa Indonesia
                 $condition = 'Cerah';
                 if ($code >= 1 && $code <= 3) $condition = 'Cerah Berawan';
                 elseif ($code >= 45 && $code <= 48) $condition = 'Berkabut';
                 elseif ($code >= 51 && $code <= 67) $condition = 'Hujan Ringan';
-                elseif ($code >= 71 && $code <= 77) $condition = 'Bersalju'; // Unlikely in Indo but mapping it
+                elseif ($code >= 71 && $code <= 77) $condition = 'Bersalju';
                 elseif ($code >= 80 && $code <= 82) $condition = 'Hujan Deras';
                 elseif ($code >= 95) $condition = 'Badai Petir';
 
@@ -528,7 +527,7 @@ Aturan penting:
     }
 
     /**
-     * Sweetly answer user conversational queries during monitoring mode
+     * Memberikan jawaban ramah untuk pertanyaan pengguna saat mode pemantauan
      */
     public function answerUserQuery($query, $currentData, $lang = 'id')
     {
@@ -576,7 +575,7 @@ Aturan penting:
     }
 
     /**
-     * Call Gemini API with a prompt and return text, or fallback on error
+     * Memanggil API Gemini untuk menghasilkan teks respons
      */
     private function callGemini($prompt, $key, $fallback)
     {

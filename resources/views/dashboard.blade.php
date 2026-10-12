@@ -80,7 +80,7 @@
     .typing-dot-3 { animation: typing-dots 1.4s ease-in-out infinite 0.4s; }
   </style>
 <style data-purpose="accessibility-focus">
-    /* High contrast focus ring for accessible keyboard navigation */
+    /* Cincin fokus kontras tinggi untuk navigasi aksesibilitas */
     a:focus-visible, button:focus-visible, input:focus-visible {
       outline: 3px solid #0675A3;
       outline-offset: 2px;
@@ -364,7 +364,7 @@
     let isSpeaking = false;
     let isListening = false;
     let audioCtx = null;
-    let currentAudio = null; // Track current audio element for stopping
+    let currentAudio = null;
 
     let prefs = JSON.parse(localStorage.getItem('echosense_prefs')) || {
         volume: 80, speed: 100, language: 'id', voiceURI: 'elevenlabs:Xb7hH8MSUJpSbSDYk0k2',
@@ -388,9 +388,7 @@
     const alerts = JSON.parse(localStorage.getItem('echosense_alerts')) || { alert_aqi: true, alert_weather: true, alert_traffic: false };
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-    // ============================================================
-    // SPEECH RECOGNITION SETUP
-    // ============================================================
+    // Inisialisasi pengenalan suara
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
     let speechSupported = false;
@@ -415,8 +413,7 @@
                 stopListening();
                 handleUserSpeech(transcript);
             } else {
-                // Show interim results
-                updateMicLabel(`🎙️ "${transcript}..."`);
+                updateMicLabel(`"${transcript}..."`);
             }
         };
 
@@ -592,7 +589,7 @@
             done();
         };
 
-        // Workaround for Chrome speech pause bug on long sentences
+        // Penanganan jeda otomatis Chrome pada kalimat panjang
         const chromeResumeLoop = setInterval(() => {
             if (window.speechSynthesis.speaking) {
                 window.speechSynthesis.pause();
@@ -625,8 +622,8 @@
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
             osc.type = 'sine';
-            osc.frequency.setValueAtTime(587.33, now); // D5
-            osc.frequency.setValueAtTime(880, now + 0.1); // A5
+            osc.frequency.setValueAtTime(587.33, now);
+            osc.frequency.setValueAtTime(880, now + 0.1);
             gain.gain.setValueAtTime(0.18, now);
             gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
             osc.connect(gain);
@@ -638,7 +635,7 @@
 
     function togglePlayPause() {
         if (isSpeaking) {
-            // Pause
+            // Jeda pemutaran
             if (currentAudio) {
                 currentAudio.pause();
             }
@@ -650,7 +647,7 @@
             updateAudioControls(false);
             updateStatus('Dijeda', '#42586A');
         } else if (isPaused) {
-            // Resume
+            // Lanjutkan pemutaran
             if (currentAudio && currentAudio.paused) {
                 currentAudio.play();
                 isSpeaking = true;
@@ -681,9 +678,7 @@
         }
     }
 
-    // ============================================================
-    // MICROPHONE CONTROL
-    // ============================================================
+    // Kontrol mikrofon
     function startListening() {
         if (!speechSupported) {
             addMessage('system', 'Browser Anda tidak mendukung input suara. Silakan gunakan Chrome atau Edge.');
@@ -699,14 +694,14 @@
         try {
             recognition.start();
         } catch(e) {
-            // Already started
+            // Pengenalan suara sudah berjalan
         }
         
         btnMic.classList.add('mic-pulsing', 'bg-red-500', 'hover:bg-red-600');
         btnMic.classList.remove('bg-aquaBlue', 'hover:bg-aquaHover');
         micIcon.classList.add('hidden');
         micStopIcon.classList.remove('hidden');
-        updateMicLabel('🎙️ Mendengarkan...');
+        updateMicLabel('Mendengarkan...');
         updateStatus('Mendengarkan...', '#FD7659');
     }
 
@@ -1040,17 +1035,17 @@
                     const lat = position.coords.latitude;
                     const lon = position.coords.longitude;
                     
-                    // 1. Reverse geocoding in parallel
+                    // Geocoding balik koordinat lokasi secara paralel
                     const locName = await reverseGeocode(lat, lon);
                     currentLocation = { lat, lon, name: locName };
                     
-                    // 2. Fetch environment data (AQI, weather, traffic) in parallel!
+                    // Mengambil data lingkungan secara paralel
                     const data = await fetchEnvironmentData(lat, lon);
                     preloadedOriginData = data;
                     currentData = data;
                     previousData = JSON.parse(JSON.stringify(data));
                     
-                    // Save and update UI
+                    // Simpan dan perbarui tampilan antarmuka
                     if (locations.length === 0 || !locations.find(l => l.lat == lat && l.lon == lon)) {
                         locations = [{
                             id: Date.now(),
@@ -1080,7 +1075,7 @@
     }
 
     async function startConversation() {
-        // Initialize and resume AudioContext for browser audio policy
+        // Inisialisasi konteks audio browser
         if (!audioCtx) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
@@ -1094,10 +1089,10 @@
         currentState = STATES.GREETING;
         updateStatus('Menyapa & memuat data...', '#FEB161');
 
-        // PARALEL 1: Langsung ambil lokasi GPS & data lingkungan di background!
+        // Ambil lokasi GPS dan data lingkungan di latar belakang
         startParallelBackgroundFetch();
         
-        // PARALEL 2: Bersamaan langsung mulai suara TTS menyapa dan menjelaskan sistem!
+        // Memulai suara sapaan dan pengenalan sistem secara bersamaan
         const greeting = prefs.language === 'en'
             ? "Hello! Welcome to EchoSense. I am your inclusive voice assistant that helps you understand the environmental conditions around you in real-time. I provide updates on air quality, weather, and traffic conditions. Please note that as an AI-powered system, I may occasionally make mistakes or experience slight data delays, so always prioritize your safety. How it works: you can listen to my voice guidance and respond directly using your voice whenever the microphone is active after the chime. I am currently detecting your location and retrieving environmental data in the background."
             : "Halo! Selamat datang di EchoSense. Saya adalah asisten suara inklusif yang membantu Anda memahami kondisi lingkungan sekitar secara real-time. Saya dapat memberikan informasi tentang kualitas udara, cuaca, dan kondisi lalu lintas. Harap diperhatikan bahwa sistem berbasis kecerdasan buatan ini dapat menimbulkan kesalahan informasi atau keterlambatan data, sehingga tetap utamakan keselamatan dan intuisi Anda. Cara kerjanya, Anda cukup mendengarkan panduan suara saya dan dapat berbicara langsung saat mikrofon aktif setelah bunyi nada. Saat ini, saya sedang mendeteksi lokasi dan data lingkungan Anda di latar belakang.";
@@ -1332,12 +1327,12 @@
         const intent = await response.json();
         
         if (intent.intent === 'confirm_no') {
-            // No destination, go to monitoring
+            // Tanpa tujuan perjalanan, langsung ke mode pemantauan
             startMonitoring();
             return;
         }
         
-        // Extract destination
+        // Ekstraksi nama tujuan
         let destName = text;
         if (intent.intent === 'set_destination' && intent.destination) {
             destName = intent.destination;
@@ -1375,9 +1370,7 @@
         }
     }
 
-    // ============================================================
-    // REAL-TIME MONITORING
-    // ============================================================
+    // Pemantauan berkala kondisi lingkungan
     function startMonitoring() {
         currentState = STATES.MONITORING;
         
@@ -1407,7 +1400,7 @@
             currentData = newData;
         }, intervalMs);
         
-        // Also start GPS tracking if user has a destination
+        // Pelacakan GPS jika ada tujuan perjalanan
         if (destination) {
             startGPSTracking();
         }
@@ -1426,7 +1419,7 @@
     function checkForAlerts(oldData, newData) {
         if (!oldData || !newData) return;
         
-        // AQI Alert
+        // Peringatan kualitas udara
         if (alerts.alert_aqi) {
             const oldAQI = oldData.raw_data?.aqi?.pm25 || 0;
             const newAQI = newData.raw_data?.aqi?.pm25 || 0;
@@ -1438,7 +1431,7 @@
             }
         }
         
-        // Weather Alert
+        // Peringatan cuaca ekstrem
         if (alerts.alert_weather) {
             const oldCondition = oldData.raw_data?.weather?.condition || '';
             const newCondition = newData.raw_data?.weather?.condition || '';
@@ -1451,7 +1444,7 @@
             }
         }
         
-        // Traffic Alert
+        // Peringatan kemacetan lalu lintas
         if (alerts.alert_traffic) {
             const oldCongestion = oldData.raw_data?.traffic?.congestion || '';
             const newCongestion = newData.raw_data?.traffic?.congestion || '';
@@ -1465,7 +1458,7 @@
     }
 
     async function triggerAlert(type, data) {
-        // Stop any current speech
+        // Hentikan suara yang sedang aktif
         stopSpeaking();
         
         addTypingIndicator();
@@ -1486,7 +1479,7 @@
             });
         } catch(e) {
             removeTypingIndicator();
-            // Fallback alert
+            // Peringatan cadangan jika API bermasalah
             const fallbackMsg = type === 'aqi' 
                 ? `Perhatian. Kualitas udara memburuk. PM2.5 sekarang di angka ${data.value}.`
                 : type === 'weather'
@@ -1518,7 +1511,7 @@
                     updateStatus('Memantau (Tekan Spasi untuk bicara)', '#21B9BE');
                 });
             } else {
-                // Re-fetch current conditions
+                // Ambil ulang data kondisi terkini
                 addTypingIndicator();
                 updateStatus('Mengambil data terbaru...', '#14C5D9');
                 const data = await fetchEnvironmentData(currentLocation.lat, currentLocation.lon);
@@ -1546,7 +1539,7 @@
                 updateStatus('Memantau (Tekan Spasi untuk bicara)', '#21B9BE');
             });
         } else {
-            // Try as conversational query or destination
+            // Tangani sebagai percakapan santai atau tujuan perjalanan
             if (intent.answer) {
                 addMessage('assistant', intent.answer);
                 speak(intent.answer, () => {
@@ -1575,17 +1568,15 @@
         }
     }
 
-    // ============================================================
-    // EVENT LISTENERS
-    // ============================================================
+    // Perekam aksi pengguna
     
-    // Play/Pause button
+    // Tombol putar atau jeda
     btnPlayPause?.addEventListener('click', togglePlayPause);
 
-    // Replay button
+    // Tombol putar ulang suara
     btnReplay?.addEventListener('click', replayLastNarration);
 
-    // Mic button
+    // Tombol mikrofon
     btnMic?.addEventListener('click', () => {
         if (isListening) {
             stopListening();
@@ -1594,7 +1585,7 @@
         }
     });
 
-    // Keyboard shortcuts
+    // Pintasan keyboard
     document.addEventListener('keydown', (event) => {
         if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') return;
         
@@ -1628,11 +1619,9 @@
         }
     });
 
-    // ============================================================
-    // TAP ANYWHERE ON SCREEN TO TALK (FOR MOBILE & ACCESSIBILITY)
-    // ============================================================
+    // Ketuk layar di mana saja untuk berbicara pada mode pemantauan
     document.addEventListener('click', (event) => {
-        // Do not intercept clicks on interactive links, inputs, or control buttons
+        // Jangan tangani klik pada elemen tombol, tautan, atau form
         if (event.target.closest('a, button, input, textarea, select, #location-modal, [role="button"]')) {
             return;
         }
@@ -1666,14 +1655,14 @@
         }
     }
 
-    // Auto-start initialization (Starts immediately when visually impaired user opens the page)
+    // Inisialisasi otomatis saat pengguna tunanetra membuka halaman
     function initAutoStart() {
         if (hasAutoStarted) return;
         hasAutoStarted = true;
         startConversation();
     }
 
-    // Auto-start on load
+    // Memulai asisten saat DOM siap
     document.addEventListener('DOMContentLoaded', () => {
         renderLocations();
         initAutoStart();
@@ -1683,7 +1672,7 @@
         if (!hasAutoStarted) initAutoStart();
     });
 
-    // Global listeners: any user activity immediately un-suspends audio context & starts/resumes playback without any visual barrier
+    // Listener global untuk membuka kunci audio browser pada interaksi pertama
     ['click', 'keydown', 'touchstart', 'focus'].forEach(evt => {
         window.addEventListener(evt, () => {
             unlockAndStartAudio();

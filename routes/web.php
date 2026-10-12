@@ -15,14 +15,14 @@ Route::get('/pengaturan', function () {
 });
 
 Route::get('/riwayat', function () {
-    return view('pengaturan'); // placeholder
+    return view('pengaturan');
 });
 
 Route::get('/peringatan', function () {
-    return view('pengaturan'); // placeholder
+    return view('pengaturan');
 });
 
-// API Routes
+// Rute API
 Route::get('/api/briefing', [\App\Http\Controllers\DashboardController::class, 'getEnvironmentBriefing']);
 Route::get('/api/voices', [\App\Http\Controllers\DashboardController::class, 'getVoices']);
 Route::post('/api/tts', [\App\Http\Controllers\DashboardController::class, 'generateTTS']);

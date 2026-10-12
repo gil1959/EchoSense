@@ -352,12 +352,12 @@
 <!-- BEGIN: MainFooter -->
 <x-footer />
 <!-- END: MainFooter -->
-<!-- JavaScript for Interactive Controls -->
+<!-- Skrip Interaksi Pengaturan -->
 <script data-purpose="settings-interaction">
-    // Default Preferences (no more sonification params)
+    // Preferensi bawaan
     const defaultPrefs = {
         volume: 80,
-        speed: 100, // 100 = 1.0x
+        speed: 100,
         language: 'id',
         voiceURI: 'elevenlabs:Xb7hH8MSUJpSbSDYk0k2',
         autoGreet: true,
@@ -365,9 +365,9 @@
         repeatAlert: false
     };
 
-    // Load preferences
+    // Memuat preferensi tersimpan
     let prefs = JSON.parse(localStorage.getItem('echosense_prefs')) || defaultPrefs;
-    // Migration: ensure new fields exist
+    // Migrasi nilai bawaan jika belum tersedia
     if (prefs.speed === undefined) prefs.speed = defaultPrefs.speed;
     if (prefs.autoGreet === undefined) prefs.autoGreet = defaultPrefs.autoGreet;
     if (prefs.monitorInterval === undefined) prefs.monitorInterval = defaultPrefs.monitorInterval;
@@ -400,7 +400,7 @@
         
         setTimeout(populateVoices, 100);
         
-        // Load Alerts
+        // Memuat status toggle peringatan
         const alerts = JSON.parse(localStorage.getItem('echosense_alerts')) || { alert_aqi: true, alert_weather: true, alert_traffic: false };
         const alertAqiEl = document.querySelector('input[name="alert_aqi"]');
         const alertWeatherEl = document.querySelector('input[name="alert_weather"]');
@@ -450,7 +450,7 @@
       slider.style.background = `linear-gradient(90deg, #0675A3 0%, #14C5D9 ${percent}%, #E6F2F7 ${percent}%, #E6F2F7 100%)`;
     }
 
-    // Initialize on load
+    // Inisialisasi pengaturan saat halaman siap
     document.addEventListener('DOMContentLoaded', initSettings);
 
     let availableVoices = [];
@@ -467,7 +467,7 @@
         
         selectVoice.innerHTML = '<option value="default">Default OS (Disarankan)</option>';
         
-        // Add Local/Browser Voices
+        // Menambahkan opsi suara lokal atau browser
         const optGroup1 = document.createElement('optgroup');
         optGroup1.label = "Suara Bawaan (Browser/OS)";
         filteredVoices.forEach((voice) => {
@@ -481,7 +481,7 @@
         });
         selectVoice.appendChild(optGroup1);
         
-        // Fetch ElevenLabs Voices
+        // Mengambil daftar suara dari ElevenLabs
         try {
             const response = await fetch('/api/voices');
             const data = await response.json();
@@ -508,7 +508,7 @@
     
     document.getElementById('select-language')?.addEventListener('change', populateVoices);
 
-    // Form Submit (Save Settings)
+    // Menyimpan perubahan preferensi
     document.querySelector('form')?.addEventListener('submit', function(e) {
         e.preventDefault();
         prefs.volume = parseInt(document.getElementById('volume-range').value);
@@ -521,13 +521,13 @@
         
         localStorage.setItem('echosense_prefs', JSON.stringify(prefs));
         
-        // Save Alerts
+        // Simpan preferensi peringatan
         const alert_aqi = document.querySelector('input[name="alert_aqi"]').checked;
         const alert_weather = document.querySelector('input[name="alert_weather"]').checked;
         const alert_traffic = document.querySelector('input[name="alert_traffic"]').checked;
         localStorage.setItem('echosense_alerts', JSON.stringify({ alert_aqi, alert_weather, alert_traffic }));
         
-        // Save Active Locations
+        // Simpan status lokasi aktif
         const activeLocs = {};
         document.querySelectorAll('.loc-checkbox').forEach(cb => {
             activeLocs[cb.dataset.id] = cb.checked;
@@ -540,7 +540,7 @@
         setTimeout(() => btn.innerHTML = originalText, 2000);
     });
 
-    // Preview voice
+    // Uji coba pratinjau suara
     document.getElementById('btn-preview')?.addEventListener('click', function() {
         const langVal = document.getElementById('select-language').value;
         const voiceURI = document.getElementById('select-voice').value;
@@ -553,7 +553,7 @@
         speakText(text, voiceURI, langVal, speedVal);
     });
 
-    // Language Test trigger
+    // Uji coba tes bahasa
     document.getElementById('btn-test-language')?.addEventListener('click', function() {
         const langVal = document.getElementById('select-language').value;
         const voiceURI = document.getElementById('select-voice').value;
@@ -614,7 +614,7 @@
         }
     }
 
-    // Reset settings trigger
+    // Setel ulang preferensi ke default
     document.getElementById('btn-reset')?.addEventListener('click', function() {
       localStorage.setItem('echosense_prefs', JSON.stringify(defaultPrefs));
       prefs = {...defaultPrefs};
@@ -678,7 +678,7 @@
         if (countSpan) countSpan.textContent = `${activeCount} dari ${checkboxes.length} aktif`;
     }
     
-    // Call loadDynamicLocations on DOMContentLoaded
+    // Muat lokasi dinamis setelah DOM siap
     document.addEventListener('DOMContentLoaded', loadDynamicLocations);
   </script>
 </body></html>

@@ -15,7 +15,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Get environment briefing data for a location (replaces old getSonificationData)
+     * Mengambil data ringkasan lingkungan untuk suatu koordinat lokasi
      */
     public function getEnvironmentBriefing(Request $request)
     {
@@ -29,7 +29,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Get destination data: geocode + environment briefing for a destination
+     * Mengambil data tujuan: geocoding dan ringkasan kondisi di lokasi tujuan
      */
     public function getDestinationData(Request $request)
     {
@@ -40,7 +40,7 @@ class DashboardController extends Controller
             return response()->json(['error' => 'Destination is required'], 400);
         }
 
-        // 1. Geocode the destination name to coordinates with robust extraction
+        // Ekstraksi dan geocoding nama lokasi tujuan
         $cleanedDest = $this->echoSense->extractDestination($destination);
         $geocoded = $this->echoSense->geocodeLocation($destination);
 
@@ -51,10 +51,10 @@ class DashboardController extends Controller
             ], 404);
         }
 
-        // 2. Fetch environment data for the destination
+        // Mengambil data lingkungan lokasi tujuan
         $envData = $this->echoSense->getEnvironmentData($geocoded['lat'], $geocoded['lon'], $lang);
 
-        // 3. Generate destination-specific briefing
+        // Membuat narasi ringkasan kondisi tujuan
         $destBriefing = $this->echoSense->generateDestinationBriefing($envData, $geocoded['name'], $lang);
 
         return response()->json([
@@ -69,7 +69,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Process a voice command from the user
+     * Memproses perintah suara pengguna dan menentukan intensi
      */
     public function processVoiceCommand(Request $request)
     {
@@ -82,7 +82,7 @@ class DashboardController extends Controller
 
         $intent = $this->echoSense->processVoiceIntent($text, $lang);
 
-        // If user is querying conditions and provided current telemetry, generate immediate warm answer
+        // Jika menanyakan kondisi dan data tersedia, buat jawaban ramah langsung
         if ($intent['intent'] === 'query_condition' && $request->has('current_data')) {
             $intent['answer'] = $this->echoSense->answerUserQuery($text, $request->input('current_data'), $lang);
         }
@@ -91,7 +91,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Generate alert narration for environment warnings
+     * Menghasilkan narasi peringatan kondisi lingkungan berbahaya
      */
     public function generateAlert(Request $request)
     {
@@ -109,7 +109,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * Get available TTS voices from ElevenLabs
+     * Mengambil daftar pilihan suara dari ElevenLabs
      */
     public function getVoices()
     {
@@ -130,7 +130,7 @@ class DashboardController extends Controller
     }
     
     /**
-     * Generate TTS audio via ElevenLabs
+     * Menghasilkan audio ucapan melalui ElevenLabs
      */
     public function generateTTS(Request $request)
     {
@@ -147,7 +147,7 @@ class DashboardController extends Controller
             return response()->json(['error' => 'Missing text or voice_id'], 400);
         }
 
-        // Sanitize text so ElevenLabs pronounces "30 derajat Celcius", "kilometer per jam", etc. naturally
+        // Sanitasi teks agar pelafalan angka dan satuan terdengar alami
         $text = $this->echoSense->sanitizeForTTS($rawText, $lang);
 
         $cacheKey = 'tts_' . md5($voiceId . '_' . trim($text));
@@ -161,11 +161,12 @@ class DashboardController extends Controller
             'Content-Type' => 'application/json'
         ])->post("https://api.elevenlabs.io/v1/text-to-speech/{$voiceId}?output_format=mp3_44100_128", [
             'text' => $text,
-            'model_id' => 'eleven_multilingual_v2', // Supports ID and EN
+            'model_id' => 'eleven_multilingual_v2',
         ]);
         
         if ($response->successful()) {
-            \Illuminate\Support\Facades\Cache::put($cacheKey, $response->body(), 86400 * 7); // Simpan 7 hari untuk menghemat kuota
+            // Simpan audio ke cache selama 7 hari untuk menghemat kuota
+            \Illuminate\Support\Facades\Cache::put($cacheKey, $response->body(), 86400 * 7);
             return response($response->body(), 200)->header('Content-Type', 'audio/mpeg');
         }
         
@@ -175,3 +176,4 @@ class DashboardController extends Controller
         return response()->json(['error' => $errorMsg], $response->status());
     }
 }
+
