@@ -4,7 +4,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>EchoSense - Dashboard utama dan kontrol audio</title>
+<title>EchoSense - Asisten Suara Lingkungan Aksesibel</title>
 <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}"/>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -50,67 +50,40 @@
     };
   </script>
 <style data-purpose="custom-animations">
-    @keyframes soundwave {
-      0%, 100% { height: 10px; }
-      50% { height: 42px; }
+    @keyframes pulse-mic {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(6, 117, 163, 0.5); }
+      50% { box-shadow: 0 0 0 16px rgba(6, 117, 163, 0); }
     }
-    .wave-bar-1 { animation: soundwave 1.1s ease-in-out infinite; }
-    .wave-bar-2 { animation: soundwave 1.1s ease-in-out infinite 0.16s; }
-    .wave-bar-3 { animation: soundwave 1.1s ease-in-out infinite 0.32s; }
-    .wave-bar-4 { animation: soundwave 1.1s ease-in-out infinite 0.48s; }
-    .wave-bar-5 { animation: soundwave 1.1s ease-in-out infinite 0.28s; }
-    .wave-bar-6 { animation: soundwave 1.1s ease-in-out infinite 0.42s; }
-    .wave-bar-7 { animation: soundwave 1.1s ease-in-out infinite 0.2s; }
+    @keyframes recording-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .mic-pulsing {
+      animation: pulse-mic 1.5s ease-in-out infinite;
+    }
+    .recording-dot {
+      animation: recording-pulse 1s ease-in-out infinite;
+    }
+    @keyframes fade-in-up {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .msg-animate {
+      animation: fade-in-up 0.3s ease-out forwards;
+    }
+    @keyframes typing-dots {
+      0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+    .typing-dot-1 { animation: typing-dots 1.4s ease-in-out infinite; }
+    .typing-dot-2 { animation: typing-dots 1.4s ease-in-out infinite 0.2s; }
+    .typing-dot-3 { animation: typing-dots 1.4s ease-in-out infinite 0.4s; }
   </style>
 <style data-purpose="accessibility-focus">
     /* High contrast focus ring for accessible keyboard navigation */
     a:focus-visible, button:focus-visible, input:focus-visible {
       outline: 3px solid #0675A3;
       outline-offset: 2px;
-    }
-    /* Accessible custom range styling */
-    input[type=range] {
-      -webkit-appearance: none;
-      background: transparent;
-    }
-    input[type=range]::-webkit-slider-thumb {
-      height: 22px;
-      width: 22px;
-      border-radius: 9999px;
-      background: #033067;
-      border: 2px solid #FFFFFF;
-      box-shadow: 0 1px 4px rgba(3, 48, 103, 0.35);
-      cursor: pointer;
-      -webkit-appearance: none;
-      margin-top: -6px;
-    }
-    input[type=range]::-webkit-slider-runnable-track {
-      width: 100%;
-      height: 10px;
-      border-radius: 9999px;
-      border: 1px solid #6B8899;
-      background: linear-gradient(90deg, #0675A3 0%, #14C5D9 var(--vol, 80%), #E6F2F7 var(--vol, 80%), #E6F2F7 100%);
-    }
-    input[type=range]::-moz-range-thumb {
-      height: 22px;
-      width: 22px;
-      border-radius: 9999px;
-      background: #033067;
-      border: 2px solid #FFFFFF;
-      box-shadow: 0 1px 4px rgba(3, 48, 103, 0.35);
-      cursor: pointer;
-    }
-    input[type=range]::-moz-range-track {
-      width: 100%;
-      height: 10px;
-      border-radius: 9999px;
-      border: 1px solid #6B8899;
-      background: #E6F2F7;
-    }
-    input[type=range]::-moz-range-progress {
-      height: 10px;
-      border-radius: 9999px;
-      background: linear-gradient(90deg, #0675A3 0%, #14C5D9 100%);
     }
   </style>
 </head>
@@ -121,8 +94,9 @@
 <!-- BEGIN: MainContentContainer -->
 <main class="flex-1 max-w-7xl mx-auto w-full px-4 lg:px-8 py-6 flex flex-col gap-6">
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-<!-- BEGIN: SavedLocationsSidebar -->
-<aside aria-label="Lokasi tersimpan" class="lg:col-span-4 flex flex-col gap-4">
+<!-- BEGIN: LeftSidebar -->
+<aside aria-label="Lokasi dan informasi" class="lg:col-span-4 flex flex-col gap-4">
+<!-- Lokasi Tersimpan -->
 <div class="flex items-center justify-between px-1">
 <h2 class="text-sm font-bold text-textPrimary flex items-center gap-2">
 <svg aria-hidden="true" class="w-4 h-4 text-aquaBlue" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
@@ -136,132 +110,94 @@
 <div class="flex flex-col gap-3" id="location-list-container">
 <!-- Location cards will be dynamically injected here by Javascript -->
 </div>
-<!-- Accessible Hint Card -->
+<!-- Panduan Suara -->
 <div class="rounded-card border border-cardBorder bg-cardBg p-4 text-xs text-textSecondary shadow-subtle">
-<p class="font-semibold text-textPrimary mb-1">Panduan sonifikasi</p>
-<p class="leading-relaxed">Frekuensi nada mencerminkan indeks AQI, ritme modulasi mengikuti kepadatan lalu lintas jalan raya.</p>
+<p class="font-semibold text-textPrimary mb-1">Panduan interaksi suara</p>
+<p class="leading-relaxed">Tekan tombol mikrofon atau spasi untuk berbicara dengan EchoSense. Sistem akan merespons dengan narasi suara natural.</p>
 </div>
 </aside>
-<!-- END: SavedLocationsSidebar -->
-<!-- BEGIN: MainAudioAndTelemetryPanel -->
-<section aria-label="Panel kontrol dan telemetri" class="lg:col-span-8 flex flex-col gap-6">
-<!-- 1. Audio Control Module -->
-<div class="rounded-card border-2 border-deepNavy bg-cardBg p-6 shadow-subtle flex flex-col gap-5" data-purpose="audio-controller">
-<!-- Controller Status Header -->
+<!-- END: LeftSidebar -->
+<!-- BEGIN: MainVoicePanel -->
+<section aria-label="Panel asisten suara" class="lg:col-span-8 flex flex-col gap-6">
+<!-- Voice Conversation Panel (Active Immediately) -->
+<div id="voice-panel" class="flex flex-col gap-6">
+<!-- Status Header -->
+<div class="rounded-card border-2 border-deepNavy bg-cardBg p-5 shadow-subtle flex flex-col gap-4" data-purpose="voice-controller">
 <div class="flex flex-wrap items-center justify-between gap-3 border-b border-cardBorder pb-4">
 <div>
-<span class="text-xs uppercase tracking-wide text-aquaBlue font-semibold">Kontrol audio</span>
-<h1 class="text-xl md:text-2xl font-bold text-textPrimary mt-0.5">Saat ini: Jakarta, ID</h1>
+<span class="text-xs uppercase tracking-wide text-aquaBlue font-semibold">Asisten Suara EchoSense</span>
+<h1 class="text-xl md:text-2xl font-bold text-textPrimary mt-0.5" id="voice-header-title">Menginisialisasi...</h1>
 </div>
-<div class="flex items-center gap-2 bg-trackBg px-3.5 py-1.5 rounded-full border border-cardBorder text-xs text-textSecondary font-medium">
-<span aria-hidden="true" class="inline-block w-2.5 h-2.5 rounded-full bg-tealMint"></span>
-<span class="">Diperbarui: 14:35 WIB</span>
+<div class="flex items-center gap-3">
+<div id="status-badge" class="flex items-center gap-2 bg-trackBg px-3.5 py-1.5 rounded-full border border-cardBorder text-xs text-textSecondary font-medium">
+<span aria-hidden="true" class="inline-block w-2.5 h-2.5 rounded-full bg-tealMint" id="status-dot"></span>
+<span id="status-text">Memulai...</span>
 </div>
 </div>
-<!-- Play / Pause Action Hero Button -->
-<div class="flex flex-col gap-4">
-<button aria-label="Putar atau jeda audio sonifikasi, pintasan tombol spasi" aria-pressed="true" class="w-full py-4 px-6 rounded-card bg-aquaBlue hover:bg-aquaHover text-white font-bold text-base flex items-center justify-center gap-3 transition shadow-sm active:scale-[0.99] focus:outline-none" id="btn-play-pause" type="button">
-<span aria-hidden="true" class="w-8 h-8 rounded-full bg-white text-aquaBlue flex items-center justify-center shadow-inner">
-<!-- Pause / Play Icon -->
-<svg class="w-4 h-4 fill-current" id="play-pause-icon" viewbox="0 0 24 24">
-<rect height="16" width="4" x="6" y="4"></rect>
-<rect height="16" width="4" x="14" y="4"></rect>
+<!-- Hidden Audio Element for Direct Low-Latency Playback -->
+<audio id="echosense-audio" autoplay playsinline preload="auto" class="hidden"></audio>
+
+<!-- Conversation Transcript -->
+<div id="transcript-area" class="min-h-[280px] max-h-[420px] overflow-y-auto p-4 rounded-xl bg-trackBg/30 border border-cardBorder space-y-3 scroll-smooth" role="log" aria-live="polite" aria-label="Riwayat percakapan">
+<!-- Messages will be injected here -->
+</div>
+
+<!-- Voice Action Controls: Play/Pause, Mic, Replay & Text Input Fallback -->
+<div class="flex flex-col items-center gap-3 pt-2">
+<div class="flex items-center justify-center gap-4">
+<!-- Play / Pause Button -->
+<button id="btn-play-pause" class="w-12 h-12 rounded-full border-2 border-deepNavy hover:bg-deepNavy/10 text-deepNavy flex items-center justify-center transition shadow-sm focus:outline-none" type="button" aria-label="Jeda atau lanjutkan suara" title="Jeda atau lanjutkan suara">
+<svg id="icon-pause" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 24 24">
+<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
 </svg>
-</span>
-<span class="">Play / Pause</span>
+<svg id="icon-play" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+<polygon points="5 3 19 12 5 21 5 3"></polygon>
+</svg>
 </button>
-<!-- Waveform Visualizer (7 vertical bars with Sunrise Pulse gradient on navy container) -->
-<div aria-label="Visualisasi spektrum audio sonifikasi" class="h-16 bg-deepNavy rounded-xl px-6 flex items-center justify-center gap-3.5 overflow-hidden" role="img">
-<span class="wave-bar-1 w-2 rounded-full bg-gradient-to-t from-sunrise-start to-sunrise-end"></span>
-<span class="wave-bar-2 w-2 rounded-full bg-gradient-to-t from-sunrise-start to-sunrise-end"></span>
-<span class="wave-bar-3 w-2 rounded-full bg-gradient-to-t from-sunrise-start to-sunrise-end"></span>
-<span class="wave-bar-4 w-2 rounded-full bg-gradient-to-t from-sunrise-start to-sunrise-end"></span>
-<span class="wave-bar-5 w-2 rounded-full bg-gradient-to-t from-sunrise-start to-sunrise-end"></span>
-<span class="wave-bar-6 w-2 rounded-full bg-gradient-to-t from-sunrise-start to-sunrise-end"></span>
-<span class="wave-bar-7 w-2 rounded-full bg-gradient-to-t from-sunrise-start to-sunrise-end"></span>
-</div>
-</div>
-<!-- Volume & Timeline Controls -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-<!-- Volume Slider -->
-<div class="flex flex-col gap-2 bg-trackBg/50 p-4 rounded-xl border border-cardBorder">
-<div class="flex items-center justify-between text-xs">
-<span class="text-textSecondary font-medium flex items-center gap-1.5">
-<svg aria-hidden="true" class="w-4 h-4 text-aquaBlue" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
-<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-<path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+
+<!-- Main Mic Button -->
+<button id="btn-mic" class="w-16 h-16 rounded-full bg-aquaBlue hover:bg-aquaHover text-white flex items-center justify-center transition-all shadow-lg focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed" type="button" aria-label="Tekan untuk berbicara" disabled>
+<svg id="mic-icon" class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
 </svg>
-                  Volume
-                </span>
-<span class="text-deepNavy font-bold" id="volume-readout">30%</span>
-</div>
-<input aria-label="Tingkat volume audio" class="w-full cursor-pointer focus:outline-none" id="volume-slider" max="100" min="0" oninput="updateVolume(this.value)" style="--vol: 30%;" type="range" value="30"/>
-</div>
-<!-- Progress Timeline Control -->
-<div class="flex flex-col gap-2 bg-trackBg/50 p-4 rounded-xl border border-cardBorder">
-<div class="flex items-center justify-between text-xs">
-<span class="text-textSecondary font-medium flex items-center gap-1.5">
-<svg aria-hidden="true" class="w-4 h-4 text-aquaBlue" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
-<circle cx="12" cy="12" r="10"></circle>
-<polyline points="12 6 12 12 16 14"></polyline>
+<svg id="mic-stop-icon" class="w-7 h-7 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<rect x="6" y="6" width="12" height="12" rx="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
-                  Progres pemutaran
-                </span>
-<span class="text-textSecondary">01:12 / 03:20 <span class="text-deepNavy font-bold ml-1">(35%)</span></span>
-</div>
-<div aria-label="Waktu pemutaran audio" aria-valuemax="100" aria-valuemin="0" aria-valuenow="35" class="w-full bg-trackBg h-2.5 rounded-full overflow-hidden border border-borderInput relative" role="progressbar">
-<div class="bg-gradient-to-r from-aquaBlue to-softCyan h-full rounded-full" style="width: 35%"></div>
-</div>
-</div>
-</div>
-<!-- Secondary Audio Actions: Ulang & Lokasi berikutnya -->
-<div class="flex flex-wrap items-center gap-3 pt-1">
-<button aria-label="Ulang pemutaran audio sonifikasi" class="flex-1 min-w-[140px] py-2.5 px-4 rounded-xl border-2 border-deepNavy text-deepNavy bg-white hover:bg-deepNavy hover:text-white text-xs font-semibold flex items-center justify-center gap-2 transition focus:outline-none" type="button">
-<svg aria-hidden="true" class="w-4 h-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
-<path d="M1 4v6h6"></path>
-<path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-</svg>
-<span class="">Ulang</span>
 </button>
-<button aria-label="Pindah ke pemutaran lokasi berikutnya" class="flex-1 min-w-[180px] py-2.5 px-4 rounded-xl border-2 border-deepNavy text-deepNavy bg-white hover:bg-deepNavy hover:text-white text-xs font-semibold flex items-center justify-center gap-2 transition focus:outline-none" type="button">
-<span class="">Lokasi berikutnya</span>
-<svg aria-hidden="true" class="w-4 h-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
-<line x1="5" x2="19" y1="12" y2="12"></line>
-<polyline points="12 5 19 12 12 19"></polyline>
+
+<!-- Replay Button -->
+<button id="btn-replay" class="w-12 h-12 rounded-full border-2 border-slatecol/60 hover:border-deepNavy hover:bg-deepNavy/10 text-deepNavy flex items-center justify-center transition shadow-sm focus:outline-none" type="button" aria-label="Ulangi narasi terakhir" title="Ulangi suara narasi">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
 </svg>
 </button>
 </div>
+
+<!-- Accessible Status Text for Controls -->
+<div class="flex items-center gap-4 text-xs text-textSecondary font-medium">
+<span id="play-pause-label">Putar / Jeda</span>
+<span class="text-cardBorder">•</span>
+<span id="mic-label">Bicara (Spasi)</span>
+<span class="text-cardBorder">•</span>
+<span>Ulangi suara</span>
 </div>
-<!-- 2. AI Speech Summary Card -->
-<article aria-labelledby="ai-summary-heading" class="rounded-card border border-cardBorder bg-cardBg p-6 shadow-subtle flex flex-col gap-4" data-purpose="ai-summary">
-<div class="flex flex-wrap items-center justify-between gap-2">
-<h2 class="text-sm font-bold text-textPrimary flex items-center gap-2" id="ai-summary-heading">
-<svg aria-hidden="true" class="w-4 h-4 text-aquaBlue" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
-<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+
+<!-- Accessible Text Input Fallback -->
+<form id="text-input-form" class="w-full max-w-lg flex items-center gap-2 mt-1" onsubmit="handleTextInputSubmit(event)">
+<div class="relative flex-1">
+<input type="text" id="manual-text-input" placeholder="Atau ketik jawaban di sini (contoh: Ya / Ke Bekasi)..." class="w-full text-sm rounded-xl border border-cardBorder bg-white px-4 py-2.5 text-textPrimary placeholder:text-textSecondary/60 focus:border-aquaBlue focus:outline-none transition shadow-sm" autocomplete="off" />
+</div>
+<button type="submit" id="btn-send-text" class="px-4 py-2.5 rounded-xl bg-deepNavy hover:bg-navyHover text-white text-sm font-semibold flex items-center gap-1.5 transition shadow-sm" aria-label="Kirim pesan teks">
+<span>Kirim</span>
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<line x1="22" y1="2" x2="11" y2="13"></line>
+<polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
 </svg>
-              Ringkasan suara AI (30–60 detik)
-            </h2>
-<div aria-label="Pilihan kecepatan suara" class="flex items-center gap-1.5 text-xs text-textSecondary" role="group">
-<span class="">Kecepatan:</span>
-<button aria-pressed="true" class="px-2.5 py-1 rounded-lg font-semibold bg-aquaBlue text-white" type="button">1.0x</button>
-<button aria-pressed="false" class="px-2.5 py-1 rounded-lg font-semibold bg-trackBg text-textSecondary hover:text-textPrimary border border-cardBorder" type="button">1.25x</button>
+</button>
+</form>
 </div>
 </div>
-<!-- Transcript Preview with Highlight on Current Sentence -->
-<div aria-live="polite" class="p-4 rounded-xl bg-trackBg/40 border border-cardBorder text-sm text-textPrimary leading-relaxed">
-<p class="">
-<span class="bg-trackBg px-1.5 py-0.5 rounded border border-cardBorder font-medium text-textPrimary" id="ai-summary-text">Memuat ringkasan AI...</span>
-            </p>
-</div>
-<!-- Subtext Details -->
-<div class="flex flex-wrap items-center justify-between text-xs text-textSecondary pt-1">
-<span class="flex items-center gap-1.5" id="ui-synth-lang">
-<span aria-hidden="true" class="w-2 h-2 rounded-full bg-tealMint"></span>
-Sintesis suara: Bahasa Indonesia (Aksara Sonik v1)
-</span>
-<button aria-expanded="false" class="text-aquaBlue font-semibold hover:underline focus:outline-none" type="button">Perluas teks lengkap</button>
-</div>
-</article>
+
 <!-- 3. Telemetry Metric Grid (3 Data Cards) -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4" data-purpose="telemetry-grid">
 <!-- Card 1: Kualitas Udara -->
@@ -279,9 +215,6 @@ Sintesis suara: Bahasa Indonesia (Aksara Sonik v1)
 </div>
 <p class="text-xs text-textSecondary">Data real-time <span class="font-medium text-textPrimary">OpenAQ API</span></p>
 </div>
-<button aria-expanded="false" class="text-xs font-semibold text-aquaBlue text-left pt-3 border-t border-cardBorder mt-4 hover:underline focus:outline-none" type="button">
-              Perluas detail
-            </button>
 </article>
 <!-- Card 2: Cuaca -->
 <article class="rounded-card border border-cardBorder bg-cardBg p-5 shadow-subtle flex flex-col justify-between hover:border-aquaBlue transition">
@@ -298,11 +231,8 @@ Sintesis suara: Bahasa Indonesia (Aksara Sonik v1)
 <div class="mb-2">
 <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-tealMint text-deepNavy" id="ui-weather-condition">Memuat</span>
 </div>
-<p class="text-xs text-textSecondary">Data real-time <span class="font-medium text-textPrimary">BMKG</span></p>
+<p class="text-xs text-textSecondary">Data real-time <span class="font-medium text-textPrimary">Open-Meteo</span></p>
 </div>
-<button aria-expanded="false" class="text-xs font-semibold text-aquaBlue text-left pt-3 border-t border-cardBorder mt-4 hover:underline focus:outline-none" type="button">
-              Perluas detail
-            </button>
 </article>
 <!-- Card 3: Lalu Lintas -->
 <article class="rounded-card border border-cardBorder bg-cardBg p-5 shadow-subtle flex flex-col justify-between hover:border-aquaBlue transition">
@@ -322,15 +252,13 @@ Sintesis suara: Bahasa Indonesia (Aksara Sonik v1)
 </div>
 <p class="text-xs text-textSecondary">Data real-time <span class="font-medium text-textPrimary">TomTom Traffic</span></p>
 </div>
-<button aria-expanded="false" class="text-xs font-semibold text-aquaBlue text-left pt-3 border-t border-cardBorder mt-4 hover:underline focus:outline-none" type="button">
-              Perluas detail
-            </button>
 </article>
 </div>
-</section>
-<!-- END: MainAudioAndTelemetryPanel -->
 </div>
-<!-- BEGIN: QuickKeyboardShortcutsBar -->
+</section>
+<!-- END: MainVoicePanel -->
+</div>
+<!-- Keyboard Shortcuts Bar -->
 <footer aria-label="Daftar pintasan keyboard" class="mt-auto py-3.5 px-5 rounded-card bg-deepNavy text-white text-xs flex flex-wrap items-center justify-between gap-4 shadow-subtle">
 <div class="flex items-center gap-2 font-semibold">
 <svg aria-hidden="true" class="w-4 h-4 text-sunrise-start" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
@@ -342,118 +270,602 @@ Sintesis suara: Bahasa Indonesia (Aksara Sonik v1)
 <div class="flex flex-wrap items-center gap-4 md:gap-8">
 <div class="flex items-center gap-2">
 <kbd class="px-2 py-0.5 rounded bg-white/15 border border-white/20 text-white font-mono text-xs">Spasi</kbd>
-<span class="text-slate-200">Play/Pause</span>
+<span class="text-slate-200">Bicara</span>
 </div>
 <div class="flex items-center gap-2">
-<kbd class="px-2 py-0.5 rounded bg-white/15 border border-white/20 text-white font-mono text-xs">H</kbd>
-<span class="text-slate-200">Bantuan</span>
+<kbd class="px-2 py-0.5 rounded bg-white/15 border border-white/20 text-white font-mono text-xs">P</kbd>
+<span class="text-slate-200">Jeda / Putar</span>
+</div>
+<div class="flex items-center gap-2">
+<kbd class="px-2 py-0.5 rounded bg-white/15 border border-white/20 text-white font-mono text-xs">R</kbd>
+<span class="text-slate-200">Ulangi suara</span>
+</div>
+<div class="flex items-center gap-2">
+<kbd class="px-2 py-0.5 rounded bg-white/15 border border-white/20 text-white font-mono text-xs">Esc</kbd>
+<span class="text-slate-200">Hentikan suara</span>
 </div>
 <div class="flex items-center gap-2">
 <kbd class="px-2 py-0.5 rounded bg-white/15 border border-white/20 text-white font-mono text-xs">S</kbd>
 <span class="text-slate-200">Pengaturan</span>
 </div>
-<div class="flex items-center gap-2">
-<kbd class="px-2 py-0.5 rounded bg-white/15 border border-white/20 text-white font-mono text-xs">M</kbd>
-<span class="text-slate-200">Bisukan audio</span>
-</div>
 </div>
 </footer>
-<!-- END: QuickKeyboardShortcutsBar -->
 </main>
 <!-- END: MainContentContainer -->
 <!-- BEGIN: MainFooter -->
 <x-footer />
 <!-- END: MainFooter -->
-<!-- BEGIN: InteractiveAccessibilityScript -->
-<script data-purpose="keyboard-handlers">
-    // --- State Management ---
+
+<!-- Location Search Modal -->
+<div id="location-modal" class="fixed inset-0 bg-[#0A1F33]/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl relative">
+        <button onclick="document.getElementById('location-modal').classList.add('hidden')" class="absolute top-6 right-6 text-[#42586A] hover:text-[#0A1F33] focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        
+        <h2 class="text-2xl font-bold text-[#0A1F33] mb-2">Tambah Lokasi Lainnya</h2>
+        <p class="text-sm text-[#42586A] mb-6">Cari kota, kabupaten, kecamatan, atau kelurahan spesifik untuk dipantau secara real-time.</p>
+        
+        <form id="add-location-form" onsubmit="searchLocation(event)" class="space-y-4">
+            <div>
+                <label for="search-loc-input" class="block text-sm font-semibold text-[#0A1F33] mb-1.5">Nama Lokasi</label>
+                <input type="text" id="search-loc-input" placeholder="Contoh: Plaju, Palembang..." class="w-full text-base rounded-2xl border-2 border-[#D6E6ED] px-4 py-3.5 text-[#0A1F33] focus:outline-none focus:border-[#0675A3] transition">
+            </div>
+            <p id="search-loc-status" class="text-sm text-[#0675A3] font-medium hidden">Mencari di peta...</p>
+            
+            <button type="submit" class="w-full bg-[#0675A3] hover:bg-[#033067] text-white py-3.5 rounded-2xl font-bold text-base transition">
+                Cari & Tambahkan
+            </button>
+        </form>
+
+        <div class="relative flex py-5 items-center">
+            <div class="flex-grow border-t border-[#D6E6ED]"></div>
+            <span class="flex-shrink-0 mx-4 text-[#42586A] text-sm font-medium">ATAU</span>
+            <div class="flex-grow border-t border-[#D6E6ED]"></div>
+        </div>
+
+        <button onclick="addCurrentLocation(); document.getElementById('location-modal').classList.add('hidden')" aria-label="Gunakan GPS saat ini" class="w-full py-3.5 px-4 rounded-2xl border-2 border-dashed border-[#0675A3] bg-[#E6F2F7] hover:bg-[#D6E6ED] text-[#0675A3] transition flex items-center justify-center gap-2 text-base font-bold focus:outline-none" type="button">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Deteksi GPS Saat Ini</span>
+        </button>
+    </div>
+</div>
+
+<!-- BEGIN: Voice Assistant Core Script -->
+<script data-purpose="voice-assistant-core">
+    // ============================================================
+    // STATE MANAGEMENT
+    // ============================================================
+    const STATES = {
+        IDLE: 'idle',
+        GREETING: 'greeting',
+        EXPLAIN_SYSTEM: 'explain_system',
+        DETECT_LOCATION: 'detect_location',
+        CONFIRM_LOCATION: 'confirm_location',
+        LISTENING: 'listening',
+        FETCH_ORIGIN: 'fetch_origin',
+        BRIEF_ORIGIN: 'brief_origin',
+        ASK_DESTINATION: 'ask_destination',
+        LISTEN_DESTINATION: 'listen_destination',
+        FETCH_DESTINATION: 'fetch_destination',
+        BRIEF_DESTINATION: 'brief_destination',
+        MONITORING: 'monitoring',
+        PROCESSING: 'processing'
+    };
+
+    let currentState = STATES.IDLE;
     let locations = JSON.parse(localStorage.getItem('echosense_locations')) || [];
     let activeLocationIndex = 0;
-    let beatInterval = null;
-    
+    let currentData = null;
+    let currentLocation = null;
+    let destination = null;
+    let monitoringInterval = null;
+    let previousData = null;
+    let isSpeaking = false;
+    let isListening = false;
+    let audioCtx = null;
+    let currentAudio = null; // Track current audio element for stopping
+
+    let prefs = JSON.parse(localStorage.getItem('echosense_prefs')) || {
+        volume: 80, speed: 100, language: 'id', voiceURI: 'elevenlabs:Xb7hH8MSUJpSbSDYk0k2',
+        autoGreet: true, monitorInterval: 60, repeatAlert: false
+    };
+    if (prefs.speed === undefined) prefs.speed = 100;
+    if (prefs.autoGreet === undefined) prefs.autoGreet = true;
+    if (prefs.monitorInterval === undefined) prefs.monitorInterval = 60;
+    // Pastikan selalu menggunakan ElevenLabs sebagai suara utama
+    if (!prefs.voiceURI || prefs.voiceURI === 'default') {
+        prefs.voiceURI = 'elevenlabs:Xb7hH8MSUJpSbSDYk0k2';
+    }
+
+    let isPaused = false;
+    let lastSpokenText = '';
+    let lastOnEnd = null;
+    let hasAutoStarted = false;
+    let locationPromise = null;
+    let preloadedOriginData = null;
+
+    const alerts = JSON.parse(localStorage.getItem('echosense_alerts')) || { alert_aqi: true, alert_weather: true, alert_traffic: false };
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+    // ============================================================
+    // SPEECH RECOGNITION SETUP
+    // ============================================================
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let speechSupported = false;
+
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = prefs.language === 'en' ? 'en-US' : 'id-ID';
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.maxAlternatives = 1;
+        speechSupported = true;
+
+        recognition.onresult = (event) => {
+            let transcript = '';
+            let isFinal = false;
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                transcript = event.results[i][0].transcript;
+                isFinal = event.results[i].isFinal;
+            }
+            
+            if (isFinal) {
+                stopListening();
+                handleUserSpeech(transcript);
+            } else {
+                // Show interim results
+                updateMicLabel(`🎙️ "${transcript}..."`);
+            }
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Speech Recognition Error:', event.error);
+            stopListening();
+            if (event.error === 'no-speech') {
+                addMessage('system', 'Saya tidak mendengar suara. Silakan coba lagi.');
+                enableMic();
+            } else if (event.error === 'not-allowed') {
+                addMessage('system', 'Akses mikrofon ditolak. Silakan izinkan akses mikrofon di browser Anda.');
+            }
+        };
+
+        recognition.onend = () => {
+            if (isListening) {
+                stopListening();
+            }
+        };
+    }
+
+    // ============================================================
+    // UI ELEMENTS
+    // ============================================================
+    const voicePanel = document.getElementById('voice-panel');
+    const btnPlayPause = document.getElementById('btn-play-pause');
+    const iconPlay = document.getElementById('icon-play');
+    const iconPause = document.getElementById('icon-pause');
+    const playPauseLabel = document.getElementById('play-pause-label');
+    const btnReplay = document.getElementById('btn-replay');
+    const btnMic = document.getElementById('btn-mic');
+    const micIcon = document.getElementById('mic-icon');
+    const micStopIcon = document.getElementById('mic-stop-icon');
+    const micLabel = document.getElementById('mic-label');
+    const transcriptArea = document.getElementById('transcript-area');
+    const statusText = document.getElementById('status-text');
+    const statusDot = document.getElementById('status-dot');
+    const voiceHeaderTitle = document.getElementById('voice-header-title');
+    const locationListContainer = document.getElementById('location-list-container');
+
+    // ============================================================
+    // TTS ENGINE & AUDIO CONTROLS
+    // ============================================================
+    function updateAudioControls(speaking) {
+        if (speaking) {
+            iconPause?.classList.remove('hidden');
+            iconPlay?.classList.add('hidden');
+            if (playPauseLabel) playPauseLabel.textContent = 'Jeda suara';
+        } else {
+            iconPause?.classList.add('hidden');
+            iconPlay?.classList.remove('hidden');
+            if (playPauseLabel) playPauseLabel.textContent = 'Putar suara';
+        }
+    }
+
+    function speak(text, onEnd) {
+        lastSpokenText = text;
+        lastOnEnd = onEnd;
+        isSpeaking = true;
+        isPaused = false;
+        updateAudioControls(true);
+        updateStatus('Berbicara...', '#FEB161');
+        disableMic();
+
+        const voiceURI = prefs.voiceURI || 'elevenlabs:Xb7hH8MSUJpSbSDYk0k2';
+        const rate = (prefs.speed || 100) / 100;
+
+        if (voiceURI.startsWith('elevenlabs:')) {
+            const elVoiceId = voiceURI.replace('elevenlabs:', '');
+            
+            fetch('/api/tts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken || '' },
+                body: JSON.stringify({ text: text, voice_id: elVoiceId })
+            }).then(async res => {
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error || "ElevenLabs API Error");
+                }
+                return res.blob();
+            }).then(blob => {
+                const url = URL.createObjectURL(blob);
+                const audio = document.getElementById('echosense-audio') || new Audio();
+                audio.src = url;
+                audio.playbackRate = rate;
+                audio.volume = (prefs.volume || 80) / 100;
+                currentAudio = audio;
+                
+                audio.onended = () => {
+                    currentAudio = null;
+                    isSpeaking = false;
+                    isPaused = false;
+                    updateAudioControls(false);
+                    if (onEnd) onEnd();
+                };
+                audio.onerror = (e) => {
+                    console.error("Audio playback error:", e);
+                    currentAudio = null;
+                    isSpeaking = false;
+                    updateAudioControls(false);
+                };
+                
+                const playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(err => {
+                        console.warn("Autoplay held by browser policy until interaction:", err);
+                        // JANGAN switch ke Web Speech API bawaan perangkat!
+                        // Dengarkan event keyboard / focus / sentuhan apapun secara silent tanpa banner visual
+                        const resumeAudio = () => {
+                            if (audio.paused && isSpeaking) {
+                                audio.play().catch(e => console.error("Play error on resume:", e));
+                            }
+                            ['keydown', 'keyup', 'focus', 'pointerdown', 'mousedown', 'touchstart'].forEach(evt => {
+                                window.removeEventListener(evt, resumeAudio, true);
+                                document.removeEventListener(evt, resumeAudio, true);
+                            });
+                        };
+                        ['keydown', 'keyup', 'focus', 'pointerdown', 'mousedown', 'touchstart'].forEach(evt => {
+                            window.addEventListener(evt, resumeAudio, { once: true, capture: true, passive: true });
+                            document.addEventListener(evt, resumeAudio, { once: true, capture: true, passive: true });
+                        });
+                    });
+                }
+            }).catch(e => {
+                console.error("ElevenLabs error:", e);
+                addMessage('system', 'Kendala suara ElevenLabs: ' + e.message);
+                isSpeaking = false;
+                updateAudioControls(false);
+                enableMic();
+            });
+        } else {
+            speakBrowser(text, rate, onEnd);
+        }
+    }
+
+    function speakBrowser(text, rate, onEnd) {
+        if (!window.speechSynthesis) {
+            isSpeaking = false;
+            updateAudioControls(false);
+            if (onEnd) onEnd();
+            return;
+        }
+
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.resume();
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = prefs.language === 'en' ? 'en-US' : 'id-ID';
+        utterance.rate = rate || 1.0;
+        utterance.volume = (prefs.volume || 80) / 100;
+
+        const voices = window.speechSynthesis.getVoices();
+        const targetLang = prefs.language === 'en' ? 'en' : 'id';
+        const langVoice = voices.find(v => v.lang.toLowerCase().startsWith(targetLang));
+        if (langVoice) {
+            utterance.voice = langVoice;
+        }
+
+        let hasEnded = false;
+        const done = () => {
+            if (hasEnded) return;
+            hasEnded = true;
+            clearInterval(chromeResumeLoop);
+            isSpeaking = false;
+            isPaused = false;
+            updateAudioControls(false);
+            if (onEnd) onEnd();
+        };
+
+        utterance.onend = done;
+        utterance.onerror = (e) => {
+            console.warn('SpeechSynthesis error:', e);
+            done();
+        };
+
+        // Workaround for Chrome speech pause bug on long sentences
+        const chromeResumeLoop = setInterval(() => {
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.pause();
+                window.speechSynthesis.resume();
+            } else {
+                clearInterval(chromeResumeLoop);
+            }
+        }, 8000);
+
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function stopSpeaking() {
+        window.speechSynthesis.cancel();
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+            currentAudio = null;
+        }
+        isSpeaking = false;
+        isPaused = false;
+        updateAudioControls(false);
+    }
+
+    function playMicChime() {
+        try {
+            const ctx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+            if (ctx.state === 'suspended') ctx.resume();
+            const now = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(587.33, now); // D5
+            osc.frequency.setValueAtTime(880, now + 0.1); // A5
+            gain.gain.setValueAtTime(0.18, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.35);
+        } catch(e) {}
+    }
+
+    function togglePlayPause() {
+        if (isSpeaking) {
+            // Pause
+            if (currentAudio) {
+                currentAudio.pause();
+            }
+            if (window.speechSynthesis && window.speechSynthesis.speaking) {
+                window.speechSynthesis.pause();
+            }
+            isSpeaking = false;
+            isPaused = true;
+            updateAudioControls(false);
+            updateStatus('Dijeda', '#42586A');
+        } else if (isPaused) {
+            // Resume
+            if (currentAudio && currentAudio.paused) {
+                currentAudio.play();
+                isSpeaking = true;
+                isPaused = false;
+                updateAudioControls(true);
+                updateStatus('Berbicara...', '#FEB161');
+            } else if (window.speechSynthesis && window.speechSynthesis.paused) {
+                window.speechSynthesis.resume();
+                isSpeaking = true;
+                isPaused = false;
+                updateAudioControls(true);
+                updateStatus('Berbicara...', '#FEB161');
+            } else if (lastSpokenText) {
+                speak(lastSpokenText, lastOnEnd);
+            }
+        } else if (lastSpokenText) {
+            speak(lastSpokenText, lastOnEnd);
+        } else {
+            startConversation();
+        }
+    }
+
+    function replayLastNarration() {
+        if (lastSpokenText) {
+            stopSpeaking();
+            stopListening();
+            speak(lastSpokenText, lastOnEnd);
+        }
+    }
+
+    // ============================================================
+    // MICROPHONE CONTROL
+    // ============================================================
+    function startListening() {
+        if (!speechSupported) {
+            addMessage('system', 'Browser Anda tidak mendukung input suara. Silakan gunakan Chrome atau Edge.');
+            return;
+        }
+        if (isSpeaking) {
+            stopSpeaking();
+        }
+        
+        isListening = true;
+        recognition.lang = prefs.language === 'en' ? 'en-US' : 'id-ID';
+        
+        try {
+            recognition.start();
+        } catch(e) {
+            // Already started
+        }
+        
+        btnMic.classList.add('mic-pulsing', 'bg-red-500', 'hover:bg-red-600');
+        btnMic.classList.remove('bg-aquaBlue', 'hover:bg-aquaHover');
+        micIcon.classList.add('hidden');
+        micStopIcon.classList.remove('hidden');
+        updateMicLabel('🎙️ Mendengarkan...');
+        updateStatus('Mendengarkan...', '#FD7659');
+    }
+
+    function stopListening() {
+        isListening = false;
+        try {
+            recognition.stop();
+        } catch(e) {}
+        
+        btnMic.classList.remove('mic-pulsing', 'bg-red-500', 'hover:bg-red-600');
+        btnMic.classList.add('bg-aquaBlue', 'hover:bg-aquaHover');
+        micIcon.classList.remove('hidden');
+        micStopIcon.classList.add('hidden');
+        updateMicLabel('Tekan untuk berbicara (atau spasi)');
+    }
+
+    function enableMic() {
+        btnMic.disabled = false;
+        btnMic.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+
+    function disableMic() {
+        btnMic.disabled = true;
+        btnMic.classList.add('opacity-50', 'cursor-not-allowed');
+    }
+
+    function updateMicLabel(text) {
+        micLabel.textContent = text;
+    }
+
+    // ============================================================
+    // UI HELPERS
+    // ============================================================
+    function addMessage(role, text) {
+        const div = document.createElement('div');
+        div.className = 'msg-animate';
+        
+        if (role === 'assistant') {
+            div.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-full bg-deepNavy flex-shrink-0 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                        </svg>
+                    </div>
+                    <div class="bg-white rounded-2xl rounded-tl-md px-4 py-3 shadow-subtle border border-cardBorder max-w-[85%]">
+                        <p class="text-sm text-textPrimary leading-relaxed">${text}</p>
+                    </div>
+                </div>
+            `;
+        } else if (role === 'user') {
+            div.innerHTML = `
+                <div class="flex items-start gap-3 justify-end">
+                    <div class="bg-deepNavy rounded-2xl rounded-tr-md px-4 py-3 shadow-subtle max-w-[85%]">
+                        <p class="text-sm text-white leading-relaxed">${text}</p>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-aquaBlue flex-shrink-0 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                    </div>
+                </div>
+            `;
+        } else if (role === 'system') {
+            div.innerHTML = `
+                <div class="flex justify-center">
+                    <div class="bg-sunrise-start/20 rounded-xl px-4 py-2 border border-sunrise-start/30">
+                        <p class="text-xs text-textSecondary text-center">${text}</p>
+                    </div>
+                </div>
+            `;
+        } else if (role === 'alert') {
+            div.innerHTML = `
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-full bg-red-500 flex-shrink-0 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/>
+                        </svg>
+                    </div>
+                    <div class="bg-red-50 rounded-2xl rounded-tl-md px-4 py-3 shadow-subtle border border-red-200 max-w-[85%]">
+                        <p class="text-sm text-red-800 leading-relaxed font-medium">${text}</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        transcriptArea.appendChild(div);
+        transcriptArea.scrollTop = transcriptArea.scrollHeight;
+    }
+
+    function addTypingIndicator() {
+        const div = document.createElement('div');
+        div.id = 'typing-indicator';
+        div.className = 'msg-animate';
+        div.innerHTML = `
+            <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-full bg-deepNavy flex-shrink-0 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                    </svg>
+                </div>
+                <div class="bg-white rounded-2xl rounded-tl-md px-4 py-3 shadow-subtle border border-cardBorder flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-textSecondary typing-dot-1"></span>
+                    <span class="w-2 h-2 rounded-full bg-textSecondary typing-dot-2"></span>
+                    <span class="w-2 h-2 rounded-full bg-textSecondary typing-dot-3"></span>
+                </div>
+            </div>
+        `;
+        transcriptArea.appendChild(div);
+        transcriptArea.scrollTop = transcriptArea.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+        document.getElementById('typing-indicator')?.remove();
+    }
+
+    function updateStatus(text, color) {
+        statusText.textContent = text;
+        statusDot.style.backgroundColor = color || '#21B9BE';
+    }
+
+    function updateTelemetryCards(data) {
+        if (!data || !data.raw_data) return;
+        
+        document.getElementById('ui-aqi-value').textContent = `AQI ${Math.round(data.raw_data.aqi.pm25)}`;
+        document.getElementById('ui-aqi-category').textContent = data.raw_data.aqi.category;
+        
+        const aqiTag = document.getElementById('ui-aqi-category');
+        if (data.raw_data.aqi.pm25 > 150) {
+            aqiTag.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-600 text-white";
+        } else if (data.raw_data.aqi.pm25 > 50) {
+            aqiTag.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-300 text-red-900";
+        } else if (data.raw_data.aqi.pm25 > 25) {
+            aqiTag.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-yellow-300 text-yellow-900";
+        } else {
+            aqiTag.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-sunrise-start text-deepNavy";
+        }
+
+        document.getElementById('ui-weather-value').textContent = `${data.raw_data.weather.temperature}°C`;
+        document.getElementById('ui-weather-condition').textContent = data.raw_data.weather.condition;
+        document.getElementById('ui-traffic-congestion').textContent = data.raw_data.traffic.congestion;
+        document.getElementById('ui-traffic-speed').textContent = `${Math.round(data.raw_data.traffic.currentSpeed)} km/j`;
+    }
+
+    // ============================================================
+    // LOCATION MANAGEMENT
+    // ============================================================
     async function reverseGeocode(lat, lon) {
         try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=id`);
             const data = await res.json();
-            return data.display_name || 'Lokasi Anda'; // Use full detailed address
+            return data.display_name || 'Lokasi Anda';
         } catch(e) {
             return 'Lokasi Anda';
         }
     }
 
-
-
-    let prefs = JSON.parse(localStorage.getItem('echosense_prefs')) || {
-        tempo: 60, pitch: 45, volume: 30, instrument: 'sine', language: 'id', playMode: 'bersamaan', voiceURI: 'elevenlabs:Xb7hH8MSUJpSbSDYk0k2'
-    };
-    
-    if (prefs.voiceURI === undefined) {
-        prefs.voiceURI = 'elevenlabs:Xb7hH8MSUJpSbSDYk0k2';
-        localStorage.setItem('echosense_prefs', JSON.stringify(prefs));
-    }
-
-    // --- Audio Nodes ---
-    let audioCtx, compressor, masterGain, analyser;
-    let aqiDroneOsc, aqiDroneGain;
-    let weatherOsc, weatherGain;
-    let trafficPulseOsc, trafficPulseGain;
-    let isPlaying = false;
-    let currentData = null;
-    let progressInterval;
-    let playbackTime = 0;
-    let totalTime = 30; // 30 seconds loop
-    let animationId;
-    let utterance = null;
-
-    // --- UI Elements ---
-    const playBtn = document.getElementById('btn-play-pause');
-    const volumeSlider = document.getElementById('volume-slider');
-    const volumeReadout = document.getElementById('volume-readout');
-    const progressBar = document.querySelector('[role="progressbar"] > div');
-    const progressText = document.querySelector('[role="progressbar"]').previousElementSibling.querySelector('span:last-child');
-    const locationListContainer = document.getElementById('location-list-container');
-    
-    function init() {
-        volumeSlider.value = prefs.volume;
-        updateVolume(prefs.volume);
-        renderLocations();
-        
-        if (locations.length > 0) {
-            loadDataAndPlay(false); // Fetch on load, but don't play automatically (Browser policy)
-        } else {
-            // Automatically detect location if first time
-            if ("geolocation" in navigator) {
-                playBtn.innerHTML = '<span aria-hidden="true" class="w-8 h-8 rounded-full bg-white text-[#0675A3] flex items-center justify-center shadow-inner"><svg class="w-4 h-4 fill-current animate-spin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" stroke-dasharray="31.4 31.4"></circle></svg></span><span>Meminta Akses GPS...</span>';
-                document.getElementById('ai-summary-text').innerHTML = '<span class="animate-pulse">Menunggu persetujuan lokasi dari browser...</span>';
-                
-                navigator.geolocation.getCurrentPosition(async (position) => {
-                    document.getElementById('ai-summary-text').innerHTML = '<span class="animate-pulse">Menyelaraskan titik koordinat GPS...</span>';
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-                    const cityName = await reverseGeocode(lat, lon);
-                    
-                    locations = [{
-                        id: Date.now(),
-                        name: cityName,
-                        lat: lat,
-                        lon: lon,
-                        region: 'GPS Real-time'
-                    }];
-                    localStorage.setItem('echosense_locations', JSON.stringify(locations));
-                    renderLocations();
-                    loadDataAndPlay(false); // Fetch initial data right after getting GPS
-                }, () => {
-                    playBtn.innerHTML = '<span aria-hidden="true" class="w-8 h-8 rounded-full bg-white text-[#0675A3] flex items-center justify-center shadow-inner"><svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></span><span>Izin Lokasi Ditolak</span>';
-                    document.getElementById('ai-summary-text').innerHTML = 'Gagal mengakses GPS. Silakan tambah lokasi pemantauan secara manual.';
-                    renderLocations();
-                });
-            }
-        }
-    }
-
     function renderLocations() {
         if(!locationListContainer) return;
-        
         const countSpan = document.getElementById('location-count');
         if (countSpan) countSpan.textContent = `${locations.length} terpantau`;
 
@@ -469,30 +881,23 @@ Sintesis suara: Bahasa Indonesia (Aksara Sonik v1)
                                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FEB161] opacity-75"></span>
                                 <span class="relative inline-flex rounded-full h-3 w-3 bg-[#FEB161]"></span>
                             </span>
-                            <span class="font-bold text-base text-white">${loc.name} (saat ini)</span>
+                            <span class="font-bold text-sm text-white">${loc.name.split(',')[0]} (saat ini)</span>
                         </div>
                         <span class="text-xs px-2.5 py-0.5 rounded-full bg-[#FEB161] text-[#033067] font-semibold">Aktif</span>
                     </div>
                     <div class="flex items-center justify-between text-xs text-slate-200 pt-2 border-t border-white/15">
-                        <span class="">Memuat data...</span>
-                        <span class="text-xs text-[#FEB161] font-medium">${isPlaying ? 'Memutar audio' : 'Jeda'}</span>
+                        <span id="loc-status-${idx}">Memuat data...</span>
                     </div>
                 </button>`;
             } else {
-                // If it's saved in active status in settings it's "Siaga lembut", else "Audio statis"
-                const activeLocs = JSON.parse(localStorage.getItem('echosense_active_locations')) || {};
-                const isActiveInSettings = activeLocs[loc.id] !== false; // Default true
-                const statusLabel = isActiveInSettings ? 'Siaga lembut' : 'Audio statis';
-                
                 html += `
                 <button onclick="switchLocation(${idx})" aria-pressed="false" class="w-full text-left p-4 rounded-card bg-[#FFFFFF] border border-[#D6E6ED] hover:border-[#0675A3] text-[#0A1F33] shadow-subtle transition group focus:outline-none" type="button">
                     <div class="flex items-center justify-between mb-1.5">
-                        <span class="font-bold text-base text-[#0A1F33] group-hover:text-[#0675A3] transition">${loc.name.split(',')[0]}</span>
+                        <span class="font-bold text-sm text-[#0A1F33] group-hover:text-[#0675A3] transition">${loc.name.split(',')[0]}</span>
                         <span class="text-xs text-[#42586A]">${loc.region || 'Indonesia'}</span>
                     </div>
                     <div class="flex items-center justify-between text-xs text-[#42586A] pt-1">
                         <span class="">Ketuk untuk memantau</span>
-                        <span class="text-xs text-[#42586A] bg-slate-100 px-2 py-0.5 rounded-full font-medium">${statusLabel}</span>
                     </div>
                 </button>`;
             }
@@ -501,21 +906,15 @@ Sintesis suara: Bahasa Indonesia (Aksara Sonik v1)
         html += `
         <button onclick="document.getElementById('location-modal').classList.remove('hidden')" aria-label="Tambah lokasi lainnya" class="w-full mt-3 py-3.5 px-4 rounded-card border-2 border-dashed border-[#D6E6ED] hover:border-[#0675A3] bg-[#FFFFFF] text-[#0675A3] transition flex items-center justify-center gap-2 text-sm font-semibold focus:outline-none" type="button">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            <span>+ Tambah Lokasi Lainnya</span>
+            <span>+ Tambah Lokasi</span>
         </button>`;
         
         locationListContainer.innerHTML = html;
         
-        // Update Main Header
-        const mainHeader = document.querySelector('[data-purpose="audio-controller"] h1');
+        // Update header
         if (locations.length > 0) {
             const activeLoc = locations[activeLocationIndex];
-            if(mainHeader) {
-                const shortName = activeLoc.name.split(',')[0]; // Ambil nama terpendek untuk header besar
-                mainHeader.textContent = `Saat ini: ${shortName}`;
-            }
-        } else {
-            if(mainHeader) mainHeader.textContent = `Pilih atau Tambah Lokasi`;
+            voiceHeaderTitle.textContent = activeLoc.name.split(',')[0];
         }
     }
 
@@ -555,10 +954,26 @@ Sintesis suara: Bahasa Indonesia (Aksara Sonik v1)
     }
 
     async function switchLocation(idx) {
-        if(idx === activeLocationIndex) return; // Ignore if same
+        if(idx === activeLocationIndex && currentData) return;
         activeLocationIndex = idx;
         renderLocations();
-        await loadDataAndPlay(true);
+        
+        const loc = locations[idx];
+        currentLocation = { lat: loc.lat, lon: loc.lon, name: loc.name };
+        
+        addTypingIndicator();
+        const data = await fetchEnvironmentData(loc.lat, loc.lon);
+        removeTypingIndicator();
+        
+        if (data) {
+            currentData = data;
+            updateTelemetryCards(data);
+            addMessage('assistant', data.briefing);
+            speak(data.briefing, () => {
+                enableMic();
+                updateStatus('Siap mendengarkan', '#21B9BE');
+            });
+        }
     }
 
     function addCurrentLocation() {
@@ -578,524 +993,679 @@ Sintesis suara: Bahasa Indonesia (Aksara Sonik v1)
                 localStorage.setItem('echosense_locations', JSON.stringify(locations));
                 switchLocation(locations.length - 1);
             }, () => {
-                alert("Gagal mendapatkan lokasi. Pastikan izin GPS diberikan.");
+                addMessage('system', 'Gagal mendapatkan lokasi. Pastikan izin GPS diberikan.');
             });
-        } else {
-            alert("Geolokasi tidak didukung di browser ini.");
         }
     }
 
-    function updateVolume(val) {
-      volumeReadout.textContent = val + '%';
-      volumeSlider.style.setProperty('--vol', val + '%');
-      prefs.volume = val;
-      localStorage.setItem('echosense_prefs', JSON.stringify(prefs));
-      
-      if (masterGain && isPlaying) {
-          const now = audioCtx.currentTime;
-          const isDucked = window.speechSynthesis.speaking;
-          masterGain.gain.cancelScheduledValues(now);
-          masterGain.gain.setValueAtTime(masterGain.gain.value, now);
-          masterGain.gain.linearRampToValueAtTime((val / 100) * (isDucked ? 0.25 : 0.8), now + 0.5);
-      }
-    }
-    
-    function formatTime(seconds) {
-        const m = Math.floor(seconds / 60);
-        const s = Math.floor(seconds % 60);
-        return `0${m}:${s < 10 ? '0' : ''}${s}`;
-    }
-
-    function startProgress() {
-        clearInterval(progressInterval);
-        playbackTime = 0;
-        // Progress bar is now handled in a smaller interval for smoothness
-        progressInterval = setInterval(() => {
-            playbackTime += 0.1;
-            if (playbackTime >= totalTime) {
-                playbackTime = totalTime;
-            }
-            const percent = Math.floor((playbackTime / totalTime) * 100);
-            progressBar.style.width = percent + '%';
-            progressText.innerHTML = `${formatTime(Math.floor(playbackTime))} / ${formatTime(Math.floor(totalTime))} <span class="text-[#033067] font-bold ml-1">(${percent}%)</span>`;
-        }, 100);
-    }
-
-    function drawWaveform() {
-        if(!analyser) return;
-        animationId = requestAnimationFrame(drawWaveform);
-        const dataArray = new Uint8Array(analyser.frequencyBinCount);
-        analyser.getByteFrequencyData(dataArray);
-        
-        for(let i = 1; i <= 7; i++) {
-            const bar = document.querySelector(`.wave-bar-${i}`);
-            if(bar) {
-                const value = dataArray[i * 2] || 10;
-                const height = Math.max(10, (value / 255) * 60);
-                bar.style.height = `${height}px`;
-                bar.style.animation = 'none';
-            }
-        }
-    }
-
-    async function loadDataAndPlay(autoPlay = true) {
-        if (locations.length === 0) return alert('Silakan deteksi atau tambah lokasi terlebih dahulu!');
-        
-        playBtn.innerHTML = '<span aria-hidden="true" class="w-8 h-8 rounded-full bg-white text-[#0675A3] flex items-center justify-center shadow-inner"><svg class="w-4 h-4 fill-current animate-spin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" stroke-dasharray="31.4 31.4"></circle></svg></span><span>Memuat Data...</span>';
-        document.getElementById('ai-summary-text').innerHTML = '<span class="animate-pulse">Mengambil data telemetri terbaru dari satelit...</span>';
-        document.getElementById('ui-aqi-value').innerHTML = '<span class="animate-pulse text-sm">Memuat...</span>';
-        document.getElementById('ui-weather-value').innerHTML = '<span class="animate-pulse text-sm">Memuat...</span>';
-        document.getElementById('ui-traffic-congestion').innerHTML = '<span class="animate-pulse text-sm">Memuat...</span>';
-        document.getElementById('ui-traffic-speed').innerHTML = '';
-        
+    // ============================================================
+    // DATA FETCHING
+    // ============================================================
+    async function fetchEnvironmentData(lat, lon) {
         try {
-            const activeLoc = locations[activeLocationIndex];
-            const response = await fetch(`/api/sonify?lat=${activeLoc.lat}&lon=${activeLoc.lon}&lang=${prefs.language}`);
-            const data = await response.json();
-            currentData = data;
-            
-            document.getElementById('ai-summary-text').textContent = data.briefing;
-            document.getElementById('ui-aqi-value').textContent = `AQI ${Math.round(data.raw_data.aqi.pm25)}`;
-            document.getElementById('ui-aqi-category').textContent = data.raw_data.aqi.category;
-            
-            const synthLangEl = document.getElementById('ui-synth-lang');
-            if (synthLangEl) {
-                if (prefs.language.startsWith('en')) {
-                    synthLangEl.innerHTML = '<span aria-hidden="true" class="w-2 h-2 rounded-full bg-tealMint"></span>Sintesis suara: English (Aksara Sonik v1)';
-                } else {
-                    synthLangEl.innerHTML = '<span aria-hidden="true" class="w-2 h-2 rounded-full bg-tealMint"></span>Sintesis suara: Bahasa Indonesia (Aksara Sonik v1)';
-                }
-            }
-            
-            const aqiTag = document.getElementById('ui-aqi-category');
-            if (data.raw_data.aqi.pm25 > 150) {
-                aqiTag.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-600 text-white";
-                if(JSON.parse(localStorage.getItem('echosense_alerts') || '{}').alert_aqi && autoPlay) playAlertTone();
-            } else if (data.raw_data.aqi.pm25 > 50) {
-                aqiTag.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-300 text-red-900";
-            } else if (data.raw_data.aqi.pm25 > 25) {
-                aqiTag.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-yellow-300 text-yellow-900";
-            } else {
-                aqiTag.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-sunrise-start text-deepNavy";
-            }
-
-            document.getElementById('ui-weather-value').textContent = `${data.raw_data.weather.temperature}°C`;
-            document.getElementById('ui-weather-condition').textContent = data.raw_data.weather.condition;
-            document.getElementById('ui-traffic-congestion').textContent = data.raw_data.traffic.congestion;
-            document.getElementById('ui-traffic-speed').textContent = `${Math.round(data.raw_data.traffic.currentSpeed)} km/j`;
-            
-            const currentLocEl = document.querySelector('button[aria-pressed="true"] .border-t span:first-child');
-            if(currentLocEl) currentLocEl.textContent = `AQI ${Math.round(data.raw_data.aqi.pm25)} • ${data.raw_data.weather.temperature}°C`;
-            
-            const timeStr = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
-            const timeTag = document.querySelector('.bg-trackBg > span:last-child');
-            if (timeTag) timeTag.textContent = `Diperbarui: ${timeStr}`;
-            
-            if (autoPlay) {
-                if (!isPlaying) {
-                    startSoundscape(data);
-                    isPlaying = true;
-                    startProgress();
-                    drawWaveform();
-                } else {
-                    updateSoundscape(data);
-                }
-                playBtn.innerHTML = '<span aria-hidden="true" class="w-8 h-8 rounded-full bg-white text-[#0675A3] flex items-center justify-center shadow-inner"><svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></span><span>Jeda Audio</span>';
-                playBtn.setAttribute('aria-pressed', 'true');
-            } else {
-                playBtn.innerHTML = '<span aria-hidden="true" class="w-8 h-8 rounded-full bg-white text-[#0675A3] flex items-center justify-center shadow-inner"><svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span><span>Play / Pause</span>';
-                playBtn.setAttribute('aria-pressed', 'false');
-            }
-            
+            const response = await fetch(`/api/briefing?lat=${lat}&lon=${lon}&lang=${prefs.language}`);
+            return await response.json();
         } catch(e) {
-            console.error(e);
-            playBtn.innerHTML = '<span>Error memuat data</span>';
+            console.error('Fetch error:', e);
+            return null;
         }
     }
 
-    function initAudio() {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            
-            compressor = audioCtx.createDynamicsCompressor();
-            compressor.threshold.value = -24;
-            compressor.ratio.value = 4;
-            
-            masterGain = audioCtx.createGain();
-            analyser = audioCtx.createAnalyser();
-            analyser.fftSize = 64;
-            
-            masterGain.connect(compressor);
-            compressor.connect(analyser);
-            analyser.connect(audioCtx.destination);
-        }
-    }
-
-    function startSoundscape(data) {
-        initAudio();
-        const now = audioCtx.currentTime;
-        
-        masterGain.gain.cancelScheduledValues(now);
-        masterGain.gain.setValueAtTime(0, now);
-        masterGain.gain.linearRampToValueAtTime((prefs.volume/100) * 0.8, now + 1); 
-        
-        const pitchOffset = (prefs.pitch - 50);
-        
-        // AQI Drone (Base Sine + User Instrument Overtone + Filter)
-        aqiDroneOsc = audioCtx.createOscillator();
-        aqiDroneOsc.type = 'sine';
-        aqiDroneOsc.frequency.value = data.audio_params.frequency + pitchOffset;
-        
-        window.aqiOvertoneOsc = audioCtx.createOscillator();
-        window.aqiOvertoneOsc.type = prefs.instrument || 'triangle';
-        window.aqiOvertoneOsc.frequency.value = data.audio_params.frequency + pitchOffset;
-        
-        const aqiFilter = audioCtx.createBiquadFilter();
-        aqiFilter.type = 'lowpass';
-        aqiFilter.frequency.value = 1000;
-        aqiFilter.Q.value = 0.8;
-        
-        aqiDroneGain = audioCtx.createGain();
-        aqiDroneGain.gain.setValueAtTime(0, now);
-        aqiDroneGain.gain.linearRampToValueAtTime(0.2, now + 1);
-        
-        // Base sine at full internal gain
-        const baseGain = audioCtx.createGain();
-        baseGain.gain.value = 1.0;
-        aqiDroneOsc.connect(baseGain);
-        baseGain.connect(aqiFilter);
-        
-        // Overtone at low internal gain for subtle texture
-        const overtoneGain = audioCtx.createGain();
-        overtoneGain.gain.value = 0.05;
-        window.aqiOvertoneOsc.connect(overtoneGain);
-        overtoneGain.connect(aqiFilter);
-        
-        aqiFilter.connect(aqiDroneGain);
-        aqiDroneGain.connect(masterGain);
-        
-        aqiDroneOsc.start();
-        window.aqiOvertoneOsc.start();
-        
-        // Weather (Triangle)
-        weatherOsc = audioCtx.createOscillator();
-        weatherGain = audioCtx.createGain();
-        weatherOsc.type = 'triangle';
-        weatherOsc.frequency.value = (data.audio_params.frequency + pitchOffset) * 1.5; 
-        weatherGain.gain.value = 0;
-        weatherGain.gain.linearRampToValueAtTime(0.15, now + 1);
-        weatherOsc.connect(weatherGain);
-        weatherGain.connect(masterGain);
-        weatherOsc.start();
-        
-        trafficPulseGain = audioCtx.createGain();
-        trafficPulseGain.gain.value = 0;
-        trafficPulseGain.connect(masterGain);
-        
-        startTrafficPulse(data);
-        playVoice(data);
-    }
-    
-    function updateSoundscape(data) {
-        if (!audioCtx) return;
-        const now = audioCtx.currentTime;
-        const pitchOffset = (prefs.pitch - 50);
-        
-        if (aqiDroneOsc) {
-            aqiDroneOsc.frequency.cancelScheduledValues(now);
-            aqiDroneOsc.frequency.setValueAtTime(aqiDroneOsc.frequency.value, now);
-            aqiDroneOsc.frequency.linearRampToValueAtTime(data.audio_params.frequency + pitchOffset, now + 1);
-        }
-        if (window.aqiOvertoneOsc) {
-            window.aqiOvertoneOsc.frequency.cancelScheduledValues(now);
-            window.aqiOvertoneOsc.frequency.setValueAtTime(window.aqiOvertoneOsc.frequency.value, now);
-            window.aqiOvertoneOsc.frequency.linearRampToValueAtTime(data.audio_params.frequency + pitchOffset, now + 1);
-        }
-        if (weatherOsc) {
-            weatherOsc.frequency.linearRampToValueAtTime((data.audio_params.frequency + pitchOffset) * 1.5, now + 1);
-        }
-        
-        startTrafficPulse(data);
-        playVoice(data);
-    }
-
-    function startTrafficPulse(data) {
-        if (beatInterval) clearInterval(beatInterval);
-        const tempoMs = (60 / data.audio_params.tempo) * 1000;
-        
-        beatInterval = setInterval(() => {
-            if (!isPlaying) return;
-            const now = audioCtx.currentTime;
-            
-            trafficPulseOsc = audioCtx.createOscillator();
-            trafficPulseOsc.type = 'triangle';
-            trafficPulseOsc.frequency.value = (data.audio_params.frequency + (prefs.pitch - 50)) * 0.5;
-            
-            trafficPulseGain.gain.cancelScheduledValues(now);
-            trafficPulseGain.gain.setValueAtTime(0, now);
-            trafficPulseGain.gain.linearRampToValueAtTime(0.3, now + 0.05); // attack
-            trafficPulseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.2); // decay
-            
-            trafficPulseOsc.connect(trafficPulseGain);
-            trafficPulseOsc.start(now);
-            trafficPulseOsc.stop(now + 0.25);
-        }, tempoMs);
-    }
-
-    function playAlertTone() {
-        if (!audioCtx) return;
-        const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.value = 600;
-        
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(0.4, now + 0.1);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-        
-        osc.connect(gain);
-        gain.connect(masterGain);
-        osc.start(now);
-        osc.stop(now + 0.5);
-    }
-    
-    function playVoice(data) {
-        if(utterance) window.speechSynthesis.cancel();
-        
-        const voiceURI = prefs.voiceURI || 'default';
-        const rateBtn = document.querySelector('button[aria-pressed="true"]');
-        const playbackRate = (rateBtn && rateBtn.textContent.includes('1.25x')) ? 1.25 : 1.0;
-        
-        totalTime = Math.max(5, data.briefing.length / 14);
-        
-        const duckAmbient = () => {
-            if (!audioCtx) return;
-            const now = audioCtx.currentTime;
-            if (aqiDroneGain) {
-                aqiDroneGain.gain.cancelScheduledValues(now);
-                aqiDroneGain.gain.setValueAtTime(aqiDroneGain.gain.value, now);
-                aqiDroneGain.gain.linearRampToValueAtTime(0.05, now + 0.3);
-            }
-            if (weatherGain) {
-                weatherGain.gain.cancelScheduledValues(now);
-                weatherGain.gain.setValueAtTime(weatherGain.gain.value, now);
-                weatherGain.gain.linearRampToValueAtTime(0.03, now + 0.3);
-            }
-        };
-        
-        const unduckAmbient = () => {
-            if (!audioCtx || !isPlaying) return;
-            const now = audioCtx.currentTime;
-            if (aqiDroneGain) {
-                aqiDroneGain.gain.cancelScheduledValues(now);
-                aqiDroneGain.gain.setValueAtTime(aqiDroneGain.gain.value, now);
-                aqiDroneGain.gain.linearRampToValueAtTime(0.2, now + 0.8);
-            }
-            if (weatherGain) {
-                weatherGain.gain.cancelScheduledValues(now);
-                weatherGain.gain.setValueAtTime(weatherGain.gain.value, now);
-                weatherGain.gain.linearRampToValueAtTime(0.15, now + 0.8);
-            }
-        };
-
-        if (voiceURI.startsWith('elevenlabs:')) {
-            const elVoiceId = voiceURI.replace('elevenlabs:', '');
-            
-            // Get CSRF Token from meta tag
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            
-            fetch('/api/tts', {
+    async function fetchDestinationData(destName) {
+        try {
+            const response = await fetch('/api/destination', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken || '' },
-                body: JSON.stringify({ text: data.briefing, voice_id: elVoiceId })
-            }).then(async res => {
-                if (!res.ok) {
-                    const err = await res.json();
-                    throw new Error(err.error || "ElevenLabs API Error");
-                }
-                return res.arrayBuffer();
-            })
-              .then(buffer => audioCtx.decodeAudioData(buffer))
-              .then(audioBuffer => {
-                  if (!isPlaying) return;
-                  const source = audioCtx.createOscillator();
-                  const ttsSource = audioCtx.createBufferSource();
-                  ttsSource.buffer = audioBuffer;
-                  ttsSource.playbackRate.value = playbackRate;
-                  
-                  const ttsGain = audioCtx.createGain();
-                  ttsGain.gain.value = 1.0;
-                  
-                  ttsSource.connect(ttsGain);
-                  ttsGain.connect(masterGain);
-                  
-                  ttsSource.onended = unduckAmbient;
-                  
-                  const playDelay = (prefs.playMode === 'berurutan') ? (totalTime / 2) : 0;
-                  
-                  setTimeout(() => {
-                      if (!isPlaying) return;
-                      duckAmbient();
-                      ttsSource.start();
-                  }, playDelay * 1000);
-                  
-              }).catch(e => {
-                  console.error("ElevenLabs Playback Error:", e);
-                  alert("Gagal memutar suara ElevenLabs: " + e.message + "\n\nSistem beralih ke suara Default OS.");
-                  
-                  // Fallback to local TTS
-                  utterance = new SpeechSynthesisUtterance(data.briefing);
-                  utterance.lang = (prefs.language === 'en') ? 'en-US' : 'id-ID';
-                  utterance.rate = playbackRate;
-                  utterance.onstart = duckAmbient;
-                  utterance.onend = unduckAmbient;
-                  window.speechSynthesis.speak(utterance);
-              });
-              
-        } else {
-            utterance = new SpeechSynthesisUtterance(data.briefing);
-            utterance.lang = (prefs.language === 'en') ? 'en-US' : 'id-ID';
-            
-            if (voiceURI && voiceURI !== 'default') {
-                const actualUri = voiceURI.replace('local:', '');
-                const voices = window.speechSynthesis.getVoices();
-                const selectedVoice = voices.find(v => v.voiceURI === actualUri);
-                if (selectedVoice) {
-                    utterance.voice = selectedVoice;
-                }
+                body: JSON.stringify({ destination: destName, lang: prefs.language })
+            });
+            return await response.json();
+        } catch(e) {
+            console.error('Destination fetch error:', e);
+            return null;
+        }
+    }
+
+    // ============================================================
+    // CONVERSATION FLOW (PARALLEL INITIALIZATION)
+    // ============================================================
+    function startParallelBackgroundFetch() {
+        locationPromise = new Promise(async (resolve) => {
+            if (!("geolocation" in navigator)) {
+                resolve(null);
+                return;
             }
+
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                try {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    
+                    // 1. Reverse geocoding in parallel
+                    const locName = await reverseGeocode(lat, lon);
+                    currentLocation = { lat, lon, name: locName };
+                    
+                    // 2. Fetch environment data (AQI, weather, traffic) in parallel!
+                    const data = await fetchEnvironmentData(lat, lon);
+                    preloadedOriginData = data;
+                    currentData = data;
+                    previousData = JSON.parse(JSON.stringify(data));
+                    
+                    // Save and update UI
+                    if (locations.length === 0 || !locations.find(l => l.lat == lat && l.lon == lon)) {
+                        locations = [{
+                            id: Date.now(),
+                            name: locName,
+                            lat: lat,
+                            lon: lon,
+                            region: 'GPS Real-time'
+                        }, ...locations.filter(l => l.lat != lat || l.lon != lon)];
+                        activeLocationIndex = 0;
+                        localStorage.setItem('echosense_locations', JSON.stringify(locations));
+                    }
+                    renderLocations();
+                    if (data) {
+                        updateTelemetryCards(data);
+                    }
+                    
+                    resolve({ location: currentLocation, data: data });
+                } catch(err) {
+                    console.error("Parallel background fetch error:", err);
+                    resolve(null);
+                }
+            }, (error) => {
+                console.warn("GPS access denied or error:", error);
+                resolve(null);
+            }, { enableHighAccuracy: false, timeout: 8000 });
+        });
+    }
+
+    async function startConversation() {
+        // Initialize and resume AudioContext for browser audio policy
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        if (window.speechSynthesis) {
+            window.speechSynthesis.resume();
+        }
+
+        currentState = STATES.GREETING;
+        updateStatus('Menyapa & memuat data...', '#FEB161');
+
+        // PARALEL 1: Langsung ambil lokasi GPS & data lingkungan di background!
+        startParallelBackgroundFetch();
+        
+        // PARALEL 2: Bersamaan langsung mulai suara TTS menyapa dan menjelaskan sistem!
+        const greeting = prefs.language === 'en'
+            ? "Hello! Welcome to EchoSense. I am your inclusive voice assistant that helps you understand the environmental conditions around you in real-time. I provide updates on air quality, weather, and traffic conditions. Please note that as an AI-powered system, I may occasionally make mistakes or experience slight data delays, so always prioritize your safety. How it works: you can listen to my voice guidance and respond directly using your voice whenever the microphone is active after the chime. I am currently detecting your location and retrieving environmental data in the background."
+            : "Halo! Selamat datang di EchoSense. Saya adalah asisten suara inklusif yang membantu Anda memahami kondisi lingkungan sekitar secara real-time. Saya dapat memberikan informasi tentang kualitas udara, cuaca, dan kondisi lalu lintas. Harap diperhatikan bahwa sistem berbasis kecerdasan buatan ini dapat menimbulkan kesalahan informasi atau keterlambatan data, sehingga tetap utamakan keselamatan dan intuisi Anda. Cara kerjanya, Anda cukup mendengarkan panduan suara saya dan dapat berbicara langsung saat mikrofon aktif setelah bunyi nada. Saat ini, saya sedang mendeteksi lokasi dan data lingkungan Anda di latar belakang.";
+        
+        addMessage('assistant', greeting);
+        
+        speak(greeting, async () => {
+            // Setelah TTS sapaan awal selesai berbicara:
+            updateStatus('Menyiapkan konfirmasi...', '#14C5D9');
             
-            utterance.rate = playbackRate;
-            utterance.onstart = duckAmbient;
-            utterance.onend = unduckAmbient;
+            // Tunggu data paralel (biasanya sudah selesai selama sapaan dibacakan)
+            let result = null;
+            try {
+                result = await Promise.race([
+                    locationPromise,
+                    new Promise(res => setTimeout(() => res(null), 3000))
+                ]);
+            } catch(e) {}
+
+            promptLocationConfirmation(result);
+        });
+    }
+
+    function promptLocationConfirmation(result) {
+        currentState = STATES.CONFIRM_LOCATION;
+
+        if (result && result.location) {
+            const shortName = result.location.name ? result.location.name.split(',').slice(0, 3).join(',') : 'lokasi Anda';
+            const confirmMsg = prefs.language === 'en'
+                ? `I detected your location at ${shortName}. Is that correct? You can answer with your voice right after the chime. Please say: Yes, that's correct, or say your actual location if incorrect.`
+                : `Saya mendeteksi lokasi Anda saat ini di ${shortName}. Apakah benar? Anda dapat langsung menjawab menggunakan suara setelah bunyi nada ini. Silakan sebutkan: Ya benar, atau sebutkan nama lokasi Anda jika salah.`;
             
-            if (prefs.playMode === 'berurutan') {
+            addMessage('assistant', confirmMsg);
+            speak(confirmMsg, () => {
+                playMicChime();
+                enableMic();
+                updateStatus('Mendengarkan jawaban...', '#FD7659');
                 setTimeout(() => {
-                    if (isPlaying) window.speechSynthesis.speak(utterance);
-                }, (totalTime / 2) * 1000);
-            } else {
-                window.speechSynthesis.speak(utterance);
-            }
-        }
-    }
-
-    function stopSoundscape() {
-        if (!audioCtx) return;
-        const now = audioCtx.currentTime;
-        const currentVol = masterGain.gain.value;
-        
-        masterGain.gain.cancelScheduledValues(now);
-        masterGain.gain.setValueAtTime(currentVol, now);
-        masterGain.gain.linearRampToValueAtTime(0.001, now + 0.5); 
-        
-        if (beatInterval) clearInterval(beatInterval);
-        window.speechSynthesis.cancel();
-        
-        setTimeout(() => {
-            if (aqiDroneOsc) { aqiDroneOsc.stop(); aqiDroneOsc.disconnect(); }
-            if (window.aqiOvertoneOsc) { window.aqiOvertoneOsc.stop(); window.aqiOvertoneOsc.disconnect(); }
-            if (weatherOsc) { weatherOsc.stop(); weatherOsc.disconnect(); }
-        }, 600);
-    }
-
-    function stopAudioPlayback() {
-        stopSoundscape();
-        if (progressInterval) clearInterval(progressInterval);
-        if (animationId) cancelAnimationFrame(animationId);
-        isPlaying = false;
-        
-        for(let i = 1; i <= 7; i++) {
-            const bar = document.querySelector(`.wave-bar-${i}`);
-            if(bar) bar.style.height = '10px';
-        }
-        
-        playBtn.innerHTML = '<span aria-hidden="true" class="w-8 h-8 rounded-full bg-white text-[#0675A3] flex items-center justify-center shadow-inner"><svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span><span>Play / Pause</span>';
-        playBtn.setAttribute('aria-pressed', 'false');
-    }
-
-    function toggleSonification() {
-        if (!isPlaying) {
-            if (currentData) {
-               startSoundscape(currentData);
-               isPlaying = true;
-               startProgress();
-               drawWaveform();
-               playBtn.innerHTML = '<span aria-hidden="true" class="w-8 h-8 rounded-full bg-white text-[#0675A3] flex items-center justify-center shadow-inner"><svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg></span><span>Jeda Audio</span>';
-               playBtn.setAttribute('aria-pressed', 'true');
-            } else {
-               loadDataAndPlay();
-            }
+                    if (!isListening && !isSpeaking) startListening();
+                }, 350);
+            });
         } else {
-            stopAudioPlayback();
+            const manualMsg = prefs.language === 'en'
+                ? "I couldn't detect your GPS location automatically. You can tell me your location now after the chime. Please say the name of your city or area."
+                : "Saya tidak dapat mendeteksi lokasi GPS Anda secara otomatis. Anda dapat menyebutkan lokasi Anda sekarang setelah bunyi nada ini. Silakan sebutkan nama kota atau daerah Anda saat ini.";
+            
+            addMessage('assistant', manualMsg);
+            speak(manualMsg, () => {
+                playMicChime();
+                enableMic();
+                updateStatus('Menunggu nama lokasi...', '#FD7659');
+                setTimeout(() => {
+                    if (!isListening && !isSpeaking) startListening();
+                }, 350);
+            });
         }
     }
 
-    playBtn.addEventListener('click', toggleSonification);
+    function handleTextInputSubmit(e) {
+        if (e) e.preventDefault();
+        const input = document.getElementById('manual-text-input');
+        if (!input) return;
+        const text = input.value.trim();
+        if (!text) return;
+        input.value = '';
+        if (isSpeaking) stopSpeaking();
+        if (isListening) stopListening();
+        handleUserSpeech(text);
+    }
+
+    async function handleUserSpeech(text) {
+        addMessage('user', text);
+        
+        switch (currentState) {
+            case STATES.CONFIRM_LOCATION:
+                await handleLocationConfirmation(text);
+                break;
+            case STATES.ASK_DESTINATION:
+            case STATES.LISTEN_DESTINATION:
+                await handleDestinationInput(text);
+                break;
+            case STATES.MONITORING:
+                await handleMonitoringCommand(text);
+                break;
+            default:
+                await handleGeneralCommand(text);
+                break;
+        }
+    }
+
+    async function handleLocationConfirmation(text) {
+        addTypingIndicator();
+        updateStatus('Memproses jawaban...', '#14C5D9');
+
+        const response = await fetch('/api/voice-command', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken || '' },
+            body: JSON.stringify({ text: text, lang: prefs.language })
+        });
+        const intent = await response.json();
+        removeTypingIndicator();
+        
+        if (intent.intent === 'confirm_yes') {
+            // Lokasi dikonfirmasi benar!
+            // Karena data lingkungan SUDAH DIAMBIL PARALEL saat sapaan, langsung bacakan!
+            if (preloadedOriginData) {
+                currentData = preloadedOriginData;
+                previousData = JSON.parse(JSON.stringify(preloadedOriginData));
+                updateTelemetryCards(currentData);
+                
+                const locStatus = document.getElementById(`loc-status-${activeLocationIndex}`);
+                if (locStatus && currentData.raw_data) {
+                    locStatus.textContent = `AQI ${Math.round(currentData.raw_data.aqi.pm25)} • ${currentData.raw_data.weather.temperature}°C`;
+                }
+
+                currentState = STATES.BRIEF_ORIGIN;
+                addMessage('assistant', currentData.briefing);
+                
+                speak(currentData.briefing, () => {
+                    askDestination();
+                });
+            } else {
+                await fetchAndBriefOrigin();
+            }
+        } else if (intent.intent === 'confirm_no') {
+            const msg = prefs.language === 'en'
+                ? "I see. Please tell me your current location after the chime."
+                : "Baik. Silakan sebutkan lokasi Anda saat ini setelah bunyi nada ini.";
+            addMessage('assistant', msg);
+            speak(msg, () => {
+                playMicChime();
+                enableMic();
+                setTimeout(() => {
+                    if (!isListening && !isSpeaking) startListening();
+                }, 350);
+            });
+        } else {
+            // Pengguna langsung menyebutkan nama lokasi
+            addTypingIndicator();
+            updateStatus('Mencari lokasi...', '#14C5D9');
+            
+            try {
+                const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(text)}&limit=1`);
+                const geoData = await geoRes.json();
+                removeTypingIndicator();
+                
+                if (geoData && geoData.length > 0) {
+                    const loc = geoData[0];
+                    currentLocation = { lat: loc.lat, lon: loc.lon, name: loc.display_name };
+                    
+                    locations = [{
+                        id: Date.now(), name: loc.display_name,
+                        lat: loc.lat, lon: loc.lon, region: 'Manual'
+                    }, ...locations];
+                    activeLocationIndex = 0;
+                    localStorage.setItem('echosense_locations', JSON.stringify(locations));
+                    renderLocations();
+                    
+                    await fetchAndBriefOrigin();
+                } else {
+                    const msg = prefs.language === 'en'
+                        ? "Sorry, I couldn't find that location. Please try again after the chime with a more specific name."
+                        : "Maaf, saya tidak dapat menemukan lokasi tersebut. Silakan coba lagi setelah nada berbunyi dengan nama kota yang lebih spesifik.";
+                    addMessage('assistant', msg);
+                    speak(msg, () => {
+                        playMicChime();
+                        enableMic();
+                        setTimeout(() => {
+                            if (!isListening && !isSpeaking) startListening();
+                        }, 350);
+                    });
+                }
+            } catch(e) {
+                removeTypingIndicator();
+                addMessage('system', 'Gagal mencari lokasi.');
+                enableMic();
+            }
+        }
+    }
+
+    async function fetchAndBriefOrigin() {
+        currentState = STATES.FETCH_ORIGIN;
+        addTypingIndicator();
+        updateStatus('Mengambil data lingkungan...', '#14C5D9');
+        
+        const data = await fetchEnvironmentData(currentLocation.lat, currentLocation.lon);
+        removeTypingIndicator();
+        
+        if (data) {
+            currentData = data;
+            previousData = JSON.parse(JSON.stringify(data));
+            updateTelemetryCards(data);
+            
+            const locStatus = document.getElementById(`loc-status-${activeLocationIndex}`);
+            if (locStatus) locStatus.textContent = `AQI ${Math.round(data.raw_data.aqi.pm25)} • ${data.raw_data.weather.temperature}°C`;
+            
+            currentState = STATES.BRIEF_ORIGIN;
+            addMessage('assistant', data.briefing);
+            
+            speak(data.briefing, () => {
+                askDestination();
+            });
+        } else {
+            addMessage('system', 'Gagal mengambil data lingkungan.');
+            askDestination();
+        }
+    }
+
+    function askDestination() {
+        currentState = STATES.ASK_DESTINATION;
+        const msg = prefs.language === 'en'
+            ? "Are you planning to travel anywhere today? If yes, please tell me your destination after the chime. If not, say: No."
+            : "Apakah Anda berencana bepergian hari ini? Jika ya, silakan sebutkan tujuan Anda setelah bunyi nada ini. Jika tidak, sebutkan: Tidak.";
+        
+        addMessage('assistant', msg);
+        speak(msg, () => {
+            playMicChime();
+            enableMic();
+            updateStatus('Menunggu tujuan...', '#FD7659');
+            setTimeout(() => {
+                if (!isListening && !isSpeaking) startListening();
+            }, 350);
+        });
+    }
+
+    async function handleDestinationInput(text) {
+        const response = await fetch('/api/voice-command', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken || '' },
+            body: JSON.stringify({ text: text, lang: prefs.language })
+        });
+        const intent = await response.json();
+        
+        if (intent.intent === 'confirm_no') {
+            // No destination, go to monitoring
+            startMonitoring();
+            return;
+        }
+        
+        // Extract destination
+        let destName = text;
+        if (intent.intent === 'set_destination' && intent.destination) {
+            destName = intent.destination;
+        }
+        
+        currentState = STATES.FETCH_DESTINATION;
+        addTypingIndicator();
+        updateStatus(`Mencari data ${destName}...`, '#14C5D9');
+        
+        const destData = await fetchDestinationData(destName);
+        removeTypingIndicator();
+        
+        if (destData && !destData.error) {
+            destination = destData.destination;
+            
+            currentState = STATES.BRIEF_DESTINATION;
+            addMessage('assistant', destData.briefing);
+            
+            speak(destData.briefing, () => {
+                startMonitoring();
+            });
+        } else {
+            const errorMsg = destData?.fallback_message || (prefs.language === 'en'
+                ? `Sorry, I couldn't find information about ${destName}. Please try a different name.`
+                : `Maaf, aku belum dapat menemukan informasi untuk lokasi ${destName}. Kamu bisa coba sebutkan nama kota atau daerah tujuan lainnya ya.`);
+            
+            addMessage('assistant', errorMsg);
+            speak(errorMsg, () => {
+                currentState = STATES.ASK_DESTINATION;
+                enableMic();
+                setTimeout(() => {
+                    if (!isListening && !isSpeaking) startListening();
+                }, 500);
+            });
+        }
+    }
+
+    // ============================================================
+    // REAL-TIME MONITORING
+    // ============================================================
+    function startMonitoring() {
+        currentState = STATES.MONITORING;
+        
+        const msg = prefs.language === 'en'
+            ? "I am now in active monitoring mode. I will regularly monitor environmental conditions and alert you if anything changes. You can speak or ask me questions anytime by pressing the spacebar on your keyboard, tapping the microphone button, or tapping your screen, for example ask about the weather, air quality, or traffic."
+            : "Saya sekarang dalam mode pemantauan aktif. Saya akan terus memeriksa kondisi secara berkala dan langsung memberi peringatan jika ada perubahan. Kamu bisa berbicara atau bertanya kapan saja dengan menekan tombol Spasi di keyboard, mengetuk layar, atau menekan tombol mikrofon. Misalnya tanyakan tentang cuaca, kualitas udara, atau lalu lintas.";
+        
+        addMessage('assistant', msg);
+        speak(msg, () => {
+            enableMic();
+            updateStatus('Memantau (Tekan Spasi untuk bicara)', '#21B9BE');
+        });
+        
+        const intervalMs = (prefs.monitorInterval || 60) * 1000;
+        
+        if (monitoringInterval) clearInterval(monitoringInterval);
+        monitoringInterval = setInterval(async () => {
+            if (!currentLocation || isSpeaking) return;
+            
+            const newData = await fetchEnvironmentData(currentLocation.lat, currentLocation.lon);
+            if (!newData) return;
+            
+            updateTelemetryCards(newData);
+            checkForAlerts(previousData, newData);
+            
+            previousData = JSON.parse(JSON.stringify(newData));
+            currentData = newData;
+        }, intervalMs);
+        
+        // Also start GPS tracking if user has a destination
+        if (destination) {
+            startGPSTracking();
+        }
+    }
+
+    function startGPSTracking() {
+        if (!("geolocation" in navigator)) return;
+        
+        navigator.geolocation.watchPosition((position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            currentLocation = { ...currentLocation, lat, lon };
+        }, null, { enableHighAccuracy: false, maximumAge: 30000 });
+    }
+
+    function checkForAlerts(oldData, newData) {
+        if (!oldData || !newData) return;
+        
+        // AQI Alert
+        if (alerts.alert_aqi) {
+            const oldAQI = oldData.raw_data?.aqi?.pm25 || 0;
+            const newAQI = newData.raw_data?.aqi?.pm25 || 0;
+            if (newAQI > 150 && oldAQI <= 150) {
+                triggerAlert('aqi', {
+                    value: newAQI,
+                    category: newData.raw_data.aqi.category
+                });
+            }
+        }
+        
+        // Weather Alert
+        if (alerts.alert_weather) {
+            const oldCondition = oldData.raw_data?.weather?.condition || '';
+            const newCondition = newData.raw_data?.weather?.condition || '';
+            const dangerConditions = ['Hujan Deras', 'Badai Petir'];
+            if (dangerConditions.includes(newCondition) && !dangerConditions.includes(oldCondition)) {
+                triggerAlert('weather', {
+                    condition: newCondition,
+                    temperature: newData.raw_data.weather.temperature
+                });
+            }
+        }
+        
+        // Traffic Alert
+        if (alerts.alert_traffic) {
+            const oldCongestion = oldData.raw_data?.traffic?.congestion || '';
+            const newCongestion = newData.raw_data?.traffic?.congestion || '';
+            if (newCongestion === 'Macet Parah' && oldCongestion !== 'Macet Parah') {
+                triggerAlert('traffic', {
+                    congestion: newCongestion,
+                    currentSpeed: newData.raw_data.traffic.currentSpeed
+                });
+            }
+        }
+    }
+
+    async function triggerAlert(type, data) {
+        // Stop any current speech
+        stopSpeaking();
+        
+        addTypingIndicator();
+        
+        try {
+            const response = await fetch('/api/alert', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken || '' },
+                body: JSON.stringify({ type, data, lang: prefs.language })
+            });
+            const result = await response.json();
+            removeTypingIndicator();
+            
+            addMessage('alert', result.narration);
+            speak(result.narration, () => {
+                enableMic();
+                updateStatus('Memantau (Tekan Spasi untuk bicara)', '#21B9BE');
+            });
+        } catch(e) {
+            removeTypingIndicator();
+            // Fallback alert
+            const fallbackMsg = type === 'aqi' 
+                ? `Perhatian. Kualitas udara memburuk. PM2.5 sekarang di angka ${data.value}.`
+                : type === 'weather'
+                ? `Peringatan cuaca. Kondisi berubah menjadi ${data.condition}.`
+                : `Peringatan lalu lintas. Kondisi saat ini ${data.congestion}.`;
+            
+            addMessage('alert', fallbackMsg);
+            speak(fallbackMsg, () => {
+                enableMic();
+                updateStatus('Memantau (Tekan Spasi untuk bicara)', '#21B9BE');
+            });
+        }
+    }
+
+    async function handleMonitoringCommand(text) {
+        const response = await fetch('/api/voice-command', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken || '' },
+            body: JSON.stringify({ text: text, lang: prefs.language, current_data: currentData })
+        });
+        const intent = await response.json();
+        
+        if (intent.intent === 'query_condition') {
+            const answer = intent.answer || (currentData ? currentData.briefing : null);
+            if (answer) {
+                addMessage('assistant', answer);
+                speak(answer, () => {
+                    enableMic();
+                    updateStatus('Memantau (Tekan Spasi untuk bicara)', '#21B9BE');
+                });
+            } else {
+                // Re-fetch current conditions
+                addTypingIndicator();
+                updateStatus('Mengambil data terbaru...', '#14C5D9');
+                const data = await fetchEnvironmentData(currentLocation.lat, currentLocation.lon);
+                removeTypingIndicator();
+                
+                if (data) {
+                    currentData = data;
+                    updateTelemetryCards(data);
+                    addMessage('assistant', data.briefing);
+                    speak(data.briefing, () => {
+                        enableMic();
+                        updateStatus('Memantau (Tekan Spasi untuk bicara)', '#21B9BE');
+                    });
+                }
+            }
+        } else if (intent.intent === 'set_destination') {
+            await handleDestinationInput(text);
+        } else if (intent.intent === 'help') {
+            const helpMsg = prefs.language === 'en'
+                ? "You can ask me questions anytime by pressing the spacebar or speaking, such as 'How is the weather today?', 'Is traffic heavy?', or tell me a new destination like 'To Palembang'."
+                : "Kamu bisa bertanya kapan saja dengan menekan tombol Spasi atau langsung berbicara, misalnya: 'Bagaimana cuaca sekarang?', 'Apakah lalu lintas macet?', atau sebutkan tujuan perjalanan baru seperti 'Mau ke Palembang'.";
+            addMessage('assistant', helpMsg);
+            speak(helpMsg, () => {
+                enableMic();
+                updateStatus('Memantau (Tekan Spasi untuk bicara)', '#21B9BE');
+            });
+        } else {
+            // Try as conversational query or destination
+            if (intent.answer) {
+                addMessage('assistant', intent.answer);
+                speak(intent.answer, () => {
+                    enableMic();
+                    updateStatus('Memantau (Tekan Spasi untuk bicara)', '#21B9BE');
+                });
+            } else {
+                await handleDestinationInput(text);
+            }
+        }
+    }
+
+    async function handleGeneralCommand(text) {
+        addTypingIndicator();
+        const data = await fetchEnvironmentData(currentLocation?.lat || '-6.1751', currentLocation?.lon || '106.8272');
+        removeTypingIndicator();
+        
+        if (data) {
+            currentData = data;
+            updateTelemetryCards(data);
+            addMessage('assistant', data.briefing);
+            speak(data.briefing, () => {
+                enableMic();
+                updateStatus('Siap mendengarkan', '#21B9BE');
+            });
+        }
+    }
+
+    // ============================================================
+    // EVENT LISTENERS
+    // ============================================================
     
-    // Bind Ulang
-    document.querySelector('button[aria-label="Ulang pemutaran audio sonifikasi"]')?.addEventListener('click', () => {
-        playbackTime = 0;
-        if(isPlaying) {
-            toggleSonification(); 
-            setTimeout(toggleSonification, 300);
+    // Play/Pause button
+    btnPlayPause?.addEventListener('click', togglePlayPause);
+
+    // Replay button
+    btnReplay?.addEventListener('click', replayLastNarration);
+
+    // Mic button
+    btnMic?.addEventListener('click', () => {
+        if (isListening) {
+            stopListening();
+        } else {
+            startListening();
         }
     });
 
-    // Bind Lokasi Berikutnya
-    document.querySelector('button[aria-label="Pindah ke pemutaran lokasi berikutnya"]')?.addEventListener('click', () => {
-        let next = activeLocationIndex + 1;
-        if(next >= locations.length) next = 0;
-        switchLocation(next);
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (event) => {
+        if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') return;
+        
+        if (event.code === 'Space') {
+            event.preventDefault();
+            if (!btnMic.disabled) {
+                if (isListening) {
+                    stopListening();
+                } else {
+                    startListening();
+                }
+            } else if (isSpeaking || isPaused) {
+                togglePlayPause();
+            }
+        } else if (event.code === 'KeyP') {
+            event.preventDefault();
+            togglePlayPause();
+        } else if (event.code === 'KeyR') {
+            event.preventDefault();
+            replayLastNarration();
+        } else if (event.code === 'Escape') {
+            stopSpeaking();
+            stopListening();
+            updateStatus('Dihentikan', '#42586A');
+            setTimeout(() => {
+                enableMic();
+                updateStatus('Siap mendengarkan', '#21B9BE');
+            }, 1000);
+        } else if (event.code === 'KeyS') {
+            window.location.href = '/pengaturan';
+        }
     });
 
-    // Spacebar listener
-    document.addEventListener('keydown', function(event) {
-      if (event.code === 'Space' && event.target.tagName !== 'INPUT' && event.target.tagName !== 'TEXTAREA') {
-        event.preventDefault();
-        playBtn.classList.add('ring-4', 'ring-[#0675A3]');
-        toggleSonification();
-        setTimeout(() => playBtn.classList.remove('ring-4', 'ring-[#0675A3]'), 200);
-      }
+    function unlockAndStartAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        if (currentAudio && currentAudio.paused && isSpeaking) {
+            currentAudio.play().catch(() => {});
+        }
+        if (!hasAutoStarted || currentState === STATES.IDLE) {
+            hasAutoStarted = true;
+            startConversation();
+        }
+    }
+
+    // Auto-start initialization (Starts immediately when visually impaired user opens the page)
+    function initAutoStart() {
+        if (hasAutoStarted) return;
+        hasAutoStarted = true;
+        startConversation();
+    }
+
+    // Auto-start on load
+    document.addEventListener('DOMContentLoaded', () => {
+        renderLocations();
+        initAutoStart();
     });
-    
-    // Init on load
-    document.addEventListener('DOMContentLoaded', init);
+
+    window.addEventListener('load', () => {
+        if (!hasAutoStarted) initAutoStart();
+    });
+
+    // Global listeners: any user activity immediately un-suspends audio context & starts/resumes playback without any visual barrier
+    ['click', 'keydown', 'touchstart', 'focus'].forEach(evt => {
+        window.addEventListener(evt, () => {
+            unlockAndStartAudio();
+        }, { passive: true });
+    });
   </script>
-
-  <!-- Location Search Modal -->
-  <div id="location-modal" class="fixed inset-0 bg-[#0A1F33]/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-      <div class="bg-white w-full max-w-md rounded-[32px] p-8 shadow-2xl relative">
-          <button onclick="document.getElementById('location-modal').classList.add('hidden')" class="absolute top-6 right-6 text-[#42586A] hover:text-[#0A1F33] focus:outline-none">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-          </button>
-          
-          <h2 class="text-2xl font-bold text-[#0A1F33] font-outfit mb-2">Tambah Lokasi Lainnya</h2>
-          <p class="text-sm text-[#42586A] mb-6">Cari kota, kabupaten, kecamatan, atau kelurahan spesifik untuk dipantau secara real-time.</p>
-          
-          <form id="add-location-form" onsubmit="searchLocation(event)" class="space-y-4">
-              <div>
-                  <label for="search-loc-input" class="block text-sm font-semibold text-[#0A1F33] mb-1.5">Nama Lokasi</label>
-                  <input type="text" id="search-loc-input" placeholder="Contoh: Plaju, Palembang..." class="w-full text-base rounded-2xl border-2 border-[#D6E6ED] px-4 py-3.5 text-[#0A1F33] focus:outline-none focus:border-[#0675A3] transition">
-              </div>
-              <p id="search-loc-status" class="text-sm text-[#0675A3] font-medium hidden">Mencari di peta...</p>
-              
-              <button type="submit" class="w-full bg-[#0675A3] hover:bg-[#033067] text-white py-3.5 rounded-2xl font-bold text-base transition">
-                  Cari & Tambahkan
-              </button>
-          </form>
-
-          <div class="relative flex py-5 items-center">
-              <div class="flex-grow border-t border-[#D6E6ED]"></div>
-              <span class="flex-shrink-0 mx-4 text-[#42586A] text-sm font-medium">ATAU</span>
-              <div class="flex-grow border-t border-[#D6E6ED]"></div>
-          </div>
-
-          <button onclick="addCurrentLocation(); document.getElementById('location-modal').classList.add('hidden')" aria-label="Gunakan GPS saat ini" class="w-full py-3.5 px-4 rounded-2xl border-2 border-dashed border-[#0675A3] bg-[#E6F2F7] hover:bg-[#D6E6ED] text-[#0675A3] transition flex items-center justify-center gap-2 text-base font-bold focus:outline-none" type="button">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              <span>Deteksi GPS Saat Ini</span>
-          </button>
-      </div>
-  </div>
-<!-- END: InteractiveAccessibilityScript -->
 </body></html>

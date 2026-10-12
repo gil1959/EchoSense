@@ -22,6 +22,10 @@ Route::get('/peringatan', function () {
     return view('pengaturan'); // placeholder
 });
 
-Route::get('/api/sonify', [\App\Http\Controllers\DashboardController::class, 'getSonificationData']);
+// API Routes
+Route::get('/api/briefing', [\App\Http\Controllers\DashboardController::class, 'getEnvironmentBriefing']);
 Route::get('/api/voices', [\App\Http\Controllers\DashboardController::class, 'getVoices']);
 Route::post('/api/tts', [\App\Http\Controllers\DashboardController::class, 'generateTTS']);
+Route::post('/api/destination', [\App\Http\Controllers\DashboardController::class, 'getDestinationData']);
+Route::post('/api/voice-command', [\App\Http\Controllers\DashboardController::class, 'processVoiceCommand']);
+Route::post('/api/alert', [\App\Http\Controllers\DashboardController::class, 'generateAlert']);

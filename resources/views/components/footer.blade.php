@@ -1,6 +1,6 @@
 <footer class="border-t border-[#D6E6ED] bg-white py-6 text-sm text-[#42586A] mt-auto">
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
-<p class="">© 2026 EchoSense Technologies. Antarmuka sonifikasi lingkungan terbuka.</p>
+<p class="">© 2026 EchoSense Technologies. Asisten suara percakapan & peringatan lingkungan.</p>
 <div class="flex items-center space-x-4 text-xs font-medium">
 <span class="inline-flex items-center gap-1.5 text-[#033067] font-semibold">
 <svg aria-hidden="true" class="w-4 h-4 text-[#0675A3]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">

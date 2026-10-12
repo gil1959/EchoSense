@@ -10,7 +10,7 @@
             </span>
 <span aria-label="Status aktif" class="inline-block w-2.5 h-2.5 rounded-full bg-[#FEB161]" title="Status aktif"></span>
 </div>
-<p class="text-xs text-sky-100/80">Sonifikasi lingkungan aksesibel</p>
+<p class="text-xs text-sky-100/80">Asisten suara lingkungan aksesibel</p>
 </div>
 </a>
 <!-- Navigation Links -->

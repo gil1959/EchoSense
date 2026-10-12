@@ -2,7 +2,7 @@
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>EchoSense - Pengaturan Preferensi Audio &amp; Peringatan</title>
+<title>EchoSense - Pengaturan Preferensi Suara & Peringatan</title>
 <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}"/>
 <!-- Google Fonts: Atkinson Hyperlegible Next -->
 <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -107,94 +107,25 @@
         Pengaturan preferensi
       </h1>
 <p class="text-muted text-base max-w-4xl leading-relaxed">
-        Personalisasi tempo, pitch, intensitas, instrumen, bahasa narasi, mode pemutaran, dan ambang batas peringatan sonifikasi data iklim real-time.
+        Personalisasi suara narasi, bahasa, kecepatan bicara, dan ambang batas peringatan lingkungan untuk pengalaman EchoSense yang optimal.
       </p>
 </section>
 <!-- Two-Column Preferences Grid Form -->
 <form class="space-y-8" id="preferences-form" onsubmit="event.preventDefault();">
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-<!-- BEGIN: LeftPanel - Sonifikasi & narasi -->
-<section aria-labelledby="section-sonifikasi" class="bg-white border border-bordercol rounded-[20px] p-7 shadow-panel space-y-7">
+<!-- BEGIN: LeftPanel - Preferensi Suara & Bahasa -->
+<section aria-labelledby="section-voice" class="bg-white border border-bordercol rounded-[20px] p-7 shadow-panel space-y-7">
 <div class="border-b border-bordercol pb-4 flex items-center justify-between">
-<h2 class="text-lg font-bold text-deep flex items-center gap-2.5" id="section-sonifikasi">
+<h2 class="text-lg font-bold text-deep flex items-center gap-2.5" id="section-voice">
 <span aria-hidden="true" class="w-2.5 h-2.5 rounded-full bg-ocean"></span>
-              Sonifikasi &amp; narasi
+              Preferensi suara
             </h2>
 <span class="text-xs font-semibold text-muted bg-trackbg px-3 py-1 rounded-full border border-bordercol">
-              Sintesis audio
+              Narasi TTS
             </span>
 </div>
-<!-- Parameter Sliders -->
-<div class="space-y-6">
-<!-- Tempo Slider -->
-<div class="space-y-2">
-<div class="flex items-center justify-between text-sm">
-<label class="text-deep font-semibold" for="tempo-range">
-                  Tempo sonifikasi
-                </label>
-<div class="flex items-center gap-1.5">
-<span class="text-ocean font-bold" id="tempo-val">60%</span>
-<span class="text-muted text-xs">(120 BPM)</span>
-</div>
-</div>
-<div class="relative flex items-center">
-<input aria-label="Atur tempo sonifikasi dalam persen" aria-valuemax="100" aria-valuemin="0" aria-valuenow="60" class="w-full h-2 rounded-lg cursor-pointer bg-trackbg" id="tempo-range" max="100" min="0" oninput="updateSliderTrack(this, 'tempo-val', '%', 120)" style="background: linear-gradient(90deg, #0675A3 0%, #14C5D9 60%, #E6F2F7 60%, #E6F2F7 100%);" type="range" value="60">
-</div>
-</div>
-<!-- Pitch Slider -->
-<div class="space-y-2">
-<div class="flex items-center justify-between text-sm">
-<label class="text-deep font-semibold" for="pitch-range">
-                  Pitch / nada dasar
-                </label>
-<div class="flex items-center gap-1.5">
-<span class="text-ocean font-bold" id="pitch-val">45%</span>
-<span class="text-muted text-xs">(440 Hz)</span>
-</div>
-</div>
-<div class="relative flex items-center">
-<input aria-label="Atur pitch atau nada dasar dalam persen" aria-valuemax="100" aria-valuemin="0" aria-valuenow="45" class="w-full h-2 rounded-lg cursor-pointer bg-trackbg" id="pitch-range" max="100" min="0" oninput="updateSliderTrack(this, 'pitch-val', '%', 440)" style="background: linear-gradient(90deg, #0675A3 0%, #14C5D9 45%, #E6F2F7 45%, #E6F2F7 100%);" type="range" value="45">
-</div>
-</div>
-<!-- Intensitas Slider -->
-<div class="space-y-2">
-<div class="flex items-center justify-between text-sm">
-<label class="text-deep font-semibold" for="intensitas-range">
-                  Intensitas suara
-                </label>
-<div class="flex items-center gap-1.5">
-<span class="text-ocean font-bold" id="intensitas-val">70%</span>
-<span class="text-muted text-xs">(-3.5 dB)</span>
-</div>
-</div>
-<div class="relative flex items-center">
-<input aria-label="Atur intensitas suara dalam persen" aria-valuemax="100" aria-valuemin="0" aria-valuenow="70" class="w-full h-2 rounded-lg cursor-pointer bg-trackbg" id="intensitas-range" max="100" min="0" oninput="updateSliderTrack(this, 'intensitas-val', '%', -3.5)" style="background: linear-gradient(90deg, #0675A3 0%, #14C5D9 70%, #E6F2F7 70%, #E6F2F7 100%);" type="range" value="70">
-</div>
-</div>
-</div>
 <!-- Dropdowns Section -->
-<div class="pt-4 border-t border-bordercol space-y-5">
-<!-- Instrumen Dropdown -->
-<div class="space-y-1.5">
-<label class="block text-sm font-semibold text-deep" for="select-instrument">
-                Instrumen
-              </label>
-<div class="flex space-x-2">
-<div class="relative flex-1">
-<select class="w-full h-12 rounded-[10px] bg-white border-[1.5px] border-slatecol text-deep px-4 pr-10 text-sm focus:border-ocean focus:ring-0 transition" id="select-instrument" name="instrument">
-<option value="triangle">Piano akustik (Triangle)</option>
-<option value="sine">Sintesis halus (Sine)</option>
-<option value="square">Nada harmonis (Square)</option>
-</select>
-</div>
-<!-- Tone Test Button -->
-<button id="btn-test-instrument" aria-label="Dengarkan contoh instrumen terpilih" class="h-12 px-4 bg-trackbg hover:bg-slate-200 border-[1.5px] border-slatecol text-navy font-semibold rounded-[10px] flex items-center justify-center transition" title="Dengarkan contoh instrumen" type="button">
-<svg aria-hidden="true" class="w-4 h-4 text-ocean" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24">
-<polygon points="5 3 19 12 5 21 5 3"></polygon>
-</svg>
-</button>
-</div>
-</div>
+<div class="space-y-5">
 <!-- Bahasa Narasi Dropdown -->
 <div class="space-y-1.5">
 <label class="block text-sm font-semibold text-deep" for="select-language">
@@ -231,28 +162,67 @@
 </div>
 </div>
 </div>
-<!-- Mode Pemutaran Radio Fieldset -->
-<fieldset class="pt-4 border-t border-bordercol space-y-3">
-<legend class="block text-sm font-semibold text-deep mb-2">
-              Mode pemutaran
-            </legend>
-<div class="space-y-3">
-<label class="flex items-start space-x-3.5 cursor-pointer p-3 rounded-xl border border-transparent hover:border-bordercol hover:bg-page transition">
-<input checked="" class="mt-0.5 h-6 w-6 text-ocean border-slatecol focus:ring-ocean rounded-full" name="playback_mode" type="radio" value="bersamaan">
-<div class="text-sm">
-<span class="font-bold text-deep block">Bersamaan</span>
-<span class="text-muted leading-relaxed">Sonifikasi nada latar berbunyi serentak bersama panduan narasi suara AI.</span>
+<!-- Sliders Section -->
+<div class="pt-4 border-t border-bordercol space-y-6">
+<!-- Kecepatan Bicara Slider -->
+<div class="space-y-2">
+<div class="flex items-center justify-between text-sm">
+<label class="text-deep font-semibold" for="speed-range">
+                  Kecepatan bicara
+                </label>
+<div class="flex items-center gap-1.5">
+<span class="text-ocean font-bold" id="speed-val">1.0x</span>
 </div>
+</div>
+<div class="relative flex items-center">
+<input aria-label="Atur kecepatan bicara TTS" class="w-full h-2 rounded-lg cursor-pointer bg-trackbg" id="speed-range" max="150" min="75" oninput="updateSpeedSlider(this)" style="background: linear-gradient(90deg, #0675A3 0%, #14C5D9 33%, #E6F2F7 33%, #E6F2F7 100%);" type="range" value="100">
+</div>
+<div class="flex justify-between text-xs text-muted">
+<span>0.75x</span>
+<span>1.0x</span>
+<span>1.5x</span>
+</div>
+</div>
+<!-- Volume TTS Slider -->
+<div class="space-y-2">
+<div class="flex items-center justify-between text-sm">
+<label class="text-deep font-semibold" for="volume-range">
+                  Volume narasi
+                </label>
+<div class="flex items-center gap-1.5">
+<span class="text-ocean font-bold" id="volume-val">80%</span>
+</div>
+</div>
+<div class="relative flex items-center">
+<input aria-label="Atur volume narasi TTS" class="w-full h-2 rounded-lg cursor-pointer bg-trackbg" id="volume-range" max="100" min="10" oninput="updateSliderTrack(this, 'volume-val', '%')" style="background: linear-gradient(90deg, #0675A3 0%, #14C5D9 80%, #E6F2F7 80%, #E6F2F7 100%);" type="range" value="80">
+</div>
+</div>
+</div>
+<!-- Toggles Section -->
+<div class="pt-4 border-t border-bordercol space-y-4">
+<!-- Auto-start greeting toggle -->
+<label class="flex items-center justify-between p-3.5 rounded-xl border border-bordercol hover:border-slatecol bg-white transition cursor-pointer">
+<div class="flex items-center space-x-3">
+<div>
+<span class="text-sm font-semibold text-deep block">Sapaan otomatis</span>
+<span class="text-xs text-muted">Otomatis menyapa saat membuka website</span>
+</div>
+</div>
+<input class="h-6 w-6 rounded text-ocean border-slatecol focus:ring-ocean" name="auto_greet" type="checkbox" checked>
 </label>
-<label class="flex items-start space-x-3.5 cursor-pointer p-3 rounded-xl border border-transparent hover:border-bordercol hover:bg-page transition">
-<input class="mt-0.5 h-6 w-6 text-ocean border-slatecol focus:ring-ocean rounded-full" name="playback_mode" type="radio" value="berurutan">
-<div class="text-sm">
-<span class="font-bold text-deep block">Berurutan</span>
-<span class="text-muted leading-relaxed">Sonifikasi frekuensi diputar terlebih dahulu, disusul ringkasan suara.</span>
+<!-- Interval monitoring -->
+<div class="space-y-1.5">
+<label class="block text-sm font-semibold text-deep" for="select-interval">
+                Interval pemantauan real-time
+              </label>
+<select class="w-full h-12 rounded-[10px] bg-white border-[1.5px] border-slatecol text-deep px-4 pr-10 text-sm focus:border-ocean focus:ring-0 transition" id="select-interval" name="interval">
+<option value="30">Setiap 30 detik</option>
+<option value="60" selected>Setiap 60 detik (Disarankan)</option>
+<option value="120">Setiap 2 menit</option>
+<option value="300">Setiap 5 menit</option>
+</select>
 </div>
-</label>
 </div>
-</fieldset>
 </section>
 <!-- END: LeftPanel -->
 <!-- BEGIN: RightPanel - Peringatan lingkungan -->
@@ -263,8 +233,19 @@
               Peringatan lingkungan
             </h2>
 <span class="text-xs font-semibold text-muted bg-trackbg px-3 py-1 rounded-full border border-bordercol">
-              Kanal peringatan
+              Narasi peringatan
             </span>
+</div>
+<!-- Info banner -->
+<div class="bg-trackbg border border-bordercol rounded-xl p-4 flex items-start gap-3">
+<svg class="w-5 h-5 text-ocean flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+<circle cx="12" cy="12" r="10"></circle>
+<line x1="12" y1="16" x2="12" y2="12"></line>
+<line x1="12" y1="8" x2="12.01" y2="8"></line>
+</svg>
+<p class="text-sm text-muted leading-relaxed">
+              Semua peringatan disampaikan melalui <strong class="text-deep">narasi suara TTS</strong> secara otomatis. Sistem akan membacakan peringatan dengan suara natural saat terdeteksi perubahan kondisi lingkungan yang signifikan.
+            </p>
 </div>
 <!-- Ambang Peringatan Checkbox Fieldset -->
 <fieldset class="space-y-3">
@@ -275,49 +256,49 @@
 <label class="flex items-center justify-between p-3.5 rounded-xl border border-bordercol hover:border-slatecol bg-white transition cursor-pointer">
 <div class="flex items-center space-x-3">
 <input class="h-6 w-6 rounded text-ocean border-slatecol focus:ring-ocean alert-cb" name="alert_aqi" type="checkbox" onchange="updateAlertBadge(this, 'badge-aqi', 'Waspada', 'bg-sunrise text-navy')">
-<span class="text-sm font-semibold text-deep">Polusi udara tinggi (AQI di atas 150)</span>
+<div>
+<span class="text-sm font-semibold text-deep block">Polusi udara tinggi</span>
+<span class="text-xs text-muted">AQI di atas 150 — narasi peringatan otomatis</span>
+</div>
 </div>
 <span id="badge-aqi" class="text-xs font-medium px-2.5 py-1 rounded-md bg-trackbg text-muted border border-bordercol">Nonaktif</span>
 </label>
 <label class="flex items-center justify-between p-3.5 rounded-xl border border-bordercol hover:border-slatecol bg-white transition cursor-pointer">
 <div class="flex items-center space-x-3">
 <input class="h-6 w-6 rounded text-ocean border-slatecol focus:ring-ocean alert-cb" name="alert_weather" type="checkbox" onchange="updateAlertBadge(this, 'badge-weather', 'Kritis', 'bg-crimson text-white')">
-<span class="text-sm font-semibold text-deep">Cuaca berbahaya &amp; potensi badai</span>
+<div>
+<span class="text-sm font-semibold text-deep block">Cuaca berbahaya</span>
+<span class="text-xs text-muted">Hujan deras, badai petir — narasi peringatan otomatis</span>
+</div>
 </div>
 <span id="badge-weather" class="text-xs font-medium px-2.5 py-1 rounded-md bg-trackbg text-muted border border-bordercol">Nonaktif</span>
 </label>
 <label class="flex items-center justify-between p-3.5 rounded-xl border border-bordercol hover:border-slatecol bg-white transition cursor-pointer">
 <div class="flex items-center space-x-3">
 <input class="h-6 w-6 rounded text-ocean border-slatecol focus:ring-ocean alert-cb" name="alert_traffic" type="checkbox" onchange="updateAlertBadge(this, 'badge-traffic', 'Aktif', 'bg-ocean text-white')">
-<span class="text-sm font-medium text-muted">Lalu lintas berat / kemacetan total</span>
+<div>
+<span class="text-sm font-semibold text-deep block">Lalu lintas berat</span>
+<span class="text-xs text-muted">Kemacetan total — narasi peringatan otomatis</span>
+</div>
 </div>
 <span id="badge-traffic" class="text-xs font-medium px-2.5 py-1 rounded-md bg-trackbg text-muted border border-bordercol">Nonaktif</span>
 </label>
 </div>
 </fieldset>
-<!-- Jenis Notifikasi Section -->
+<!-- Repeat alert toggle -->
 <fieldset class="pt-4 border-t border-bordercol space-y-3">
 <legend class="block text-sm font-semibold text-deep mb-2">
-              Jenis notifikasi
+              Opsi peringatan
             </legend>
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-<!-- Audio Output -->
-<label class="flex items-center space-x-3 p-3.5 rounded-xl border-2 border-ocean/40 bg-page cursor-pointer hover:border-ocean transition">
-<input checked="" class="h-6 w-6 rounded text-ocean border-slatecol focus:ring-ocean" name="notify_audio" type="checkbox">
+<label class="flex items-center justify-between p-3.5 rounded-xl border border-bordercol hover:border-slatecol bg-white transition cursor-pointer">
+<div class="flex items-center space-x-3">
 <div>
-<span class="text-sm font-bold text-deep block">Audio</span>
-<span class="text-xs text-muted">Chime &amp; voice prompt</span>
+<span class="text-sm font-semibold text-deep block">Ulangi peringatan</span>
+<span class="text-xs text-muted">Bacakan ulang peringatan jika user tidak merespons dalam 2 menit</span>
 </div>
+</div>
+<input class="h-6 w-6 rounded text-ocean border-slatecol focus:ring-ocean" name="repeat_alert" type="checkbox">
 </label>
-<!-- Haptic Output -->
-<label class="flex items-center space-x-3 p-3.5 rounded-xl border-2 border-ocean/40 bg-page cursor-pointer hover:border-ocean transition">
-<input checked="" class="h-6 w-6 rounded text-ocean border-slatecol focus:ring-ocean" name="notify_haptic" type="checkbox">
-<div>
-<span class="text-sm font-bold text-deep block">Haptic</span>
-<span class="text-xs text-muted">Pola getaran taktil layar</span>
-</div>
-</label>
-</div>
 </fieldset>
 <!-- Lokasi Dipantau Section -->
 <fieldset class="pt-4 border-t border-bordercol space-y-3">
@@ -371,52 +352,53 @@
 <!-- BEGIN: MainFooter -->
 <x-footer />
 <!-- END: MainFooter -->
-<!-- JavaScript for Interactive Controls & Dynamic Slider Gradients -->
-<script data-purpose="slider-interaction">
-    // Default Preferences
+<!-- JavaScript for Interactive Controls -->
+<script data-purpose="settings-interaction">
+    // Default Preferences (no more sonification params)
     const defaultPrefs = {
-        tempo: 60,
-        pitch: 45,
-        volume: 30,
-        instrument: 'sine',
+        volume: 80,
+        speed: 100, // 100 = 1.0x
         language: 'id',
-        playMode: 'bersamaan',
-        voiceURI: 'elevenlabs:Xb7hH8MSUJpSbSDYk0k2' // Default to ElevenLabs Alice (Free Tier Approved)
+        voiceURI: 'elevenlabs:Xb7hH8MSUJpSbSDYk0k2',
+        autoGreet: true,
+        monitorInterval: 60,
+        repeatAlert: false
     };
 
     // Load preferences
     let prefs = JSON.parse(localStorage.getItem('echosense_prefs')) || defaultPrefs;
-    if (prefs.voiceURI === undefined) {
-        prefs.voiceURI = defaultPrefs.voiceURI;
-        localStorage.setItem('echosense_prefs', JSON.stringify(prefs));
-    }
+    // Migration: ensure new fields exist
+    if (prefs.speed === undefined) prefs.speed = defaultPrefs.speed;
+    if (prefs.autoGreet === undefined) prefs.autoGreet = defaultPrefs.autoGreet;
+    if (prefs.monitorInterval === undefined) prefs.monitorInterval = defaultPrefs.monitorInterval;
+    if (prefs.repeatAlert === undefined) prefs.repeatAlert = defaultPrefs.repeatAlert;
+    if (prefs.voiceURI === undefined || prefs.voiceURI === 'default') prefs.voiceURI = defaultPrefs.voiceURI;
 
     function initSettings() {
-        const tempo = document.getElementById('tempo-range');
-        const pitch = document.getElementById('pitch-range');
-        const intensitas = document.getElementById('intensitas-range');
-        const instrument = document.getElementById('select-instrument');
         const language = document.getElementById('select-language');
+        const volumeRange = document.getElementById('volume-range');
+        const speedRange = document.getElementById('speed-range');
+        const intervalSelect = document.getElementById('select-interval');
+        const autoGreetCb = document.querySelector('input[name="auto_greet"]');
+        const repeatAlertCb = document.querySelector('input[name="repeat_alert"]');
         
-        if (tempo) {
-            tempo.value = prefs.tempo;
-            updateSliderTrack(tempo, 'tempo-val', '%');
-        }
-        if (pitch) {
-            pitch.value = prefs.pitch;
-            updateSliderTrack(pitch, 'pitch-val', '%');
-        }
-        if (intensitas) {
-            intensitas.value = prefs.volume;
-            updateSliderTrack(intensitas, 'intensitas-val', '%');
-        }
-        if (instrument) instrument.value = prefs.instrument || 'triangle';
         if (language) language.value = prefs.language || 'id';
-        // prefs.voiceURI is handled in populateVoices
+        
+        if (volumeRange) {
+            volumeRange.value = prefs.volume || 80;
+            updateSliderTrack(volumeRange, 'volume-val', '%');
+        }
+        
+        if (speedRange) {
+            speedRange.value = prefs.speed || 100;
+            updateSpeedSlider(speedRange);
+        }
+        
+        if (intervalSelect) intervalSelect.value = prefs.monitorInterval || 60;
+        if (autoGreetCb) autoGreetCb.checked = prefs.autoGreet !== false;
+        if (repeatAlertCb) repeatAlertCb.checked = prefs.repeatAlert === true;
+        
         setTimeout(populateVoices, 100);
-
-        const playModeRadio = document.querySelector(`input[name="playback_mode"][value="${prefs.playMode}"]`);
-        if (playModeRadio) playModeRadio.checked = true;
         
         // Load Alerts
         const alerts = JSON.parse(localStorage.getItem('echosense_alerts')) || { alert_aqi: true, alert_weather: true, alert_traffic: false };
@@ -456,7 +438,16 @@
       if (displayElem) {
         displayElem.innerText = val + unit;
       }
-      slider.style.background = `linear-gradient(90deg, #0675A3 0%, #14C5D9 ${val}%, #E6F2F7 ${val}%, #E6F2F7 100%)`;
+      const percent = ((val - slider.min) / (slider.max - slider.min)) * 100;
+      slider.style.background = `linear-gradient(90deg, #0675A3 0%, #14C5D9 ${percent}%, #E6F2F7 ${percent}%, #E6F2F7 100%)`;
+    }
+
+    function updateSpeedSlider(slider) {
+      const val = slider.value;
+      const speedX = (val / 100).toFixed(2).replace(/\.?0+$/, '') + 'x';
+      document.getElementById('speed-val').innerText = speedX;
+      const percent = ((val - slider.min) / (slider.max - slider.min)) * 100;
+      slider.style.background = `linear-gradient(90deg, #0675A3 0%, #14C5D9 ${percent}%, #E6F2F7 ${percent}%, #E6F2F7 100%)`;
     }
 
     // Initialize on load
@@ -520,15 +511,13 @@
     // Form Submit (Save Settings)
     document.querySelector('form')?.addEventListener('submit', function(e) {
         e.preventDefault();
-        prefs.tempo = parseInt(document.getElementById('tempo-range').value);
-        prefs.pitch = parseInt(document.getElementById('pitch-range').value);
-        prefs.volume = parseInt(document.getElementById('intensitas-range').value);
-        prefs.instrument = document.getElementById('select-instrument').value;
+        prefs.volume = parseInt(document.getElementById('volume-range').value);
+        prefs.speed = parseInt(document.getElementById('speed-range').value);
         prefs.language = document.getElementById('select-language').value;
         prefs.voiceURI = document.getElementById('select-voice').value;
-        
-        const modeRadio = document.querySelector('input[name="playback_mode"]:checked');
-        if (modeRadio) prefs.playMode = modeRadio.value;
+        prefs.autoGreet = document.querySelector('input[name="auto_greet"]').checked;
+        prefs.monitorInterval = parseInt(document.getElementById('select-interval').value);
+        prefs.repeatAlert = document.querySelector('input[name="repeat_alert"]').checked;
         
         localStorage.setItem('echosense_prefs', JSON.stringify(prefs));
         
@@ -551,135 +540,41 @@
         setTimeout(() => btn.innerHTML = originalText, 2000);
     });
 
-    function playTestTone(buttonEl, testVoice = false) {
-      const originalHTML = buttonEl.innerHTML;
-      buttonEl.classList.add('bg-navy/10');
-      
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      
-      const pitchVal = document.getElementById('pitch-range').value;
-      const volVal = document.getElementById('intensitas-range').value;
-      const instrVal = document.getElementById('select-instrument').value;
-      const langVal = document.getElementById('select-language').value;
-      const modeVal = document.querySelector('input[name="playback_mode"]:checked')?.value || 'bersamaan';
-      
-      const maxVol = volVal / 100;
-      osc.type = instrVal; // sine, square, triangle
-      osc.frequency.value = 220 + (pitchVal * 2); // Map 0-100 to 220-420Hz
-      
-      const now = ctx.currentTime;
-      // ADSR
-      if (instrVal === 'sine') {
-          gain.gain.setValueAtTime(0, now);
-          gain.gain.linearRampToValueAtTime(maxVol, now + 0.3);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-          osc.start(now);
-          osc.stop(now + 0.8);
-      } else if (instrVal === 'square') {
-          gain.gain.setValueAtTime(0, now);
-          gain.gain.linearRampToValueAtTime(maxVol * 0.7, now + 0.1);
-          gain.gain.exponentialRampToValueAtTime(maxVol * 0.2, now + 0.3);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-          osc.start(now);
-          osc.stop(now + 0.6);
-      } else {
-          gain.gain.setValueAtTime(0, now);
-          gain.gain.linearRampToValueAtTime(maxVol, now + 0.02);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-          osc.start(now);
-          osc.stop(now + 0.5);
-      }
-      
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      
-      if (testVoice) {
-          const text = langVal === 'id' ? "Uji coba sonifikasi beserta panduan narasi suara EchoSense." : "EchoSense sonification and voice guidance preview.";
-          const voiceURI = document.getElementById('select-voice').value;
-          
-          if (voiceURI.startsWith('elevenlabs:')) {
-              const elVoiceId = voiceURI.replace('elevenlabs:', '');
-              fetch('/api/tts', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                  body: JSON.stringify({ text: text, voice_id: elVoiceId })
-              }).then(async res => {
-                  if (!res.ok) {
-                      const err = await res.json();
-                      throw new Error(err.error || "ElevenLabs API Error");
-                  }
-                  return res.blob();
-              }).then(blob => {
-                  const url = URL.createObjectURL(blob);
-                  const audio = new Audio(url);
-                  if (modeVal === 'berurutan') {
-                      setTimeout(() => audio.play(), 800);
-                  } else {
-                      audio.play();
-                  }
-              }).catch(e => {
-                  console.error(e);
-                  alert("ElevenLabs API Error: " + e.message);
-              });
-          } else {
-              const utterance = new SpeechSynthesisUtterance(text);
-              utterance.lang = langVal === 'id' ? 'id-ID' : 'en-US';
-              
-              if (voiceURI && voiceURI !== 'default') {
-                  const actualUri = voiceURI.replace('local:', '');
-                  const voices = window.speechSynthesis.getVoices();
-                  const voice = voices.find(v => v.voiceURI === actualUri);
-                  if (voice) utterance.voice = voice;
-              }
-              
-              if (modeVal === 'berurutan') {
-                  setTimeout(() => {
-                      window.speechSynthesis.speak(utterance);
-                  }, 800);
-              } else {
-                  window.speechSynthesis.speak(utterance);
-              }
-          }
-      }
-      
-      setTimeout(() => {
-        buttonEl.innerHTML = originalHTML;
-        buttonEl.classList.remove('bg-navy/10');
-      }, 1500);
-    }
-
-    // Audio preview trigger (Main big button)
+    // Preview voice
     document.getElementById('btn-preview')?.addEventListener('click', function() {
-        playTestTone(this, true); // True means test voice as well
-    });
-
-    // Audio preview trigger (Instrument small button)
-    document.getElementById('btn-test-instrument')?.addEventListener('click', function() {
-        playTestTone(this, false); // False means only tone
+        const langVal = document.getElementById('select-language').value;
+        const voiceURI = document.getElementById('select-voice').value;
+        const speedVal = parseInt(document.getElementById('speed-range').value) / 100;
+        
+        let text = langVal === 'id' 
+            ? "Ini adalah contoh suara narasi EchoSense. Saat ini kondisi lingkungan sekitar Anda baik dan aman untuk beraktivitas di luar ruangan."
+            : "This is a sample EchoSense narration voice. Current environmental conditions around you are good and safe for outdoor activities.";
+        
+        speakText(text, voiceURI, langVal, speedVal);
     });
 
     // Language Test trigger
     document.getElementById('btn-test-language')?.addEventListener('click', function() {
         const langVal = document.getElementById('select-language').value;
         const voiceURI = document.getElementById('select-voice').value;
+        const speedVal = parseInt(document.getElementById('speed-range').value) / 100;
         
-        let text = "Ini adalah contoh karakter suara untuk aplikasi EchoSense.";
-        if (langVal === 'en') {
-            text = "This is a sample voice character for the EchoSense application.";
-        }
+        let text = langVal === 'id'
+            ? "Halo, saya EchoSense, asisten suara Anda."
+            : "Hello, I am EchoSense, your voice assistant.";
         
-        // Change button color to active
         this.classList.add('bg-ocean', 'text-white');
         this.classList.remove('bg-trackbg', 'text-navy');
-        
         const resetBtn = () => {
             this.classList.remove('bg-ocean', 'text-white');
             this.classList.add('bg-trackbg', 'text-navy');
         };
         
-        if (voiceURI.startsWith('elevenlabs:')) {
+        speakText(text, voiceURI, langVal, speedVal, resetBtn);
+    });
+
+    function speakText(text, voiceURI, lang, rate, onEnd) {
+        if (voiceURI && voiceURI.startsWith('elevenlabs:')) {
             const elVoiceId = voiceURI.replace('elevenlabs:', '');
             fetch('/api/tts', {
                 method: 'POST',
@@ -694,16 +589,18 @@
             }).then(blob => {
                 const url = URL.createObjectURL(blob);
                 const audio = new Audio(url);
-                audio.onended = resetBtn;
+                audio.playbackRate = rate || 1.0;
+                if (onEnd) audio.onended = onEnd;
                 audio.play();
             }).catch(e => {
                 console.error(e);
-                alert("ElevenLabs API Error: " + e.message + "\n\nPastikan API Key ElevenLabs Anda valid dan berlangganan paket berbayar (Free Tier ElevenLabs tidak mengizinkan pemanggilan API untuk suara library).");
-                resetBtn();
+                alert("ElevenLabs API Error: " + e.message);
+                if (onEnd) onEnd();
             });
         } else {
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = langVal === 'id' ? 'id-ID' : 'en-US';
+            utterance.lang = lang === 'id' ? 'id-ID' : 'en-US';
+            utterance.rate = rate || 1.0;
             
             if (voiceURI && voiceURI !== 'default') {
                 const actualUri = voiceURI.replace('local:', '');
@@ -712,15 +609,15 @@
                 if (voice) utterance.voice = voice;
             }
             
-            utterance.onend = resetBtn;
+            if (onEnd) utterance.onend = onEnd;
             window.speechSynthesis.speak(utterance);
         }
-    });
+    }
 
     // Reset settings trigger
     document.getElementById('btn-reset')?.addEventListener('click', function() {
       localStorage.setItem('echosense_prefs', JSON.stringify(defaultPrefs));
-      prefs = defaultPrefs;
+      prefs = {...defaultPrefs};
       initSettings();
     });
 
@@ -737,7 +634,7 @@
         
         locs.forEach((loc, idx) => {
             const shortName = loc.name.split(',')[0];
-            const isChecked = activeLocs[loc.id] !== false; // Default true if not set
+            const isChecked = activeLocs[loc.id] !== false;
             if (isChecked) activeCount++;
             
             const badgeClass = isChecked ? 'text-ocean bg-white border-ocean/30' : 'text-muted bg-trackbg border-bordercol';
@@ -755,7 +652,7 @@
         countSpan.textContent = `${activeCount} dari ${locs.length} aktif`;
         
         if (locs.length === 0) {
-            html = '<p class="text-xs text-muted">Belum ada lokasi tersimpan.</p>';
+            html = '<p class="text-xs text-muted">Belum ada lokasi tersimpan. Buka Dashboard untuk mendeteksi lokasi.</p>';
         }
         
         container.innerHTML = html;
@@ -784,14 +681,4 @@
     // Call loadDynamicLocations on DOMContentLoaded
     document.addEventListener('DOMContentLoaded', loadDynamicLocations);
   </script>
-
-
-
-
-
-
-
-
-
-
 </body></html>
