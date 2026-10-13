@@ -269,7 +269,7 @@
 </div>
 <div class="flex flex-wrap items-center gap-4 md:gap-8">
 <div class="flex items-center gap-2">
-<kbd class="px-2 py-0.5 rounded bg-white/15 border border-white/20 text-white font-mono text-xs">Spasi</kbd>
+<kbd class="px-2 py-0.5 rounded bg-white/15 border border-white/20 text-white font-mono text-xs">Panah Bawah / Spasi</kbd>
 <span class="text-slate-200">Bicara</span>
 </div>
 <div class="flex items-center gap-2">
@@ -277,7 +277,7 @@
 <span class="text-slate-200">Jeda / Putar</span>
 </div>
 <div class="flex items-center gap-2">
-<kbd class="px-2 py-0.5 rounded bg-white/15 border border-white/20 text-white font-mono text-xs">R</kbd>
+<kbd class="px-2 py-0.5 rounded bg-white/15 border border-white/20 text-white font-mono text-xs">Panah Atas / R</kbd>
 <span class="text-slate-200">Ulangi suara</span>
 </div>
 <div class="flex items-center gap-2">
@@ -295,6 +295,18 @@
 <!-- BEGIN: MainFooter -->
 <x-footer />
 <!-- END: MainFooter -->
+
+<!-- Bilah Tombol Khusus Mode Pemantauan untuk Pengguna Ponsel -->
+<div id="monitoring-mobile-bar" class="fixed bottom-0 inset-x-0 bg-[#033067]/95 backdrop-blur-md border-t border-white/15 p-3.5 z-40 hidden md:hidden shadow-lg transition-all">
+    <button id="btn-mobile-talk" type="button" aria-label="Tekan tombol bicara di bagian bawah layar" class="w-full py-4 px-6 rounded-2xl bg-[#14C5D9] active:bg-[#0675A3] text-[#033067] font-bold text-base flex items-center justify-center gap-3 shadow-md focus:outline-none focus:ring-4 focus:ring-white">
+        <svg aria-hidden="true" class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" x2="12" y1="19" y2="22"></line>
+        </svg>
+        <span id="mobile-talk-label">Tekan untuk Bicara</span>
+    </button>
+</div>
 
 <!-- Location Search Modal -->
 <div id="location-modal" class="fixed inset-0 bg-[#0A1F33]/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
@@ -453,6 +465,9 @@
     const statusDot = document.getElementById('status-dot');
     const voiceHeaderTitle = document.getElementById('voice-header-title');
     const locationListContainer = document.getElementById('location-list-container');
+    const monitoringMobileBar = document.getElementById('monitoring-mobile-bar');
+    const btnMobileTalk = document.getElementById('btn-mobile-talk');
+    const mobileTalkLabel = document.getElementById('mobile-talk-label');
 
     // ============================================================
     // TTS ENGINE & AUDIO CONTROLS
@@ -703,6 +718,10 @@
         micStopIcon.classList.remove('hidden');
         updateMicLabel('Mendengarkan...');
         updateStatus('Mendengarkan...', '#FD7659');
+
+        if (mobileTalkLabel) mobileTalkLabel.textContent = 'Mendengarkan...';
+        btnMobileTalk?.classList.add('bg-red-500', 'text-white');
+        btnMobileTalk?.classList.remove('bg-[#14C5D9]', 'text-[#033067]');
     }
 
     function stopListening() {
@@ -716,6 +735,10 @@
         micIcon.classList.remove('hidden');
         micStopIcon.classList.add('hidden');
         updateMicLabel('Tekan untuk berbicara (atau spasi)');
+
+        if (mobileTalkLabel) mobileTalkLabel.textContent = 'Tekan untuk Bicara';
+        btnMobileTalk?.classList.remove('bg-red-500', 'text-white');
+        btnMobileTalk?.classList.add('bg-[#14C5D9]', 'text-[#033067]');
     }
 
     function enableMic() {
@@ -730,6 +753,9 @@
 
     function updateMicLabel(text) {
         micLabel.textContent = text;
+        if (mobileTalkLabel && isListening) {
+            mobileTalkLabel.textContent = text;
+        }
     }
 
     // ============================================================
@@ -1373,15 +1399,16 @@
     // Pemantauan berkala kondisi lingkungan
     function startMonitoring() {
         currentState = STATES.MONITORING;
+        monitoringMobileBar?.classList.remove('hidden');
         
         const msg = prefs.language === 'en'
-            ? "I am now in active monitoring mode. I will regularly monitor environmental conditions and alert you if anything changes. You can speak or ask me questions anytime by simply tapping anywhere on your screen, or pressing the spacebar on your keyboard. For example, ask about the weather, air quality, or traffic."
-            : "Saya sekarang dalam mode pemantauan aktif. Saya akan terus memeriksa kondisi secara berkala dan langsung memberi peringatan jika ada perubahan. Kamu bisa berbicara atau bertanya kapan saja cukup dengan mengetuk layar di mana saja, atau menekan tombol Spasi di keyboard. Misalnya tanyakan tentang cuaca, kualitas udara, atau lalu lintas.";
+            ? "I am now in active monitoring mode. I will regularly monitor environmental conditions and alert you if anything changes. You can speak to me anytime by pressing the talk button at the bottom of the screen, or pressing the down arrow key on your keyboard. For example, ask about the weather, air quality, or traffic."
+            : "Saya sekarang dalam mode pemantauan aktif. Saya akan terus memeriksa kondisi secara berkala dan langsung memberi peringatan jika ada perubahan. Kamu bisa berbicara atau bertanya kapan saja dengan menekan tombol bicara di bagian bawah layar, atau menekan tombol panah bawah di papan ketik. Misalnya tanyakan tentang cuaca, kualitas udara, atau lalu lintas.";
         
         addMessage('assistant', msg);
         speak(msg, () => {
             enableMic();
-            updateStatus('Memantau (Ketuk layar / Spasi untuk bicara)', '#21B9BE');
+            updateStatus('Memantau (Tombol bawah / Panah bawah untuk bicara)', '#21B9BE');
         });
         
         const intervalMs = (prefs.monitorInterval || 60) * 1000;
@@ -1475,7 +1502,7 @@
             addMessage('alert', result.narration);
             speak(result.narration, () => {
                 enableMic();
-                updateStatus('Memantau (Tekan Spasi untuk bicara)', '#21B9BE');
+                updateStatus('Memantau (Tombol bawah / Panah bawah untuk bicara)', '#21B9BE');
             });
         } catch(e) {
             removeTypingIndicator();
@@ -1489,7 +1516,7 @@
             addMessage('alert', fallbackMsg);
             speak(fallbackMsg, () => {
                 enableMic();
-                updateStatus('Memantau (Tekan Spasi untuk bicara)', '#21B9BE');
+                updateStatus('Memantau (Tombol bawah / Panah bawah untuk bicara)', '#21B9BE');
             });
         }
     }
@@ -1508,7 +1535,7 @@
                 addMessage('assistant', answer);
                 speak(answer, () => {
                     enableMic();
-                    updateStatus('Memantau (Tekan Spasi untuk bicara)', '#21B9BE');
+                    updateStatus('Memantau (Tombol bawah / Panah bawah untuk bicara)', '#21B9BE');
                 });
             } else {
                 // Ambil ulang data kondisi terkini
@@ -1523,7 +1550,7 @@
                     addMessage('assistant', data.briefing);
                     speak(data.briefing, () => {
                         enableMic();
-                        updateStatus('Memantau (Tekan Spasi untuk bicara)', '#21B9BE');
+                        updateStatus('Memantau (Tombol bawah / Panah bawah untuk bicara)', '#21B9BE');
                     });
                 }
             }
@@ -1531,12 +1558,12 @@
             await handleDestinationInput(text);
         } else if (intent.intent === 'help') {
             const helpMsg = prefs.language === 'en'
-                ? "You can ask me questions anytime by pressing the spacebar or speaking, such as 'How is the weather today?', 'Is traffic heavy?', or tell me a new destination like 'To Palembang'."
-                : "Kamu bisa bertanya kapan saja dengan menekan tombol Spasi atau langsung berbicara, misalnya: 'Bagaimana cuaca sekarang?', 'Apakah lalu lintas macet?', atau sebutkan tujuan perjalanan baru seperti 'Mau ke Palembang'.";
+                ? "You can ask me questions anytime by pressing the spacebar, down arrow key, or tapping the bottom button, such as 'How is the weather today?', 'Is traffic heavy?', or tell me a new destination like 'To Palembang'."
+                : "Kamu bisa bertanya kapan saja dengan menekan tombol bicara di bagian bawah layar, tombol panah bawah, atau tombol Spasi, misalnya: 'Bagaimana cuaca sekarang?', 'Apakah lalu lintas macet?', atau sebutkan tujuan perjalanan baru seperti 'Mau ke Palembang'.";
             addMessage('assistant', helpMsg);
             speak(helpMsg, () => {
                 enableMic();
-                updateStatus('Memantau (Tekan Spasi untuk bicara)', '#21B9BE');
+                updateStatus('Memantau (Tombol bawah / Panah bawah untuk bicara)', '#21B9BE');
             });
         } else {
             // Tangani sebagai percakapan santai atau tujuan perjalanan
@@ -1544,7 +1571,7 @@
                 addMessage('assistant', intent.answer);
                 speak(intent.answer, () => {
                     enableMic();
-                    updateStatus('Memantau (Tekan Spasi untuk bicara)', '#21B9BE');
+                    updateStatus('Memantau (Tombol bawah / Panah bawah untuk bicara)', '#21B9BE');
                 });
             } else {
                 await handleDestinationInput(text);
@@ -1585,21 +1612,38 @@
         }
     });
 
+    // Tombol bicara pada bilah dock mobile
+    btnMobileTalk?.addEventListener('click', () => {
+        if (isSpeaking) {
+            stopSpeaking();
+        }
+        if (isListening) {
+            stopListening();
+        } else {
+            playMicChime();
+            startListening();
+        }
+    });
+
     // Pintasan keyboard
     document.addEventListener('keydown', (event) => {
         if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') return;
         
-        if (event.code === 'Space') {
+        if (event.code === 'Space' || event.code === 'ArrowDown') {
             event.preventDefault();
             if (!btnMic.disabled) {
                 if (isListening) {
                     stopListening();
                 } else {
+                    playMicChime();
                     startListening();
                 }
             } else if (isSpeaking || isPaused) {
                 togglePlayPause();
             }
+        } else if (event.code === 'ArrowUp') {
+            event.preventDefault();
+            replayLastNarration();
         } else if (event.code === 'KeyP') {
             event.preventDefault();
             togglePlayPause();
@@ -1616,26 +1660,6 @@
             }, 1000);
         } else if (event.code === 'KeyS') {
             window.location.href = '/pengaturan';
-        }
-    });
-
-    // Ketuk layar di mana saja untuk berbicara pada mode pemantauan
-    document.addEventListener('click', (event) => {
-        // Jangan tangani klik pada elemen tombol, tautan, atau form
-        if (event.target.closest('a, button, input, textarea, select, #location-modal, [role="button"]')) {
-            return;
-        }
-
-        if (currentState === STATES.MONITORING) {
-            if (isSpeaking) {
-                stopSpeaking();
-            }
-            if (isListening) {
-                stopListening();
-            } else {
-                playMicChime();
-                startListening();
-            }
         }
     });
 
