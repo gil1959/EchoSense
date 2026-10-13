@@ -151,21 +151,31 @@ class EchoSenseService
     public function extractDestination($text)
     {
         $cleaned = trim($text);
+        $cleaned = trim($cleaned, " \t\n\r\0\x0B.,!?");
+
+        // Pola awalan percakapan umum bahasa Indonesia
         $patterns = [
-            '/^(saya|aku|kami|kita)\s+(mau|ingin|pengen|akan|rencana|hendak)?\s*(pergi\s+ke|menuju\s+ke|jalan\s+ke|berangkat\s+ke|ke|menuju|otw\s+ke|otw)\s+/iu',
-            '/^(mau|ingin|pengen|akan|rencana|hendak)\s+(pergi\s+ke|menuju\s+ke|jalan\s+ke|berangkat\s+ke|ke|menuju|otw\s+ke|otw)\s+/iu',
-            '/^(tujuan\s+saya|tujuannya|tujuan\s+aku|tujuan|tujuannya\s+ke|tujuan\s+ke)\s+/iu',
-            '/^(tolong\s+)?(cek|periksa|lihat|bagaimana\s+di|kondisi\s+di|cek\s+di)\s+(daerah\s+|kota\s+|wilayah\s+)?/iu',
-            '/^(pergi\s+ke|menuju\s+ke|jalan\s+ke|berangkat\s+ke|arah\s+ke|otw\s+ke|otw|ke)\s+/iu',
-            '/^(daerah|kota|wilayah|kabupaten)\s+/iu',
+            '/^(saya|aku|kami|kita)\s+(rencana|jadwal)?\s*(mau|ingin|pengen|akan|hendak)?\s*(pergi\s+ke|menuju\s+ke|jalan\s+ke|berangkat\s+ke|ke|menuju|otw\s+ke|otw|arah\s+ke|arah)\s+/iu',
+            '/^(rencana|jadwal)?\s*(mau|ingin|pengen|akan|hendak)?\s*(pergi\s+ke|menuju\s+ke|jalan\s+ke|berangkat\s+ke|ke|menuju|otw\s+ke|otw|arah\s+ke|arah)\s+/iu',
+            '/^(mau|ingin|pengen|akan|rencana|hendak)\s+(ke|jalan|pergi|otw|berangkat)\s+/iu',
+            '/^(tujuan\s+saya|tujuannya|tujuan\s+aku|tujuanku|tujuan\s+kami|tujuan\s+kita|tujuan|tujuannya\s+ke|tujuan\s+ke)\s+/iu',
+            '/^(tolong\s+)?(cek|periksa|lihat|bagaimana\s+di|kondisi\s+di|cek\s+di|info\s+di)\s+/iu',
+            '/^(pergi\s+ke|menuju\s+ke|jalan\s+ke|berangkat\s+ke|arah\s+ke|arah|menuju|otw\s+ke|otw|ke)\s+/iu',
             '/^(di)\s+(daerah\s+|kota\s+|wilayah\s+)?/iu',
+            '/^(mau|ingin|pengen)\s+/iu',
         ];
 
         foreach ($patterns as $pattern) {
             $cleaned = preg_replace($pattern, '', $cleaned);
         }
 
-        $cleaned = preg_replace('/\s+(dong|ya|yah|nih|sih|deh|aja|saja|dulu|tolong|kak|min)[\.!\?]?$/iu', '', trim($cleaned));
+        // Bersihkan partikel santai di akhir
+        $cleaned = preg_replace('/\s+(dong|ya|yah|nih|sih|deh|aja|saja|dulu|tolong|kak|min|bro|sis)[\.!\?]?$/iu', '', trim($cleaned));
+        
+        // Bersihkan kata awalan wilayah di awal
+        $cleaned = preg_replace('/^(ke\s+)?(kota|daerah|wilayah|kabupaten)\s+/iu', '', trim($cleaned));
+        $cleaned = preg_replace('/^ke\s+/iu', '', trim($cleaned));
+
         return trim($cleaned, " \t\n\r\0\x0B.,!?");
     }
 
@@ -175,11 +185,24 @@ class EchoSenseService
     public function geocodeLocation($query)
     {
         $cleaned = $this->extractDestination($query);
-        $searchTerms = array_unique(array_filter([$cleaned, $query]));
+        $searchTerms = [];
+        
+        if (!empty($cleaned)) {
+            $searchTerms[] = $cleaned;
+            $stripped = preg_replace('/^(kota|kabupaten|daerah|wilayah)\s+/iu', '', $cleaned);
+            if (!empty($stripped) && $stripped !== $cleaned) {
+                $searchTerms[] = $stripped;
+            }
+        }
+        $searchTerms[] = $query;
+        $searchTerms = array_unique(array_filter($searchTerms));
 
+        // 1. Coba pencarian langsung ke Nominatim dengan header User-Agent valid
         foreach ($searchTerms as $term) {
             try {
-                $response = Http::get("https://nominatim.openstreetmap.org/search", [
+                $response = Http::timeout(4)->withHeaders([
+                    'User-Agent' => 'EchoSense-App/1.0 (contact: support@echosense.local)'
+                ])->get("https://nominatim.openstreetmap.org/search", [
                     'format' => 'json',
                     'q' => $term,
                     'limit' => 1,
@@ -200,14 +223,17 @@ class EchoSenseService
             }
         }
 
-        // Ekstraksi entitas lokasi melalui Gemini jika pencarian langsung belum berhasil
+        // 2. Ekstraksi entitas lokasi melalui Gemini jika pencarian langsung belum berhasil
         $key = env('GEMINI_API_KEY');
         if ($key) {
             try {
-                $prompt = "Ambil HANYA 1 nama kota, kabupaten, atau daerah tujuan dari kalimat ini: '{$query}'. Jawab HANYA nama lokasinya saja tanpa tanda baca apapun.";
+                $prompt = "Ambil HANYA 1 nama kota, kabupaten, atau daerah tujuan dari kalimat ini: '{$query}'. Jawab HANYA nama lokasinya saja tanpa kata tambahan atau tanda baca apapun. Contoh: jika input 'mau ke kota palembang', jawab 'Palembang'.";
                 $extracted = trim($this->callGemini($prompt, $key, ''));
-                if (!empty($extracted) && $extracted !== $query) {
-                    $response = Http::get("https://nominatim.openstreetmap.org/search", [
+                $extracted = trim($extracted, " \t\n\r\0\x0B.,!?'\"");
+                if (!empty($extracted)) {
+                    $response = Http::timeout(4)->withHeaders([
+                        'User-Agent' => 'EchoSense-App/1.0 (contact: support@echosense.local)'
+                    ])->get("https://nominatim.openstreetmap.org/search", [
                         'format' => 'json',
                         'q' => $extracted,
                         'limit' => 1,
@@ -223,7 +249,9 @@ class EchoSenseService
                         ];
                     }
                 }
-            } catch (\Exception $e) {}
+            } catch (\Exception $e) {
+                Log::error('Geocode Gemini Error: ' . $e->getMessage());
+            }
         }
 
         return ['status' => 'error', 'message' => 'Lokasi tidak ditemukan'];
@@ -264,9 +292,9 @@ class EchoSenseService
         }
 
         if ($langKey === 'en') {
-            $prompt = "You are EchoSense, a warm and friendly voice assistant for the visually impaired. Generate a SHORT, calming alert narration (2-3 sentences max) in English. Be direct, sweet, and caring. Include actionable advice. Use words like degrees Celsius instead of symbols.\n\nAlert: {$alertDesc}\n\nStart directly with 'Attention.' or 'Warning.' — no greetings.";
+            $prompt = "You are EchoSense, a friendly, respectful, and helpful voice assistant for the visually impaired. Generate a SHORT, calming alert narration (2-3 sentences max) in English. Be clear, calm, and supportive. Include actionable advice. Do not use terms of endearment like 'darling', 'honey', or 'sweetheart'. Use words like degrees Celsius instead of symbols.\n\nAlert: {$alertDesc}\n\nStart directly with 'Attention.' or 'Warning.' — no greetings.";
         } else {
-            $prompt = "Kamu adalah EchoSense, sahabat suara tunanetra yang sangat ramah, hangat, dan peduli. Buat narasi peringatan SINGKAT yang menenangkan dan manis (2-3 kalimat maksimal) dalam Bahasa Indonesia. Langsung ke inti dan berikan saran tindakan yang penuh perhatian. Tulis suhu dengan kata 'derajat Celcius', jangan gunakan simbol (°C) atau markdown (**).\n\nPeringatan: {$alertDesc}\n\nMulai langsung dengan 'Perhatian.' atau 'Peringatan.' — tanpa sapaan.";
+            $prompt = "Kamu adalah EchoSense, asisten suara inklusif untuk tunanetra yang ramah, sopan, dan peduli. Buat narasi peringatan SINGKAT yang menenangkan dan jelas (2-3 kalimat maksimal) dalam Bahasa Indonesia. Langsung ke inti dan berikan saran tindakan yang bermanfaat. Tulis suhu dengan kata 'derajat Celcius', jangan gunakan simbol (°C) atau markdown (**). DILARANG KERAS menggunakan kata 'sayang', 'sayangku', atau panggilan berlebihan lainnya.\n\nPeringatan: {$alertDesc}\n\nMulai langsung dengan 'Perhatian.' atau 'Peringatan.' — tanpa sapaan.";
         }
 
         $result = $this->callGemini($prompt, $key, $alertDesc);
@@ -284,21 +312,22 @@ class EchoSenseService
         $weather = $destData['raw_data']['weather'];
 
         if (str_starts_with($lang, 'en')) {
-            $prompt = "You are EchoSense, an inclusive voice assistant for the visually impaired. Create a natural, sweet and conversational briefing (2-3 short sentences) in English about conditions at {$destName}.\n\nDestination: {$destName}\n- Air Quality: PM2.5 is {$aqi['pm25']} ({$aqi['category']})\n- Weather: {$weather['condition']}, {$weather['temperature']} degrees Celsius\n- Traffic: {$traffic['congestion']}, speed {$traffic['currentSpeed']} kilometers per hour\n\nInclude sweet, practical travel advice (e.g. bring an umbrella or enjoy the ride). Write temperatures with 'degrees Celsius' and speeds with 'kilometers per hour'. Do not use degree symbols or markdown. Start directly — no greetings.";
+            $prompt = "You are EchoSense, an inclusive voice assistant for the visually impaired. Create a natural, clear and friendly briefing (2-3 short sentences) in English about conditions at {$destName}.\n\nDestination: {$destName}\n- Air Quality: PM2.5 is {$aqi['pm25']} ({$aqi['category']})\n- Weather: {$weather['condition']}, {$weather['temperature']} degrees Celsius\n- Traffic: {$traffic['congestion']}, speed {$traffic['currentSpeed']} kilometers per hour\n\nInclude practical travel advice (e.g. bring an umbrella, wear a mask if air is bad, or enjoy the ride). Do not use terms of endearment. Write temperatures with 'degrees Celsius' and speeds with 'kilometers per hour'. Do not use degree symbols or markdown. Start directly — no greetings.";
             $fallback = "At {$destName}, the weather is currently {$weather['condition']} with a temperature of {$weather['temperature']} degrees Celsius. Air quality is {$aqi['category']} and traffic is {$traffic['congestion']}. Have a wonderful trip and enjoy your day!";
         } else {
-            $prompt = "Kamu adalah EchoSense, sahabat suara tunanetra yang sangat ramah, hangat, dan manis.
-Buat briefing perjalanan singkat (2-3 kalimat manis dan peduli) untuk tujuan {$destName} dengan sapaan 'kamu'.
+            $prompt = "Kamu adalah EchoSense, asisten suara inklusif untuk tunanetra yang ramah, sopan, dan peduli.
+Buat ringkasan kondisi perjalanan singkat (2-3 kalimat yang bersahabat dan santai) untuk tujuan {$destName}.
 Kondisi di {$destName}:
 - Kualitas Udara: PM2.5 di angka {$aqi['pm25']} ({$aqi['category']}).
 - Cuaca: {$weather['condition']} dengan suhu {$weather['temperature']} derajat Celcius.
 - Lalu Lintas: {$traffic['congestion']}, kecepatan sekitar {$traffic['currentSpeed']} kilometer per jam.
 
 Aturan penting:
-1. Berikan perhatian manis dan saran praktis (misal: membawa payung jika hujan, menikmati jalan jika lancar, atau tetap santai jika padat).
+1. Berikan perhatian dan saran praktis (misal: ingatkan dengan sopan untuk memakai masker jika kualitas udara tidak sehat atau buruk, membawa payung jika hujan, atau menikmati jalan jika lancar).
 2. Tulis suhu dengan kata 'derajat Celcius', dan kecepatan dengan 'kilometer per jam'. Jangan gunakan simbol derajat (°C) atau markdown bintang (**).
-3. Mulai langsung tanpa sapaan halo.";
-            $fallback = "Di {$destName} saat ini cuaca {$weather['condition']} dengan suhu {$weather['temperature']} derajat Celcius. Kualitas udara {$aqi['category']} dan lalu lintas {$traffic['congestion']}. " . ($weather['condition'] === 'Hujan Ringan' || $weather['condition'] === 'Hujan Deras' ? "Jangan lupa siapkan payung ya agar perjalananmu tetap nyaman." : "Semoga perjalananmu menyenangkan dan kamu bisa santai ya!");
+3. DILARANG KERAS menggunakan kata panggilan sayang seperti 'sayang', 'sayangku', 'cintaku', 'manisku', atau sejenisnya. Bicaralah wajar dan bersahabat dengan sapaan 'kamu'.
+4. Mulai langsung tanpa sapaan halo.";
+            $fallback = "Di {$destName} saat ini cuaca {$weather['condition']} dengan suhu {$weather['temperature']} derajat Celcius. Kualitas udara {$aqi['category']} dan lalu lintas {$traffic['congestion']}. " . ($weather['condition'] === 'Hujan Ringan' || $weather['condition'] === 'Hujan Deras' ? "Jangan lupa siapkan payung ya agar perjalananmu tetap nyaman." : ($aqi['category'] === 'Tidak Sehat' || $aqi['category'] === 'Sangat Tidak Sehat' ? "Jangan lupa pakai masker ya karena kualitas udara sedang kurang baik." : "Semoga perjalananmu menyenangkan dan kamu bisa santai ya!"));
         }
 
         $result = $this->callGemini($prompt, $key, $fallback);
@@ -364,38 +393,91 @@ Aturan penting:
 
     private function fetchOpenAQ($lat, $lon)
     {
-        $key = env('OPENAQ_API_KEY');
+        // Mengambil data kualitas udara real-time dari Open-Meteo Air Quality
         try {
-            $response = Http::withHeaders([
-                'X-API-Key' => $key
-            ])->get("https://api.openaq.org/v2/latest", [
-                'coordinates' => "{$lat},{$lon}",
-                'radius' => 10000,
-                'limit' => 1
+            $response = Http::timeout(5)->get("https://air-quality-api.open-meteo.com/v1/air-quality", [
+                'latitude' => $lat,
+                'longitude' => $lon,
+                'current' => 'pm2_5,us_aqi'
             ]);
 
-            if ($response->successful() && !empty($response->json('results'))) {
-                $measurements = $response->json('results')[0]['measurements'];
-                $pm25 = collect($measurements)->firstWhere('parameter', 'pm25')['value'] ?? 20;
-                return [
-                    'status' => 'success',
-                    'pm25' => $pm25,
-                    'category' => $pm25 > 50 ? 'Buruk' : ($pm25 > 25 ? 'Sedang' : 'Baik')
-                ];
+            if ($response->successful()) {
+                $current = $response->json('current');
+                $pm25 = isset($current['pm2_5']) ? round((float)$current['pm2_5'], 1) : null;
+                $usAqi = isset($current['us_aqi']) ? (int)$current['us_aqi'] : null;
+
+                if ($pm25 !== null) {
+                    // Penentuan kategori kualitas udara berdasarkan standar ISPU dan US AQI
+                    $category = 'Baik';
+                    if ($pm25 > 150.4 || ($usAqi && $usAqi > 200)) {
+                        $category = 'Sangat Tidak Sehat';
+                    } elseif ($pm25 > 55.4 || ($usAqi && $usAqi > 100)) {
+                        $category = 'Tidak Sehat';
+                    } elseif ($pm25 > 15.5 || ($usAqi && $usAqi > 50)) {
+                        $category = 'Sedang';
+                    }
+
+                    return [
+                        'status' => 'success',
+                        'pm25' => $pm25,
+                        'aqi' => $usAqi,
+                        'category' => $category,
+                        'source' => 'Open-Meteo'
+                    ];
+                }
             }
         } catch (\Exception $e) {
-            Log::error('OpenAQ Error: ' . $e->getMessage());
+            Log::error('Air Quality Error (Open-Meteo): ' . $e->getMessage());
+        }
+
+        // Coba layanan OpenAQ v3 jika tersedia API key
+        $key = env('OPENAQ_API_KEY');
+        if ($key) {
+            try {
+                $resV3 = Http::timeout(5)->withHeaders([
+                    'X-API-Key' => $key
+                ])->get("https://api.openaq.org/v3/locations", [
+                    'coordinates' => "{$lat},{$lon}",
+                    'radius' => 25000,
+                    'limit' => 1
+                ]);
+
+                if ($resV3->successful() && !empty($resV3->json('results'))) {
+                    $locId = $resV3->json('results')[0]['id'];
+                    $resLatest = Http::timeout(5)->withHeaders([
+                        'X-API-Key' => $key
+                    ])->get("https://api.openaq.org/v3/locations/{$locId}/latest");
+
+                    if ($resLatest->successful() && !empty($resLatest->json('results'))) {
+                        foreach ($resLatest->json('results') as $item) {
+                            if (isset($item['value']) && $item['value'] > 0) {
+                                $pm25 = round((float)$item['value'], 1);
+                                $category = $pm25 > 150.4 ? 'Sangat Tidak Sehat' : ($pm25 > 55.4 ? 'Tidak Sehat' : ($pm25 > 15.5 ? 'Sedang' : 'Baik'));
+                                return [
+                                    'status' => 'success',
+                                    'pm25' => $pm25,
+                                    'category' => $category,
+                                    'source' => 'OpenAQ'
+                                ];
+                            }
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                Log::error('Air Quality Error (OpenAQ): ' . $e->getMessage());
+            }
         }
 
         // Data cadangan jika layanan tidak dapat dihubungi
-        return ['status' => 'fallback', 'pm25' => 15, 'category' => 'Baik'];
+        return ['status' => 'fallback', 'pm25' => 15, 'category' => 'Baik', 'source' => 'fallback'];
     }
 
     private function fetchTomTom($lat, $lon)
     {
         $key = env('TOMTOM_API_KEY');
         try {
-            $response = Http::get("https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/10/json", [
+            // Mengambil data arus lalu lintas dari TomTom dengan batas waktu cepat
+            $response = Http::timeout(3)->get("https://api.tomtom.com/traffic/services/4/flowSegmentData/absolute/10/json", [
                 'point' => "{$lat},{$lon}",
                 'key' => $key
             ]);
@@ -427,7 +509,7 @@ Aturan penting:
     {
         try {
             // Mengambil prakiraan cuaca dari Open-Meteo
-            $response = Http::get("https://api.open-meteo.com/v1/forecast", [
+            $response = Http::timeout(4)->get("https://api.open-meteo.com/v1/forecast", [
                 'latitude' => $lat,
                 'longitude' => $lon,
                 'current_weather' => true,
@@ -501,23 +583,24 @@ Rules:
 - Start directly — no greetings.";
             $fallback = "Weather around you is {$weatherEn} at {$weather['temperature']} degrees Celsius. Traffic is {$trafficEn}, and air quality is {$aqiEn}. Have a relaxing day!";
         } else {
-            $prompt = "Kamu adalah EchoSense, sahabat suara tunanetra yang sangat ramah, hangat, manis, dan peduli.
-Buat ringkasan kondisi lingkungan singkat (2-3 kalimat santai dan manis) menggunakan sapaan 'kamu'.
+            $prompt = "Kamu adalah EchoSense, asisten suara inklusif untuk tunanetra yang ramah, sopan, dan peduli.
+Buat ringkasan kondisi lingkungan singkat (2-3 kalimat santai dan informatif) menggunakan sapaan 'kamu'.
 Kondisi saat ini:
 - Kualitas Udara: PM2.5 adalah {$aqi['pm25']} ({$aqi['category']}).
 - Lalu Lintas: {$traffic['congestion']}.
 - Cuaca: {$weather['condition']} dengan suhu {$weather['temperature']} derajat Celcius.
 
 Aturan penting:
-1. Berikan perhatian manis dan saran praktis sesuai kondisi:
-   - Jika hujan atau mendung: ingatkan dengan manis untuk membawa payung atau pakaian hangat agar tidak kedinginan.
-   - Jika cerah atau panas: ingatkan untuk minum air yang cukup dan kamu bisa santai menikmati hari.
-   - Jika udara segar/baik: beri tahu bahwa udaranya sejuk dan sangat nyaman untuk santai beraktivitas.
-   - Jika udara buruk/berdebu: ingatkan dengan lembut untuk mengenakan masker.
-   - Jika lalu lintas lancar: sampaikan perjalananmu akan nyaman dan santai.
-   - Jika macet: beri semangat agar tetap tenang dan sabar di perjalanan.
-2. Gunakan gaya bahasa tutur lisan yang mengalir manis, bersahabat, dan menenangkan.
-3. Jangan gunakan tanda kurung, simbol derajat (°C), atau markdown bintang (**). Tulis suhu dengan 'derajat Celcius'. Mulai langsung tanpa sapaan halo.";
+1. Berikan perhatian dan saran praktis sesuai kondisi:
+   - Jika hujan atau mendung: ingatkan untuk membawa payung atau pakaian hangat agar tidak kedinginan.
+   - Jika cerah atau panas: ingatkan untuk minum air yang cukup dan santai beraktivitas.
+   - Jika udara segar/baik: beri tahu bahwa udaranya sejuk dan sangat nyaman untuk beraktivitas.
+   - Jika udara buruk/tidak sehat/berdebu: ingatkan dengan sopan untuk mengenakan masker.
+   - Jika lalu lintas lancar: sampaikan perjalanan akan nyaman dan lancar.
+   - Jika macet: beri dorongan semangat agar tetap tenang di perjalanan.
+2. Gunakan gaya bahasa tutur lisan yang mengalir, bersahabat, sopan, dan menenangkan.
+3. DILARANG KERAS menggunakan kata panggilan sayang seperti 'sayang', 'sayangku', 'cintaku', 'manisku', atau sejenisnya.
+4. Jangan gunakan tanda kurung, simbol derajat (°C), atau markdown bintang (**). Tulis suhu dengan 'derajat Celcius'. Mulai langsung tanpa sapaan halo.";
 
             $fallback = "Cuaca di sekitarmu saat ini {$weather['condition']} dengan suhu {$weather['temperature']} derajat Celcius. Kualitas udara {$aqi['category']} dan jalanan {$traffic['congestion']}. " . ($weather['condition'] === 'Hujan Ringan' || $weather['condition'] === 'Hujan Deras' ? "Jangan lupa siapkan payung ya agar tetap nyaman." : "Kamu bisa santai beraktivitas hari ini.");
         }
@@ -538,8 +621,8 @@ Aturan penting:
         $traffic = $raw['traffic'] ?? ['congestion' => 'Lancar', 'currentSpeed' => 35];
 
         if (str_starts_with($lang, 'en')) {
-            $prompt = "You are EchoSense, a warm and sweet voice assistant for the visually impaired.
-Answer the user's question directly, sweetly, and concisely (1-3 sentences).
+            $prompt = "You are EchoSense, a friendly, respectful, and helpful voice assistant for the visually impaired.
+Answer the user's question directly, clearly, and concisely (1-3 sentences). Do not use terms of endearment.
 User question: '{$query}'
 
 Current environment data:
@@ -548,13 +631,13 @@ Current environment data:
 - Traffic: {$traffic['congestion']}, speed {$traffic['currentSpeed']} kilometers per hour.
 
 Rules:
-- Give sweet, caring advice.
+- Give practical, supportive advice.
 - Write temperatures with 'degrees Celsius' without degree symbols or markdown (**).
-- Speak naturally and warmly like a close friend.";
+- Speak naturally and politely like a reliable assistant.";
             $fallback = "Currently the weather is {$weather['condition']} with a temperature of {$weather['temperature']} degrees Celsius. Air quality is {$aqi['category']} and traffic is {$traffic['congestion']}. Stay safe and comfortable!";
         } else {
-            $prompt = "Kamu adalah EchoSense, sahabat suara untuk tunanetra yang sangat ramah, hangat, manis, dan peduli.
-Jawab pertanyaan pengguna secara ringkas, manis, dan jelas (1-3 kalimat). Gunakan sapaan 'kamu'.
+            $prompt = "Kamu adalah EchoSense, asisten suara inklusif untuk tunanetra yang ramah, sopan, dan peduli.
+Jawab pertanyaan pengguna secara ringkas, sopan, dan jelas (1-3 kalimat). Gunakan sapaan 'kamu'.
 Pertanyaan pengguna: '{$query}'
 
 Data lingkungan saat ini di lokasi pengguna:
@@ -563,9 +646,9 @@ Data lingkungan saat ini di lokasi pengguna:
 - Lalu Lintas: {$traffic['congestion']}, kecepatan {$traffic['currentSpeed']} kilometer per jam.
 
 Aturan penting:
-- Berikan saran praktis dan perhatian manis (misal: bawa payung jika tanya cuaca dan hujan, atau jalanan lancar untuk santai bepergian).
+- Berikan saran praktis dan perhatian yang bermanfaat (misal: bawa payung jika tanya cuaca dan hujan, atau masker jika kualitas udara tidak sehat).
 - Tulis suhu dengan kata 'derajat Celcius', kecepatan dengan 'kilometer per jam'. Jangan gunakan simbol (°C) atau markdown (**).
-- Jangan awali dengan sapaan kaku, bicaralah langsung seperti teman baik yang ramah.";
+- DILARANG KERAS menggunakan kata panggilan sayang seperti 'sayang', 'sayangku', 'cintaku', atau sejenisnya. Bicaralah wajar, ramah, dan sopan.";
 
             $fallback = "Saat ini cuaca {$weather['condition']} dengan suhu {$weather['temperature']} derajat Celcius. Kualitas udara {$aqi['category']} dan jalanan {$traffic['congestion']}. " . ($weather['condition'] === 'Hujan Ringan' || $weather['condition'] === 'Hujan Deras' ? "Jangan lupa pakai payung ya." : "Kamu bisa santai beraktivitas hari ini.");
         }
@@ -575,31 +658,33 @@ Aturan penting:
     }
 
     /**
-     * Memanggil API Gemini untuk menghasilkan teks respons
+     * Memanggil API Gemini untuk menghasilkan teks respons dengan model 3.5-flash
      */
     private function callGemini($prompt, $key, $fallback)
     {
-        try {
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json'
-            ])->post("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={$key}", [
-                'contents' => [
-                    ['parts' => [['text' => $prompt]]]
-                ]
-            ]);
+        $models = ['gemini-3.5-flash', 'gemini-2.5-flash'];
 
-            if ($response->successful()) {
-                $candidates = $response->json('candidates');
-                if (!empty($candidates)) {
-                    return $candidates[0]['content']['parts'][0]['text'] ?? $fallback;
+        foreach ($models as $model) {
+            try {
+                $response = Http::timeout(8)->withHeaders([
+                    'Content-Type' => 'application/json'
+                ])->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$key}", [
+                    'contents' => [
+                        ['parts' => [['text' => $prompt]]]
+                    ]
+                ]);
+
+                if ($response->successful()) {
+                    $candidates = $response->json('candidates');
+                    if (!empty($candidates)) {
+                        return $candidates[0]['content']['parts'][0]['text'] ?? $fallback;
+                    }
                 } else {
-                    Log::error('Gemini API success but no candidates: ' . $response->body());
+                    Log::error("Gemini API Error ({$model}): " . $response->body());
                 }
-            } else {
-                Log::error('Gemini API Error Response: ' . $response->body());
+            } catch (\Exception $e) {
+                Log::error("Gemini Error ({$model}): " . $e->getMessage());
             }
-        } catch (\Exception $e) {
-            Log::error('Gemini Error: ' . $e->getMessage());
         }
 
         return $fallback;

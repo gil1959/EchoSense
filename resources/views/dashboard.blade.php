@@ -213,7 +213,7 @@
 <span class="text-2xl font-bold text-textPrimary" id="ui-aqi-value">AQI --</span>
 <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-sunrise-start text-deepNavy" id="ui-aqi-category">Memuat</span>
 </div>
-<p class="text-xs text-textSecondary">Data real-time <span class="font-medium text-textPrimary">OpenAQ API</span></p>
+<p class="text-xs text-textSecondary">Data real-time <span class="font-medium text-textPrimary">Open-Meteo & OpenAQ</span></p>
 </div>
 </article>
 <!-- Card 2: Cuaca -->
@@ -852,15 +852,17 @@
     function updateTelemetryCards(data) {
         if (!data || !data.raw_data) return;
         
-        document.getElementById('ui-aqi-value').textContent = `AQI ${Math.round(data.raw_data.aqi.pm25)}`;
+        const aqiVal = data.raw_data.aqi.aqi ? data.raw_data.aqi.aqi : Math.round(data.raw_data.aqi.pm25);
+        document.getElementById('ui-aqi-value').textContent = `AQI ${aqiVal}`;
         document.getElementById('ui-aqi-category').textContent = data.raw_data.aqi.category;
         
         const aqiTag = document.getElementById('ui-aqi-category');
-        if (data.raw_data.aqi.pm25 > 150) {
+        const pm25Val = data.raw_data.aqi.pm25;
+        if (pm25Val > 150 || aqiVal > 200) {
             aqiTag.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-600 text-white";
-        } else if (data.raw_data.aqi.pm25 > 50) {
+        } else if (pm25Val > 50 || aqiVal > 100) {
             aqiTag.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-red-300 text-red-900";
-        } else if (data.raw_data.aqi.pm25 > 25) {
+        } else if (pm25Val > 25 || aqiVal > 50) {
             aqiTag.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-yellow-300 text-yellow-900";
         } else {
             aqiTag.className = "text-xs font-bold px-2.5 py-0.5 rounded-full bg-sunrise-start text-deepNavy";
@@ -1255,13 +1257,21 @@
                     if (!isListening && !isSpeaking) startListening();
                 }, 350);
             });
+        } else if (intent.intent === 'set_destination') {
+            // Pengguna langsung menyebutkan lokasi tujuan perjalanan
+            await handleDestinationInput(text);
+            return;
         } else {
-            // Pengguna langsung menyebutkan nama lokasi
+            // Pengguna langsung menyebutkan nama lokasi saat ini
             addTypingIndicator();
-            updateStatus('Mencari lokasi...', '#14C5D9');
+            let cleanLocName = text.replace(/^(saya|aku|di|lokasi\s+saya|posisi\s+saya)?\s*(di|ada\s+di)?\s*(kota|daerah|wilayah)?\s*/i, '').trim();
+            cleanLocName = cleanLocName.replace(/\s+(dong|ya|yah|nih|sih|deh|aja|saja|dulu)[\.!\?]?$/i, '').trim();
+            const searchQ = cleanLocName || text;
+
+            updateStatus(`Mencari lokasi ${searchQ}...`, '#14C5D9');
             
             try {
-                const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(text)}&limit=1`);
+                const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQ)}&limit=1`);
                 const geoData = await geoRes.json();
                 removeTypingIndicator();
                 
@@ -1362,6 +1372,9 @@
         let destName = text;
         if (intent.intent === 'set_destination' && intent.destination) {
             destName = intent.destination;
+        } else {
+            destName = destName.replace(/^(saya|aku|kami|kita)?\s*(rencana|jadwal)?\s*(mau|ingin|pengen|akan|hendak)?\s*(pergi\s+ke|menuju\s+ke|jalan\s+ke|ke|menuju|otw\s+ke|otw|arah\s+ke|arah)?\s*(kota|daerah|wilayah|kabupaten)?\s*/i, '').trim();
+            destName = destName.replace(/\s+(dong|ya|yah|nih|sih|deh|aja|saja|dulu|tolong|kak|min)[\.!\?]?$/i, '').trim();
         }
         
         currentState = STATES.FETCH_DESTINATION;
@@ -1450,7 +1463,11 @@
         if (alerts.alert_aqi) {
             const oldAQI = oldData.raw_data?.aqi?.pm25 || 0;
             const newAQI = newData.raw_data?.aqi?.pm25 || 0;
-            if (newAQI > 150 && oldAQI <= 150) {
+            const oldCat = oldData.raw_data?.aqi?.category || 'Baik';
+            const newCat = newData.raw_data?.aqi?.category || 'Baik';
+            const isDanger = ['Tidak Sehat', 'Sangat Tidak Sehat', 'Buruk', 'Berbahaya'].includes(newCat);
+            const wasDanger = ['Tidak Sehat', 'Sangat Tidak Sehat', 'Buruk', 'Berbahaya'].includes(oldCat);
+            if ((newAQI > 55 && oldAQI <= 55) || (isDanger && !wasDanger)) {
                 triggerAlert('aqi', {
                     value: newAQI,
                     category: newData.raw_data.aqi.category

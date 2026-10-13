@@ -42,12 +42,14 @@ class DashboardController extends Controller
 
         // Ekstraksi dan geocoding nama lokasi tujuan
         $cleanedDest = $this->echoSense->extractDestination($destination);
-        $geocoded = $this->echoSense->geocodeLocation($destination);
+        $searchTarget = !empty($cleanedDest) ? $cleanedDest : $destination;
+        $geocoded = $this->echoSense->geocodeLocation($searchTarget);
 
         if ($geocoded['status'] !== 'success') {
+            $displayFailed = !empty($cleanedDest) ? $cleanedDest : $destination;
             return response()->json([
                 'error' => 'Lokasi tidak ditemukan',
-                'fallback_message' => "Maaf, aku belum dapat menemukan informasi untuk lokasi {$cleanedDest}. Kamu bisa coba sebutkan nama kota atau daerah tujuan lainnya ya."
+                'fallback_message' => "Maaf, aku belum dapat menemukan informasi untuk lokasi {$displayFailed}. Kamu bisa coba sebutkan nama kota atau daerah tujuan lainnya ya."
             ], 404);
         }
 
